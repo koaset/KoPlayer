@@ -100,5 +100,20 @@ namespace KoPlayer
             }
             return loadedSettings;
         }
+
+        public static Settings Copy (Settings settings)
+        {
+            Settings ret = new Settings();
+            ret.FontName = settings.FontName;
+            ret.FontSize = settings.FontSize;
+            ret.FormHeight = settings.FormHeight;
+            ret.FormWidth = settings.FormWidth;
+            ret.Partymix_NumNext = settings.Partymix_NumNext;
+            ret.Partymix_NumPrevious = settings.Partymix_NumPrevious;
+            ret.Partymix_SourcePlayListName = settings.Partymix_SourcePlayListName;
+            ret.rowHeight = settings.rowHeight;
+            ret.StartupPlayList = settings.StartupPlayList;
+            return ret;
+        }
     }
 }

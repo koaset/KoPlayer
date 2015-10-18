@@ -27,6 +27,8 @@ namespace KoPlayer
         private const string COLUMNSETTINGSPATH = @"Settings\column_settings.xml";
         private const string DEFAULTCOLUMNSETTINGSPATH = @"Settings\default_column_settings.xml";
 
+        public Settings Settings { get { return settings; } set { settings = value; } }
+
         private Library library;
         private IPlayList showingPlayList;
         private IPlayList playingPlayList;
@@ -68,15 +70,23 @@ namespace KoPlayer
 
         private void preferencesToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            PreferencesWindow preferencesWindow = new PreferencesWindow();
+            PreferencesWindow preferencesWindow = new PreferencesWindow(this);
+            preferencesWindow.FormClosed += preferencesWindow_FormClosed;
+        }
+
+        void preferencesWindow_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            this.settings.Save(SETTINGSPATH);
         }
 
         private void MainForm_Load(object sender, EventArgs e)
         {
-            ResetSearchBarTimer();
+
+            this.trayIcon.Icon = ((System.Drawing.Icon)(this.Icon));
             this.Width = settings.FormWidth;
             this.Height = settings.FormHeight;
 
+            ResetSearchBarTimer();
             LoadPlayLists();
 
             showingPlayList = GetPlayList(settings.StartupPlayList);
@@ -324,7 +334,7 @@ namespace KoPlayer
             }
             else
                 musicPlayer.Volume = volumeTrackBar.Value;
-            UpdateSearchBar();
+            UpdateSearchBar(musicPlayer.Length, musicPlayer.Position);
             searchBarTimer.Start();
         }
 
@@ -366,12 +376,16 @@ namespace KoPlayer
             settings.FormHeight = this.Height;
             settings.StartupPlayList = showingPlayList.Name;
             settings.Save(SETTINGSPATH);
+
             columnSettings = new ColumnSettings(songGridView.Columns);
             columnSettings.Save(COLUMNSETTINGSPATH);
+
             foreach (IPlayList pl in playLists)
                 pl.Save();
+
             searchBarTimer.Stop();
             musicPlayer.Dispose();
+            trayIcon.Dispose();
         }
 
         private void songGridView_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
@@ -513,16 +527,19 @@ namespace KoPlayer
 
         private void searchBarTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
-            UpdateSearchBar();
-            UpdateCurrentTimeLabel();
-            if (searchBarTimer.Enabled && musicPlayer.PlaybackState == PlaybackState.Stopped)
+            TimeSpan length = musicPlayer.Length;
+            TimeSpan position = musicPlayer.Position;
+
+            UpdateSearchBar(length, position);
+            UpdateCurrentTimeLabel(length, position);
+
+            if ((searchBarTimer.Enabled && musicPlayer.PlaybackState == PlaybackState.Stopped)
+                || searchBarTimer.Enabled && position > length)
                 PlayNextSong();
         }
 
-        private void UpdateSearchBar()
+        private void UpdateSearchBar(TimeSpan length, TimeSpan position)
         {
-            TimeSpan length = musicPlayer.Length;
-            TimeSpan position = musicPlayer.Position;
             if (position > length)
                 length = position;
 
@@ -533,20 +550,30 @@ namespace KoPlayer
             }
         }
 
-        private void UpdateCurrentTimeLabel()
+        private void UpdateCurrentTimeLabel(TimeSpan length, TimeSpan position)
         {
+            if (position > length)
+                position = length;
+
             if (currentTime_Label.InvokeRequired)
-                currentTime_Label.Invoke(new MethodInvoker(delegate { currentTime_Label.Text = Song.DurationFromTimeSpanToString(musicPlayer.Position); }));
+                currentTime_Label.Invoke(new MethodInvoker(
+                    delegate 
+                    {
+                        currentTime_Label.Text = Song.DurationFromTimeSpanToString(musicPlayer.Position);
+                    }));
             else
-                currentTime_Label.Text = currentlyPlaying.Length.ToString();
+                currentTime_Label.Text = Song.DurationFromTimeSpanToString(musicPlayer.Position);
         }
 
         private void UpdateSongLengthLabel()
         {
             if (songInfoLabel.InvokeRequired)
-                songInfoLabel.Invoke(new MethodInvoker(delegate { songLength_Label.Text = currentlyPlaying.Length.ToString(); }));
+                songInfoLabel.Invoke(new MethodInvoker(delegate
+                    {
+                        songLength_Label.Text = Song.DurationFromTimeSpanToString(musicPlayer.Length);
+                    }));
             else
-                songLength_Label.Text = currentlyPlaying.Length.ToString();
+                songLength_Label.Text = Song.DurationFromTimeSpanToString(musicPlayer.Length);
         }
 
         private void SetSearchBarValue(int value)
@@ -775,6 +802,28 @@ namespace KoPlayer
                             songGridView.DataSource = pl.GetAll();
                     }
                 }
+            }
+        }
+
+        private void notifyIcon1_DoubleClick(object sender, EventArgs e)
+        {
+            this.Show();
+            this.WindowState = FormWindowState.Normal;
+            //Updates stops flickering when window de-minimizes
+            this.nextButton.Update();
+            this.playpauseButton.Update();
+            this.previousButton.Update();
+            this.songInfoLabel.Update();
+            this.playListGridView.Update();
+        }
+
+        private void MainForm_Resize(object sender, EventArgs e)
+        {
+            if (this.WindowState == FormWindowState.Minimized)
+            {
+                trayIcon.Visible = true;
+                //trayIcon.ShowBalloonTip(500);
+                this.Hide();
             }
         }
     }

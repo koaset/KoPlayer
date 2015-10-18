@@ -57,6 +57,7 @@
             this.songLength_Label = new System.Windows.Forms.Label();
             this.songGridView = new KoPlayer.Forms.DataGridViewPlus();
             this.playListBindingSource = new System.Windows.Forms.BindingSource(this.components);
+            this.trayIcon = new System.Windows.Forms.NotifyIcon(this.components);
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.volumeTrackBar)).BeginInit();
@@ -339,6 +340,12 @@
             // 
             this.playListBindingSource.DataSource = typeof(KoPlayer.PlayLists.PlayList);
             // 
+            // notifyIcon1
+            // 
+            this.trayIcon.Text = "KoPlayer";
+            this.trayIcon.Visible = true;
+            this.trayIcon.DoubleClick += new System.EventHandler(this.notifyIcon1_DoubleClick);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -364,6 +371,7 @@
             this.Text = "KoPlayer";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
             this.Load += new System.EventHandler(this.MainForm_Load);
+            this.Resize += new System.EventHandler(this.MainForm_Resize);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
@@ -407,5 +415,6 @@
         private Forms.DataGridViewPlus songGridView;
         private System.Windows.Forms.Label currentTime_Label;
         private System.Windows.Forms.Label songLength_Label;
+        private System.Windows.Forms.NotifyIcon trayIcon;
     }
 }
