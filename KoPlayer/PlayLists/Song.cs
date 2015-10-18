@@ -76,43 +76,6 @@ namespace KoPlayer.PlayLists
             }
         }
 
-        /*public DataGridViewRow GetGridViewItem(DataGridView gridView)
-        {
-            DataGridViewRow ret = (DataGridViewRow)gridView.Rows[0].Clone();
-
-            ret.Tag = Path;
-
-            foreach (DataGridViewColumn column in gridView.Columns)
-            {
-                //DataGridViewCell cell = new DataGridViewCell();
-                switch (column.HeaderText)
-                {
-                    case "Title":
-                        ret.Cells[0].Value = Title;
-                        break;
-                    case "Length":
-                        ret.Cells[1].Value = Length;
-                        break;
-                    case "Artist":
-                        ret.Cells[2].Value = Artist;
-                        break;
-                    case "Album":
-                        ret.Cells[3].Value = Album;
-                        break;
-                    case "#":
-                        if (TrackNumber == 0)
-                            ret.Cells[4].Value = "";
-                        else
-                            ret.Cells[4].Value = TrackNumber.ToString();
-                        break;
-                    case "Genre":
-                        ret.Cells[5].Value = Genre;
-                        break;
-                }
-            }
-            return ret;
-        }*/
-
         private static string DurationFromTimeSpanToString(TimeSpan duration)
         {
             string ret = "";
