@@ -45,7 +45,6 @@ namespace KoPlayer
 
         public MainForm()
         {
-
             library = Library.Load();
             if (library == null)
             {
@@ -75,11 +74,19 @@ namespace KoPlayer
         private void MainForm_Load(object sender, EventArgs e)
         {
             ResetSearchBarTimer();
-            this.Width = settings.formWidth;
-            this.Height = settings.formHeight;
+            this.Width = settings.FormWidth;
+            this.Height = settings.FormHeight;
 
-            showingPlayList = library; //make this be read value saved from last time else library
+            LoadPlayLists();
+
+            showingPlayList = GetPlayList(settings.StartupPlayList);
+            if (showingPlayList == null)
+                showingPlayList = library;
             playingPlayList = showingPlayList;
+
+            songGridView.RowTemplate.Height = settings.RowHeight;
+            songGridView.DefaultCellStyle.Font = new Font(settings.FontName, settings.FontSize, GraphicsUnit.Point);
+
             songGridView.DataSource = playingPlayList.GetAll();
             songGridView.AutoGenerateColumns = false;
 
@@ -90,7 +97,6 @@ namespace KoPlayer
                 columnSettings = new ColumnSettings(songGridView.Columns);
             SetColumns();
 
-            LoadPlayLists();
             SetPlayListGridView();
             PopulatePartyMix();
         }
@@ -136,27 +142,36 @@ namespace KoPlayer
             {
                 DataGridViewRow row = (DataGridViewRow)playListGridView.Rows[0].Clone();
                 row.Cells[0].Value = playList.Name;
-                row.Selected = false;
                 playListGridView.Rows.Add(row);
             }
             playListGridView.AllowUserToAddRows = false;
+
+            foreach (DataGridViewRow row in playListGridView.Rows)
+            {
+                if (row.Cells[0].Value.ToString().ToLower() == showingPlayList.Name.ToLower())
+                    row.Selected = true;
+                else
+                    row.Selected = false;
+            }
+            playListGridView.Update();
         }
+
 
         private void PopulatePartyMix()
         {
-            IPlayList source = GetPlayList(settings.partymix_SourcePlayListName);
+            IPlayList source = GetPlayList(settings.Partymix_SourcePlayListName);
             if (source == null)
             {
                 source = library;
-                settings.partymix_SourcePlayListName = library.Name;
+                settings.Partymix_SourcePlayListName = library.Name;
             }
 
             if (source.NumSongs > 0)
             {
-                while (partyMix.CurrentIndex > settings.partymix_NumPrevious)
+                while (partyMix.CurrentIndex > settings.Partymix_NumPrevious)
                     partyMix.Remove(0);
 
-                while (partyMix.NumSongs - partyMix.CurrentIndex < settings.partymix_NumNext + 1)
+                while (partyMix.NumSongs - partyMix.CurrentIndex < settings.Partymix_NumNext + 1)
                 {
                     partyMix.Add(source.GetRandom());
                 }
@@ -251,15 +266,19 @@ namespace KoPlayer
                 PopulatePartyMix();
 
             ResetSearchBarTimer();
+
             musicPlayer.Volume = 0;
             musicPlayer.Stop();
             searchBarTimer.Stop();
             TagLib.File tagFile = TagLib.File.Create(song.Path);
+
             if (tagFile.Tag.Pictures.Length > 0)
             {
                 MemoryStream ms = new MemoryStream(tagFile.Tag.Pictures[0].Data.Data);
                 pictureBox1.Image = System.Drawing.Image.FromStream(ms);
             }
+            else
+                pictureBox1.Image = null;
 
             try
             {
@@ -273,6 +292,12 @@ namespace KoPlayer
             currentlyPlaying = song;
             playingPlayList = inPlayList;
 
+            UpdateSongLengthLabel();
+            UpdateSongInfoLabel();
+        }
+
+        private void UpdateSongInfoLabel()
+        {
             if (songInfoLabel.InvokeRequired)
                 songInfoLabel.Invoke(new MethodInvoker(delegate { SetSongInfoLabelText(); }));
             else
@@ -337,8 +362,9 @@ namespace KoPlayer
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            settings.formWidth = this.Width;
-            settings.formHeight = this.Height;
+            settings.FormWidth = this.Width;
+            settings.FormHeight = this.Height;
+            settings.StartupPlayList = showingPlayList.Name;
             settings.Save(SETTINGSPATH);
             columnSettings = new ColumnSettings(songGridView.Columns);
             columnSettings.Save(COLUMNSETTINGSPATH);
@@ -488,6 +514,7 @@ namespace KoPlayer
         private void searchBarTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
             UpdateSearchBar();
+            UpdateCurrentTimeLabel();
             if (searchBarTimer.Enabled && musicPlayer.PlaybackState == PlaybackState.Stopped)
                 PlayNextSong();
         }
@@ -504,6 +531,22 @@ namespace KoPlayer
                 double perc = position.TotalMilliseconds / length.TotalMilliseconds * searchBar.Maximum;
                 SetSearchBarValue((int)perc);
             }
+        }
+
+        private void UpdateCurrentTimeLabel()
+        {
+            if (currentTime_Label.InvokeRequired)
+                currentTime_Label.Invoke(new MethodInvoker(delegate { currentTime_Label.Text = Song.DurationFromTimeSpanToString(musicPlayer.Position); }));
+            else
+                currentTime_Label.Text = currentlyPlaying.Length.ToString();
+        }
+
+        private void UpdateSongLengthLabel()
+        {
+            if (songInfoLabel.InvokeRequired)
+                songInfoLabel.Invoke(new MethodInvoker(delegate { songLength_Label.Text = currentlyPlaying.Length.ToString(); }));
+            else
+                songLength_Label.Text = currentlyPlaying.Length.ToString();
         }
 
         private void SetSearchBarValue(int value)
@@ -687,15 +730,7 @@ namespace KoPlayer
                     {
                         List<int> indexes = GetSortedRowIndexes(rows);
                         foreach (int index in indexes)
-                        {
                             pl.Remove(index);
-                        }
-                        /*for (int i = rows.Count - 1; i >= 0; i--)
-                        {
-                            Song s = (Song)rows[i].DataBoundItem;
-                            PlayList playList = pl as PlayList;
-                            playList.Insert(info.RowIndex, s);
-                        }*/
                         foreach (DataGridViewRow row in rows)
                         {
                             Song s = (Song)row.DataBoundItem;

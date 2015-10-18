@@ -1,6 +1,23 @@
 <?xml version="1.0"?>
 <PlayList xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  <songPaths />
+  <songPaths>
+    <string>D:\Musik\403\gou.mp3</string>
+    <string>D:\Musik\403\403_-_yorukumoryuu_yamikaze_.mp3</string>
+    <string>D:\Musik\403\gou.mp3</string>
+    <string>D:\Musik\403\403_-_northern_lights2.mp3</string>
+    <string>D:\Musik\403\403_-_yorukumoryuu_yamikaze_.mp3</string>
+    <string>D:\Musik\403\gou.mp3</string>
+    <string>D:\Musik\403\403_-_yorukumoryuu_yamikaze_.mp3</string>
+    <string>D:\Musik\403\403_-_northern_lights2.mp3</string>
+    <string>D:\Musik\403\bol.mp3</string>
+    <string>D:\Musik\403\403_-_northern_lights2.mp3</string>
+    <string>D:\Musik\403\403_-_northern_lights2.mp3</string>
+    <string>D:\Musik\403\ps_0.mp3</string>
+    <string>D:\Musik\403\403_-_yorukumoryuu_yamikaze_.mp3</string>
+    <string>D:\Musik\403\403_-_northern_lights2.mp3</string>
+    <string>D:\Musik\403\ps_0.mp3</string>
+    <string>D:\Musik\403\bol.mp3</string>
+  </songPaths>
   <Name>Party Mix</Name>
   <CurrentIndex>0</CurrentIndex>
 </PlayList>

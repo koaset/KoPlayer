@@ -53,6 +53,8 @@
             this.nextButton = new System.Windows.Forms.Button();
             this.searchBar = new System.Windows.Forms.TrackBar();
             this.songInfoLabel = new System.Windows.Forms.Label();
+            this.currentTime_Label = new System.Windows.Forms.Label();
+            this.songLength_Label = new System.Windows.Forms.Label();
             this.songGridView = new KoPlayer.Forms.DataGridViewPlus();
             this.playListBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.menuStrip1.SuspendLayout();
@@ -76,7 +78,7 @@
             this.helpToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(1233, 24);
+            this.menuStrip1.Size = new System.Drawing.Size(1136, 24);
             this.menuStrip1.TabIndex = 0;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -188,7 +190,7 @@
             // 
             this.statusStrip1.Location = new System.Drawing.Point(0, 624);
             this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(1233, 22);
+            this.statusStrip1.Size = new System.Drawing.Size(1136, 22);
             this.statusStrip1.TabIndex = 6;
             this.statusStrip1.Text = "statusStrip1";
             // 
@@ -283,6 +285,24 @@
             this.songInfoLabel.TabIndex = 13;
             this.songInfoLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
+            // currentTime_Label
+            // 
+            this.currentTime_Label.Location = new System.Drawing.Point(338, 58);
+            this.currentTime_Label.Name = "currentTime_Label";
+            this.currentTime_Label.Size = new System.Drawing.Size(46, 13);
+            this.currentTime_Label.TabIndex = 15;
+            this.currentTime_Label.Text = "0:00";
+            this.currentTime_Label.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
+            // 
+            // songLength_Label
+            // 
+            this.songLength_Label.Location = new System.Drawing.Point(724, 58);
+            this.songLength_Label.Name = "songLength_Label";
+            this.songLength_Label.Size = new System.Drawing.Size(46, 13);
+            this.songLength_Label.TabIndex = 16;
+            this.songLength_Label.Text = "0:00";
+            this.songLength_Label.TextAlign = System.Drawing.ContentAlignment.BottomRight;
+            // 
             // songGridView
             // 
             this.songGridView.AllowDrop = true;
@@ -306,7 +326,7 @@
             this.songGridView.ReadOnly = true;
             this.songGridView.RowHeadersVisible = false;
             this.songGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.songGridView.Size = new System.Drawing.Size(1040, 526);
+            this.songGridView.Size = new System.Drawing.Size(943, 526);
             this.songGridView.TabIndex = 14;
             this.songGridView.RowDrag += new System.Windows.Forms.ItemDragEventHandler(this.songGridView_RowDrag);
             this.songGridView.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.songGridView_CellDoubleClick);
@@ -323,7 +343,9 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1233, 646);
+            this.ClientSize = new System.Drawing.Size(1136, 646);
+            this.Controls.Add(this.songLength_Label);
+            this.Controls.Add(this.currentTime_Label);
             this.Controls.Add(this.songGridView);
             this.Controls.Add(this.songInfoLabel);
             this.Controls.Add(this.searchBar);
@@ -383,5 +405,7 @@
         private System.Windows.Forms.Label songInfoLabel;
         private System.Windows.Forms.ToolStripMenuItem newPlaylistToolStripMenuItem;
         private Forms.DataGridViewPlus songGridView;
+        private System.Windows.Forms.Label currentTime_Label;
+        private System.Windows.Forms.Label songLength_Label;
     }
 }

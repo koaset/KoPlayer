@@ -12,12 +12,41 @@ namespace KoPlayer
 {
     public class Settings
     {
-        public int formWidth = 1000;
-        public int formHeight = 600;
+        public int FormWidth = 1000;
+        public int FormHeight = 600;
 
-        public string partymix_SourcePlayListName = "Library";
-        public int partymix_NumPrevious = 5;
-        public int partymix_NumNext = 15;
+        private int rowHeight = 17;
+        public int RowHeight { get { return rowHeight; }
+            set 
+            {
+                if (rowHeight < 15)
+                    rowHeight = 15;
+                else
+                    rowHeight = value;
+            }
+        }
+
+        private string fontName = "Microsoft Sans Serif";
+        public string FontName { get { return fontName; } set { fontName = value; } }
+
+        private float fontSize = 8f;
+        public float FontSize { get { return fontSize; }
+            set
+            {
+                if (fontSize < 7f)
+                    fontSize = 7f;
+                else if (fontSize > 12f)
+                    fontSize = 12f;
+                else
+                    fontSize = value;
+            }
+        }
+
+        public string StartupPlayList = "Library";
+
+        public string Partymix_SourcePlayListName = "Library";
+        public int Partymix_NumPrevious = 5;
+        public int Partymix_NumNext = 15;
 
         public Settings()
         {

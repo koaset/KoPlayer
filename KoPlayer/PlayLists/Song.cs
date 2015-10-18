@@ -76,7 +76,7 @@ namespace KoPlayer.PlayLists
             }
         }
 
-        private static string DurationFromTimeSpanToString(TimeSpan duration)
+        public static string DurationFromTimeSpanToString(TimeSpan duration)
         {
             string ret = "";
             if (duration.Hours > 0)

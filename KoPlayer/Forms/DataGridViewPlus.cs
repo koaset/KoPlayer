@@ -44,8 +44,9 @@ namespace KoPlayer.Forms
 
         #region Constructors
 
-        public DataGridViewPlus()
+        public DataGridViewPlus() :base()
         {
+            VerticalScrollBar.VisibleChanged += VerticalScrollBar_VisibleChanged;
             InitializeComponent();
         }
 
@@ -135,6 +136,11 @@ namespace KoPlayer.Forms
         {
             if (RowDrag != null)
                 RowDrag(this, e);
+        }
+
+        void VerticalScrollBar_VisibleChanged(object sender, EventArgs e)
+        {
+            VerticalScrollBar.Visible = true;
         }
 
         #endregion
