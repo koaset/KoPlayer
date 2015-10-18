@@ -1,4 +1,4 @@
-﻿namespace KoPlayer
+﻿namespace KoPlayer.Forms
 {
     partial class MainForm
     {

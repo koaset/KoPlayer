@@ -1,4 +1,5 @@
-﻿using System;
+﻿#region Using statements
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -6,6 +7,7 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using KoPlayer.PlayLists;
@@ -15,8 +17,10 @@ using CSCore.Codecs;
 using CSCore.CoreAudioAPI;
 using CSCore.SoundOut;
 using CSCore.Streams;
+using KoPlayer;
+#endregion
 
-namespace KoPlayer
+namespace KoPlayer.Forms
 {
 
     public partial class MainForm : Form
@@ -63,11 +67,6 @@ namespace KoPlayer
             InitializeComponent();
         }
 
-        private void exitToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            Close();
-        }
-
         private void preferencesToolStripMenuItem_Click(object sender, EventArgs e)
         {
             PreferencesWindow preferencesWindow = new PreferencesWindow(this);
@@ -109,6 +108,7 @@ namespace KoPlayer
 
             SetPlayListGridView();
             PopulatePartyMix();
+            UpdateTrayIconText();
         }
 
         private void SetColumns()
@@ -280,15 +280,6 @@ namespace KoPlayer
             musicPlayer.Volume = 0;
             musicPlayer.Stop();
             searchBarTimer.Stop();
-            TagLib.File tagFile = TagLib.File.Create(song.Path);
-
-            if (tagFile.Tag.Pictures.Length > 0)
-            {
-                MemoryStream ms = new MemoryStream(tagFile.Tag.Pictures[0].Data.Data);
-                pictureBox1.Image = System.Drawing.Image.FromStream(ms);
-            }
-            else
-                pictureBox1.Image = null;
 
             try
             {
@@ -299,11 +290,49 @@ namespace KoPlayer
             {
                 MessageBox.Show("Play music exception: " + ex.ToString());
             }
+
             currentlyPlaying = song;
             playingPlayList = inPlayList;
 
+            UpdateTrayIconText();
+            UpdateSongImage();
             UpdateSongLengthLabel();
             UpdateSongInfoLabel();
+        }
+
+        private void UpdateTrayIconText()
+        {
+            string text = "";
+            if (musicPlayer.PlaybackState != PlaybackState.Stopped && currentlyPlaying != null)
+            {
+                int limit = 42; // (128 - 1) / 3 = 42.333;
+                text += ShortenString(currentlyPlaying.Title, limit) + "\n";
+                text += ShortenString(currentlyPlaying.Artist, limit) + "\n";
+                text += ShortenString(currentlyPlaying.Album, limit);
+            }
+            else
+                text = this.Text;
+            Fixes.SetNotifyIconText(trayIcon, text);
+        }
+
+        private string ShortenString(string s, int limit)
+        {
+            if (s.Length > limit)
+                return s.Substring(0, limit - 3) + "..";
+            else
+                return s;
+        }
+
+        private void UpdateSongImage()
+        {
+            TagLib.File tagFile = TagLib.File.Create(currentlyPlaying.Path);
+            if (tagFile.Tag.Pictures.Length > 0)
+            {
+                MemoryStream ms = new MemoryStream(tagFile.Tag.Pictures[0].Data.Data);
+                pictureBox1.Image = System.Drawing.Image.FromStream(ms);
+            }
+            else
+                pictureBox1.Image = null;
         }
 
         private void UpdateSongInfoLabel()
@@ -368,6 +397,11 @@ namespace KoPlayer
             Song previousSong = playingPlayList.GetPrevious();
             if (previousSong != null)
                 PlaySong(previousSong, playingPlayList);
+        }
+
+        private void exitToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Close();
         }
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
@@ -822,7 +856,6 @@ namespace KoPlayer
             if (this.WindowState == FormWindowState.Minimized)
             {
                 trayIcon.Visible = true;
-                //trayIcon.ShowBalloonTip(500);
                 this.Hide();
             }
         }

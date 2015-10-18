@@ -7,8 +7,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using KoPlayer.Forms;
 
-namespace KoPlayer
+namespace KoPlayer.Forms
 {
     public partial class PreferencesWindow : Form
     {
