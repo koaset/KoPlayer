@@ -11,12 +11,12 @@ using KoPlayer.Forms;
 
 namespace KoPlayer.Forms
 {
-    public partial class PreferencesWindow : Form
+    public partial class SettingsWindow : Form
     {
         private Settings tempSettings;
         private MainForm callingForm;
 
-        public PreferencesWindow(MainForm callingForm)
+        public SettingsWindow(MainForm callingForm)
         {
             this.callingForm = callingForm;
             this.tempSettings = Settings.Copy(callingForm.Settings);

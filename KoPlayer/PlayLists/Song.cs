@@ -52,6 +52,31 @@ namespace KoPlayer.PlayLists
             this.Read(path); ;
         }
 
+        /// <summary>
+        /// Returns a string field
+        /// </summary>
+        /// <param name="name">Name of field</param>
+        /// <returns></returns>
+        public string this[string name]
+        {
+            get
+            {
+                switch (name.ToLower())
+                {
+                    case "title":
+                        return Title;
+                    case "artist":
+                        return Artist;
+                    case "album":
+                        return Album;
+                    case "genre":
+                        return Genre;
+                    default:
+                        return null;
+                }
+            }
+        }
+
         private void Read(string path)
         {
             try
@@ -63,7 +88,11 @@ namespace KoPlayer.PlayLists
                 else
                     Artist = "";
                 Album = track.Tag.Album;
+                if (Album == null)
+                    Album = "";
                 Genre = track.Tag.FirstGenre;
+                if (Genre == null)
+                    Genre = "";
                 TrackNumber = (int)track.Tag.Track;
                 Rating = 0;
                 PlayCount = 0;

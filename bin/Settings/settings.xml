@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <Settings xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  <FormWidth>1108</FormWidth>
-  <FormHeight>642</FormHeight>
-  <StartupPlayList>Party Mix</StartupPlayList>
+  <FormWidth>1107</FormWidth>
+  <FormHeight>692</FormHeight>
+  <StartupPlayList>Library</StartupPlayList>
   <Partymix_SourcePlayListName>Library</Partymix_SourcePlayListName>
   <Partymix_NumPrevious>5</Partymix_NumPrevious>
   <Partymix_NumNext>15</Partymix_NumNext>

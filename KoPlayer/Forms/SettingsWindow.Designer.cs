@@ -1,6 +1,6 @@
 ﻿namespace KoPlayer.Forms
 {
-    partial class PreferencesWindow
+    partial class SettingsWindow
     {
         /// <summary>
         /// Required designer variable.

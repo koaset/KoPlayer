@@ -77,11 +77,11 @@
     <Compile Include="MusicPlayer.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Forms\PreferencesWindow.cs">
+    <Compile Include="Forms\SettingsWindow.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\PreferencesWindow.Designer.cs">
-      <DependentUpon>PreferencesWindow.cs</DependentUpon>
+    <Compile Include="Forms\SettingsWindow.Designer.cs">
+      <DependentUpon>SettingsWindow.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -89,8 +89,8 @@
     <EmbeddedResource Include="Forms\MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\PreferencesWindow.resx">
-      <DependentUpon>PreferencesWindow.cs</DependentUpon>
+    <EmbeddedResource Include="Forms\SettingsWindow.resx">
+      <DependentUpon>SettingsWindow.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

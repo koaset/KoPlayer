@@ -55,9 +55,10 @@
             this.songInfoLabel = new System.Windows.Forms.Label();
             this.currentTime_Label = new System.Windows.Forms.Label();
             this.songLength_Label = new System.Windows.Forms.Label();
+            this.trayIcon = new System.Windows.Forms.NotifyIcon(this.components);
+            this.searchBox = new System.Windows.Forms.TextBox();
             this.songGridView = new KoPlayer.Forms.DataGridViewPlus();
             this.playListBindingSource = new System.Windows.Forms.BindingSource(this.components);
-            this.trayIcon = new System.Windows.Forms.NotifyIcon(this.components);
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.volumeTrackBar)).BeginInit();
@@ -107,7 +108,7 @@
             this.setLibraryPathToolStripMenuItem.Name = "setLibraryPathToolStripMenuItem";
             this.setLibraryPathToolStripMenuItem.Size = new System.Drawing.Size(183, 22);
             this.setLibraryPathToolStripMenuItem.Text = "Add folder to Library";
-            this.setLibraryPathToolStripMenuItem.Click += new System.EventHandler(this.setLibraryPathToolStripMenuItem_Click);
+            this.setLibraryPathToolStripMenuItem.Click += new System.EventHandler(this.addFolderToLibraryToolStripMenuItem_Click);
             // 
             // newPlaylistToolStripMenuItem
             // 
@@ -184,7 +185,7 @@
             this.volumeTrackBar.TickFrequency = 25;
             this.volumeTrackBar.TickStyle = System.Windows.Forms.TickStyle.None;
             this.volumeTrackBar.Value = 25;
-            this.volumeTrackBar.ValueChanged += new System.EventHandler(this.trackBar1_ValueChanged);
+            this.volumeTrackBar.ValueChanged += new System.EventHandler(this.volumeTrackBar_ValueChanged);
             this.volumeTrackBar.MouseWheel += new System.Windows.Forms.MouseEventHandler(this.volumeTrackBar_MouseWheel);
             // 
             // statusStrip1
@@ -304,6 +305,26 @@
             this.songLength_Label.Text = "0:00";
             this.songLength_Label.TextAlign = System.Drawing.ContentAlignment.BottomRight;
             // 
+            // trayIcon
+            // 
+            this.trayIcon.Text = "KoPlayer";
+            this.trayIcon.Visible = true;
+            this.trayIcon.DoubleClick += new System.EventHandler(this.notifyIcon1_DoubleClick);
+            // 
+            // searchBox
+            // 
+            this.searchBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.searchBox.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
+            this.searchBox.Location = new System.Drawing.Point(962, 57);
+            this.searchBox.Name = "searchBox";
+            this.searchBox.Size = new System.Drawing.Size(162, 20);
+            this.searchBox.TabIndex = 17;
+            this.searchBox.Text = "Search Library";
+            this.searchBox.TextChanged += new System.EventHandler(this.searchBox_TextChanged);
+            this.searchBox.Enter += new System.EventHandler(this.searchBox_Enter);
+            this.searchBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.searchBox_KeyDown);
+            this.searchBox.Leave += new System.EventHandler(this.searchBox_Leave);
+            // 
             // songGridView
             // 
             this.songGridView.AllowDrop = true;
@@ -340,17 +361,12 @@
             // 
             this.playListBindingSource.DataSource = typeof(KoPlayer.PlayLists.PlayList);
             // 
-            // notifyIcon1
-            // 
-            this.trayIcon.Text = "KoPlayer";
-            this.trayIcon.Visible = true;
-            this.trayIcon.DoubleClick += new System.EventHandler(this.notifyIcon1_DoubleClick);
-            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1136, 646);
+            this.Controls.Add(this.searchBox);
             this.Controls.Add(this.songLength_Label);
             this.Controls.Add(this.currentTime_Label);
             this.Controls.Add(this.songGridView);
@@ -369,6 +385,7 @@
             this.MinimumSize = new System.Drawing.Size(1000, 600);
             this.Name = "MainForm";
             this.Text = "KoPlayer";
+            this.Activated += new System.EventHandler(this.MainForm_Activated);
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
             this.Load += new System.EventHandler(this.MainForm_Load);
             this.Resize += new System.EventHandler(this.MainForm_Resize);
@@ -416,5 +433,6 @@
         private System.Windows.Forms.Label currentTime_Label;
         private System.Windows.Forms.Label songLength_Label;
         private System.Windows.Forms.NotifyIcon trayIcon;
+        private System.Windows.Forms.TextBox searchBox;
     }
 }
