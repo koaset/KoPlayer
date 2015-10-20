@@ -750,7 +750,24 @@ namespace KoPlayer.Forms
         #region Column header events
         private void songGridView_ColumnHeaderMouseClick(object sender, DataGridViewCellMouseEventArgs e)
         {
-            if (e.Button == System.Windows.Forms.MouseButtons.Right)
+            if (e.Button == System.Windows.Forms.MouseButtons.Left)
+            {
+                if (showingPlayList != partyMix)
+                {
+                    try
+                    {
+                        ResetSearchBox();
+                        showingPlayList.Sort(songGridView.Columns[e.ColumnIndex].HeaderText);
+                        UpdateShowingPlayList();
+                        songGridView.Columns[e.ColumnIndex].HeaderCell.SortGlyphDirection = library.SortOrder;
+                    }
+                    catch
+                    {
+ 
+                    }
+                }
+            }
+            else if (e.Button == System.Windows.Forms.MouseButtons.Right)
             {
                 ContextMenu cm = new ContextMenu();
                 foreach (DataGridViewColumn column in songGridView.Columns)

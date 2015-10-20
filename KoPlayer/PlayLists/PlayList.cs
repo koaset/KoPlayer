@@ -27,6 +27,9 @@ namespace KoPlayer.PlayLists
         public List<string> songPaths;
         protected Dictionary<string, Song> libraryDictionary;
 
+        public SortOrder SortOrder { get { return sortOrder; } }
+        private SortOrder sortOrder;
+
         protected PlayList() { }
 
         public PlayList(Library library)
@@ -155,6 +158,11 @@ namespace KoPlayer.PlayLists
         public void RemoveFolder(string path)
         {
             throw new NotImplementedException();
+        }
+
+        public void Sort(string field)
+        {
+ 
         }
 
         public BindingList<Song> GetAll()

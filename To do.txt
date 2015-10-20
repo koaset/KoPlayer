@@ -1,0 +1,5 @@
+Make sorting apply to currently showing tracks
+Create settings menu
+Right click song or playlist menu
+Reload song tags on play, otherwise do something
+Tag editing

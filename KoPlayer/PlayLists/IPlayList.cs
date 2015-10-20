@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 using System.ComponentModel;
+using System.Windows.Forms;
 
 namespace KoPlayer.PlayLists
 {
@@ -25,9 +26,17 @@ namespace KoPlayer.PlayLists
         Song GetRandom();
         void AddFolder(string path);
         void RemoveFolder(string path);
+        void Sort(string field);
+        SortOrder SortOrder { get; }
         BindingList<Song> GetAll();
-        Song Get(string path);
         void Save();
+    }
+
+    public class PlayListException : Exception
+    {
+        public PlayListException(string message)
+            : base(message)
+        { }
     }
 }
 

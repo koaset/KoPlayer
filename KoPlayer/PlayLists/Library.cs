@@ -27,6 +27,14 @@ namespace KoPlayer.PlayLists
         private Dictionary<string, List<Song>> artistDictionary;
         private Dictionary<string, List<Song>> albumDictionary;
         private Dictionary<string, List<Song>> genreDictionary;
+
+        private Dictionary<string, List<Song>> trackNumberDictionary;
+        private Dictionary<string, List<Song>> ratingDictionary;
+        private Dictionary<string, List<Song>> playCountDictionary;
+        private Dictionary<string, List<Song>> lengthDictionary;
+        private Dictionary<string, List<Song>> dateAddedDictionary;
+        private Dictionary<string, List<Song>> lastPlayedDictionary;
+
         private List<Song> searchResults;
 
         private const string PATH = "Library.xml";
@@ -34,6 +42,9 @@ namespace KoPlayer.PlayLists
 
         private BindingList<Song> songs;
         private Dictionary<string, Song> pathDictionary;
+
+        public SortOrder SortOrder { get { return sortOrder; } }
+        private SortOrder sortOrder;
 
         public int NumSongs
         {
@@ -59,11 +70,98 @@ namespace KoPlayer.PlayLists
             this.artistDictionary = CreateFieldDictionary(this.songs, "artist");
             this.albumDictionary = CreateFieldDictionary(this.songs, "album");
             this.genreDictionary = CreateFieldDictionary(this.songs, "genre");
+            this.ratingDictionary = CreateFieldDictionary(this.songs, "rating");
+            this.lengthDictionary = CreateFieldDictionary(this.songs, "length");
         }
 
         public Song Get(string path)
         {
             throw new NotImplementedException();
+        }
+
+        public void Sort(string field)
+        {
+            if (sortOrder == SortOrder.None || sortOrder == SortOrder.Descending)
+                sortOrder = SortOrder.Ascending;
+            else
+                sortOrder = SortOrder.Descending;
+            Sort(sortOrder, field);
+        }
+
+        private void Sort(SortOrder sortOrder, string field)
+        {
+            this.sortOrder = sortOrder;
+
+            Dictionary<string, List<Song>> sortDictionary = GetDictionary(field);
+            if (sortDictionary == null)
+                throw new PlayListException("Invalid field name");
+
+            SortedDictionary<string, List<Song>> sortedDictionary;
+            sortedDictionary = new SortedDictionary<string, List<Song>>(sortDictionary);
+
+            IEnumerable<string> keys = sortedDictionary.Keys;
+            if (sortOrder == SortOrder.Descending)
+                keys = keys.Reverse();
+            
+            List<Song> songList = new List<Song>();
+
+            foreach (string key in keys)
+            {
+                if (field.ToLower() == "album" || field.ToLower() == "artist")
+                {
+                    sortedDictionary[key].Sort(delegate(Song song1, Song song2)
+                    {
+                        return song1.CompareTo(song2);
+                    });
+                }
+                songList.AddRange(sortedDictionary[key]);
+            }
+
+            this.songs = new BindingList<Song>(songList);
+            songs.ResetBindings();
+        }
+
+        private Dictionary<string, List<Song>> GetDictionary(string field)
+        {
+            switch (field.ToLower())
+            {
+                case "path":
+                    return GetPathListDictionary();
+                case "title":
+                    return this.titleDictionary;
+                case "artist":
+                    return this.artistDictionary;
+                case "album":
+                    return this.albumDictionary;
+                case "genre":
+                    return this.genreDictionary;
+                case "#":
+                    return this.trackNumberDictionary;
+                case "rating":
+                    return this.ratingDictionary;
+                case "play count":
+                    return this.playCountDictionary;
+                case "length":
+                    return this.lengthDictionary;
+                case "date added":
+                    return this.dateAddedDictionary;
+                case "last played":
+                    return this.lastPlayedDictionary;
+                default:
+                    return null;
+            }
+        }
+
+        private Dictionary<string, List<Song>> GetPathListDictionary()
+        {
+            Dictionary<string, List<Song>> ret = new Dictionary<string, List<Song>>();
+            foreach (string s in pathDictionary.Keys)
+            {
+                List<Song> list = new List<Song>();
+                list.Add(pathDictionary[s]);
+                ret.Add(s, list);
+            }
+            return ret;
         }
 
         public BindingList<Song> GetAll()
@@ -273,17 +371,17 @@ namespace KoPlayer.PlayLists
         /// <summary>
         /// Searches for string in all string fields and returns matches in a list
         /// </summary>
-        /// <param name="searchTerm"></param>
+        /// <param name="searchString"></param>
         /// <returns></returns>
-        public BindingList<Song> Search(string searchTerm)
+        public BindingList<Song> Search(string searchString)
         {
-            searchTerm = searchTerm.ToLower().Trim();
+            searchString = searchString.ToLower().Trim();
 
             this.searchResults = new List<Song>();
-            AddUniqueSearchResults(searchTerm, titleDictionary);
-            AddUniqueSearchResults(searchTerm, artistDictionary);
-            AddUniqueSearchResults(searchTerm, albumDictionary);
-            AddUniqueSearchResults(searchTerm, genreDictionary);
+            AddUniqueSearchResults(searchString, titleDictionary);
+            AddUniqueSearchResults(searchString, artistDictionary);
+            AddUniqueSearchResults(searchString, albumDictionary);
+            AddUniqueSearchResults(searchString, genreDictionary);
             return new BindingList<Song>(searchResults);
         }
 
@@ -294,10 +392,10 @@ namespace KoPlayer.PlayLists
         /// <param name="dictionary"></param>
         /// <param name="addedSongs"></param>
         /// <returns></returns>
-        private void AddUniqueSearchResults(string searchTerm,
+        private void AddUniqueSearchResults(string searchString,
             Dictionary<string, List<Song>> dictionary)
         {
-            List<string> keysToAdd = dictionary.Where(x => x.Key.ToLower().Contains(searchTerm)).Select(x => x.Key).ToList();
+            List<string> keysToAdd = WholeStringKeySearch(searchString, dictionary);
 
             foreach (string keyToAdd in keysToAdd)
             {
@@ -306,6 +404,96 @@ namespace KoPlayer.PlayLists
                     if (!this.searchResults.Contains(s))
                         this.searchResults.Add(s);
             }
+        }
+
+        /// <summary>
+        /// Divides the search string into words and returns all keys where the field contains all words
+        /// </summary>
+        /// <param name="searchString"></param>
+        /// <param name="dictionary"></param>
+        /// <returns></returns>
+        private List<string> SeparateWordAndSearch(string searchString,
+            Dictionary<string, List<Song>> dictionary)
+        {
+            string[] searchTerms = searchString.Split(' ');
+            List<List<string>> matchingKeyLists = new List<List<string>>();
+            foreach (string term in searchTerms)
+            {
+                if (term.Length > 0)
+                {
+                    List<string> matchingKeyList = dictionary.Where(x => x.Key.ToLower().Contains(term)).Select(x => x.Key).ToList();
+                    matchingKeyLists.Add(matchingKeyList);
+                }
+            }
+
+            List<string> keysToAdd = new List<string>();
+
+            if (matchingKeyLists.Count > 1)
+            {
+                List<string> comparer = matchingKeyLists[0];
+                matchingKeyLists.Remove(comparer);
+                foreach (string key in comparer)
+                {
+                    bool inAll = true;
+                    foreach (List<string> otherList in matchingKeyLists)
+                    {
+                        if (!otherList.Contains(key))
+                            inAll = false;
+                    }
+                    if (inAll)
+                        keysToAdd.Add(key);
+                }
+            }
+            else
+                keysToAdd.AddRange(matchingKeyLists[0]);
+            return keysToAdd;
+        }
+
+        /// <summary>
+        /// Divides the search string into words and returns all keys contaning any word
+        /// </summary>
+        /// <param name="searchString"></param>
+        /// <param name="dictionary"></param>
+        /// <returns></returns>
+        private List<string> SeparateWordOrSearch(string searchString,
+            Dictionary<string, List<Song>> dictionary)
+        {
+            string[] searchTerms = searchString.Split(' ');
+            List<List<string>> matchingKeyLists = new List<List<string>>();
+            foreach (string term in searchTerms)
+            {
+                if (term.Length > 0)
+                {
+                    List<string> matchingKeyList = dictionary.Where(x => x.Key.ToLower().Contains(term)).Select(x => x.Key).ToList();
+                    matchingKeyLists.Add(matchingKeyList);
+                }
+            }
+            List<string> keysToAdd = new List<string>();
+
+            //Must contain any search term in any field
+            
+            keysToAdd.AddRange(matchingKeyLists[0]);
+            matchingKeyLists.Remove(matchingKeyLists[0]);
+            if (matchingKeyLists.Count > 0)
+            {
+                foreach (List<string> matchingKeyList in matchingKeyLists)
+                    foreach (string key in matchingKeyList)
+                        if (!keysToAdd.Contains(key))
+                            keysToAdd.Add(key);
+            }
+            return keysToAdd;
+        }
+
+        /// <summary>
+        /// Gets all keys containing the whole search string in one piece
+        /// </summary>
+        /// <param name="searchString"></param>
+        /// <param name="dictionary"></param>
+        /// <returns></returns>
+        private List<string> WholeStringKeySearch(string searchString,
+            Dictionary<string, List<Song>> dictionary)
+        {
+            return dictionary.Where(x => x.Key.ToLower().Contains(searchString)).Select(x => x.Key).ToList();
         }
 
         private static Dictionary<string, List<Song>> CreateFieldDictionary(BindingList<Song> songs, string field)

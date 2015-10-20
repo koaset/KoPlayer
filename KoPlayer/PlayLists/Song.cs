@@ -7,9 +7,9 @@ using System.Windows.Forms;
 
 namespace KoPlayer.PlayLists
 {
-    public class Song
+    public class Song : IComparable
     {
-        [System.ComponentModel.DisplayName("Path")]
+        [System.ComponentModel.Browsable(false)]
         public string Path { get; set; }
         [System.ComponentModel.DisplayName("Title")]
         public string Title { get; set; }
@@ -19,8 +19,10 @@ namespace KoPlayer.PlayLists
         public string Album { get; set; }
         [System.ComponentModel.DisplayName("Genre")]
         public string Genre { get; set; }
-        [System.ComponentModel.DisplayName("#")]
+        [System.ComponentModel.Browsable(false)]
         public int TrackNumber { get; set; }
+        [System.ComponentModel.Browsable(false)]
+        public int DiscNumber { get; set; }
         [System.ComponentModel.DisplayName("Rating")]
         public int Rating { get; set; }
         [System.ComponentModel.DisplayName("Play Count")]
@@ -40,6 +42,7 @@ namespace KoPlayer.PlayLists
             Album = "";
             Genre = "";
             TrackNumber = -1;
+            DiscNumber = -1;
             Rating = -1;
             PlayCount = -1;
             Length = "0:0";
@@ -71,11 +74,36 @@ namespace KoPlayer.PlayLists
                         return Album;
                     case "genre":
                         return Genre;
+                    case "rating":
+                        return Rating.ToString();
+                    case "length":
+                        return Length;
                     default:
                         return null;
                 }
             }
         }
+
+        public int CompareTo(object obj)
+        {
+            if (obj == null) return 1;
+
+            Song otherSong = obj as Song;
+            if (otherSong != null)
+            {
+                if (this.Album.CompareTo(otherSong.Album) == 0)
+                {
+                    if (this.DiscNumber.CompareTo(otherSong.DiscNumber) != 0)
+                        return this.DiscNumber.CompareTo(otherSong.DiscNumber);
+                    else
+                        return this.TrackNumber.CompareTo(otherSong.TrackNumber);
+                }
+                return this.Album.CompareTo(otherSong.Album);
+            }
+            else
+                throw new ArgumentException("Object is not a Song");
+        }
+
 
         private void Read(string path)
         {
@@ -94,6 +122,7 @@ namespace KoPlayer.PlayLists
                 if (Genre == null)
                     Genre = "";
                 TrackNumber = (int)track.Tag.Track;
+                DiscNumber = (int)track.Tag.Disc;
                 Rating = 0;
                 PlayCount = 0;
                 Length = DurationFromTimeSpanToString(track.Properties.Duration);

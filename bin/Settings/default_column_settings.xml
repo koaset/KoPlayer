@@ -3,69 +3,57 @@
   <SettingList>
     <ColumnSetting>
       <DisplayIndex>0</DisplayIndex>
-      <Name>Path</Name>
-      <Width>80</Width>
-      <Visible>false</Visible>
+      <Name>Title</Name>
+      <Width>98</Width>
+      <Visible>true</Visible>
     </ColumnSetting>
     <ColumnSetting>
       <DisplayIndex>1</DisplayIndex>
-      <Name>Title</Name>
-      <Width>228</Width>
-      <Visible>true</Visible>
-    </ColumnSetting>
-    <ColumnSetting>
-      <DisplayIndex>3</DisplayIndex>
       <Name>Artist</Name>
-      <Width>143</Width>
-      <Visible>true</Visible>
-    </ColumnSetting>
-    <ColumnSetting>
-      <DisplayIndex>4</DisplayIndex>
-      <Name>Album</Name>
-      <Width>213</Width>
-      <Visible>true</Visible>
-    </ColumnSetting>
-    <ColumnSetting>
-      <DisplayIndex>6</DisplayIndex>
-      <Name>Genre</Name>
-      <Width>95</Width>
-      <Visible>true</Visible>
-    </ColumnSetting>
-    <ColumnSetting>
-      <DisplayIndex>5</DisplayIndex>
-      <Name>TrackNumber</Name>
-      <Width>20</Width>
-      <Visible>true</Visible>
-    </ColumnSetting>
-    <ColumnSetting>
-      <DisplayIndex>7</DisplayIndex>
-      <Name>Rating</Name>
-      <Width>72</Width>
-      <Visible>true</Visible>
-    </ColumnSetting>
-    <ColumnSetting>
-      <DisplayIndex>8</DisplayIndex>
-      <Name>PlayCount</Name>
-      <Width>65</Width>
+      <Width>97</Width>
       <Visible>true</Visible>
     </ColumnSetting>
     <ColumnSetting>
       <DisplayIndex>2</DisplayIndex>
-      <Name>Length</Name>
-      <Width>44</Width>
+      <Name>Album</Name>
+      <Width>98</Width>
       <Visible>true</Visible>
     </ColumnSetting>
     <ColumnSetting>
-      <DisplayIndex>9</DisplayIndex>
-      <Name>DateAdded</Name>
-      <Width>80</Width>
-      <Visible>false</Visible>
+      <DisplayIndex>3</DisplayIndex>
+      <Name>Genre</Name>
+      <Width>97</Width>
+      <Visible>true</Visible>
     </ColumnSetting>
     <ColumnSetting>
-      <DisplayIndex>10</DisplayIndex>
+      <DisplayIndex>4</DisplayIndex>
+      <Name>Rating</Name>
+      <Width>98</Width>
+      <Visible>true</Visible>
+    </ColumnSetting>
+    <ColumnSetting>
+      <DisplayIndex>5</DisplayIndex>
+      <Name>PlayCount</Name>
+      <Width>97</Width>
+      <Visible>true</Visible>
+    </ColumnSetting>
+    <ColumnSetting>
+      <DisplayIndex>6</DisplayIndex>
+      <Name>Length</Name>
+      <Width>98</Width>
+      <Visible>true</Visible>
+    </ColumnSetting>
+    <ColumnSetting>
+      <DisplayIndex>7</DisplayIndex>
+      <Name>DateAdded</Name>
+      <Width>99</Width>
+      <Visible>true</Visible>
+    </ColumnSetting>
+    <ColumnSetting>
+      <DisplayIndex>8</DisplayIndex>
       <Name>LastPlayed</Name>
-      <Width>81</Width>
-      <Visible>false</Visible>
+      <Width>98</Width>
+      <Visible>true</Visible>
     </ColumnSetting>
   </SettingList>
 </ColumnSettings>
