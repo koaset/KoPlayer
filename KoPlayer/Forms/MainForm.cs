@@ -54,6 +54,7 @@ namespace KoPlayer.Forms
         private string searchBoxDefault = "Search Library";
         private System.Timers.Timer searchLibraryTimer;
         private int searchLibraryTimerInterval = 500;
+        private PlayList renamePlaylist;
         #endregion
 
         #region Constructor & Load event
@@ -258,7 +259,7 @@ namespace KoPlayer.Forms
         {
             settings.FormWidth = this.Width;
             settings.FormHeight = this.Height;
-            settings.StartupPlayList = showingPlayList.Name;
+            settings.StartupPlayList = library.Name;
             settings.Save(SETTINGSPATH);
 
             columnSettings = new ColumnSettings(songGridView.Columns);
@@ -531,40 +532,38 @@ namespace KoPlayer.Forms
         }
         #endregion
 
-        #region Delete Playlist
+        #region Playlist manipulatiom methods
         private void playListGridView_KeyDown(object sender, KeyEventArgs e)
         {
             if (playListGridView.Focused)
                 if (e.KeyCode == Keys.Delete)
                 {
-                    DeletePlayList(playListGridView.SelectedRows);
+                    DeletePlayList(playListGridView.SelectedCells[0]);
                 }
         }
 
-        private void DeletePlayList(DataGridViewSelectedRowCollection rows)
+        private void DeletePlayList(DataGridViewCell cell)
         {
             bool deleted = false;
-            foreach (DataGridViewRow row in rows)
+            IPlayList pl = playLists[cell.RowIndex];
+            if (pl != library && pl != partyMix)
             {
-                IPlayList pl = playLists[row.Index];
-                if (pl != library && pl != partyMix)
+                if (pl == showingPlayList)
+                    ChangeToPlayList(library);
+                if (pl == playingPlayList)
                 {
-                    if (pl == showingPlayList)
-                        ChangeToPlayList(library);
-                    if (pl == playingPlayList)
-                    {
-                        StopPlaying();
-                        playingPlayList = library;
-                    }
-                    playLists.Remove(pl);
-                    try
-                    {
-                        File.Delete(pl.Path);
-                    }
-                    catch { }
-                    deleted = true;
+                    StopPlaying();
+                    playingPlayList = library;
                 }
+                playLists.Remove(pl);
+                try
+                {
+                    File.Delete(pl.Path);
+                }
+                catch { }
+                deleted = true;
             }
+            
             if (deleted)
                 SetPlayListGridView();
         }
@@ -1026,5 +1025,82 @@ namespace KoPlayer.Forms
             }
         }
         #endregion
+
+        #region Playlist gridview right click menu
+        private void playListGridView_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (e.Button == System.Windows.Forms.MouseButtons.Right)
+            {
+                ContextMenu m = new ContextMenu();
+                m.MenuItems.Add(CreateMenuItem("Create new playlist", newPlaylistToolStripMenuItem_Click));
+
+                int rowIndex = playListGridView.HitTest(e.X, e.Y).RowIndex;
+
+                if (rowIndex >= 0)
+                {
+                    playListGridView.ClearSelection();
+                    playListGridView.Rows[rowIndex].Selected = true;
+                    playListGridView.Rows[rowIndex].Cells[0].Selected = true;
+
+                    if (rowIndex > 1)
+                    {
+                        m.MenuItems.Add(CreateMenuItem("Delete playlist", playListGridViewRightClickMenuDelete));
+                        m.MenuItems.Add(CreateMenuItem("Rename playlist", playListGridViewRightClickRename));
+                    }
+                }
+                m.Show(playListGridView, new Point(e.X, e.Y));
+            }
+        }
+
+        private void playListGridViewRightClickMenuDelete(object sender, EventArgs e)
+        {
+            DeletePlayList(playListGridView.SelectedCells[0]);
+        }
+        private void playListGridViewRightClickRename(object sender, EventArgs e)
+        {
+            RenamePlayList();
+        }
+
+        private MenuItem CreateMenuItem(string name, System.EventHandler clickEvent)
+        {
+            MenuItem item = new MenuItem(name);
+            item.Click += clickEvent;
+            return item;
+        }
+        #endregion
+
+        private void RenamePlayList()
+        {
+            this.renamePlaylist = GetPlayList(playListGridView.CurrentCell.Value.ToString()) as PlayList;
+            playListGridView.BeginEdit(true);
+        }
+
+        private void playListGridView_CellEndEdit(object sender, DataGridViewCellEventArgs e)
+        {
+            string currentName = playListGridView.CurrentCell.Value.ToString();
+            string oldName = this.renamePlaylist.Name;
+            string oldPath = this.renamePlaylist.Path;
+            bool acceptable = true;
+            foreach (IPlayList pl in playLists)
+            {
+                if (currentName.ToLower() == pl.Name.ToLower())
+                    if (currentName.ToLower() != oldName.ToLower())
+                        acceptable = false;
+            }
+            if (acceptable)
+            {
+                if (currentName.ToLower() != oldName.ToLower())
+                {
+                    renamePlaylist.Name = currentName;
+                    try
+                    {
+                        System.IO.File.Move(oldPath, renamePlaylist.Path);
+                    }
+                    catch { }
+                }
+            }
+            else
+                playListGridView.BeginEdit(true);
+        }
     }
 }

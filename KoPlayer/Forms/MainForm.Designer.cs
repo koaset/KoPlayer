@@ -217,20 +217,22 @@
             this.playListGridView.MultiSelect = false;
             this.playListGridView.Name = "playListGridView";
             this.playListGridView.RowHeadersVisible = false;
-            this.playListGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
+            this.playListGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
             this.playListGridView.Size = new System.Drawing.Size(175, 345);
             this.playListGridView.TabIndex = 7;
             this.playListGridView.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.playListGridView_CellClick);
+            this.playListGridView.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.playListGridView_CellEndEdit);
             this.playListGridView.DragDrop += new System.Windows.Forms.DragEventHandler(this.playListGridView_DragDrop);
             this.playListGridView.DragEnter += new System.Windows.Forms.DragEventHandler(this.playListGridView_DragEnter);
             this.playListGridView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.playListGridView_KeyDown);
+            this.playListGridView.MouseDown += new System.Windows.Forms.MouseEventHandler(this.playListGridView_MouseDown);
             // 
             // Column1
             // 
             this.Column1.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
             this.Column1.HeaderText = "Column1";
             this.Column1.Name = "Column1";
-            this.Column1.ReadOnly = true;
+            this.Column1.ReadOnly = false;
             // 
             // previousButton
             // 

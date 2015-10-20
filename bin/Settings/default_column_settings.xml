@@ -4,56 +4,56 @@
     <ColumnSetting>
       <DisplayIndex>0</DisplayIndex>
       <Name>Title</Name>
-      <Width>98</Width>
-      <Visible>true</Visible>
-    </ColumnSetting>
-    <ColumnSetting>
-      <DisplayIndex>1</DisplayIndex>
-      <Name>Artist</Name>
-      <Width>97</Width>
+      <Width>237</Width>
       <Visible>true</Visible>
     </ColumnSetting>
     <ColumnSetting>
       <DisplayIndex>2</DisplayIndex>
-      <Name>Album</Name>
-      <Width>98</Width>
+      <Name>Artist</Name>
+      <Width>150</Width>
       <Visible>true</Visible>
     </ColumnSetting>
     <ColumnSetting>
       <DisplayIndex>3</DisplayIndex>
-      <Name>Genre</Name>
-      <Width>97</Width>
+      <Name>Album</Name>
+      <Width>195</Width>
       <Visible>true</Visible>
     </ColumnSetting>
     <ColumnSetting>
       <DisplayIndex>4</DisplayIndex>
-      <Name>Rating</Name>
-      <Width>98</Width>
+      <Name>Genre</Name>
+      <Width>104</Width>
       <Visible>true</Visible>
     </ColumnSetting>
     <ColumnSetting>
       <DisplayIndex>5</DisplayIndex>
-      <Name>PlayCount</Name>
-      <Width>97</Width>
+      <Name>RatingString</Name>
+      <Width>75</Width>
       <Visible>true</Visible>
     </ColumnSetting>
     <ColumnSetting>
       <DisplayIndex>6</DisplayIndex>
+      <Name>PlayCount</Name>
+      <Width>84</Width>
+      <Visible>false</Visible>
+    </ColumnSetting>
+    <ColumnSetting>
+      <DisplayIndex>1</DisplayIndex>
       <Name>Length</Name>
-      <Width>98</Width>
+      <Width>69</Width>
       <Visible>true</Visible>
     </ColumnSetting>
     <ColumnSetting>
       <DisplayIndex>7</DisplayIndex>
       <Name>DateAdded</Name>
-      <Width>99</Width>
-      <Visible>true</Visible>
+      <Width>119</Width>
+      <Visible>false</Visible>
     </ColumnSetting>
     <ColumnSetting>
       <DisplayIndex>8</DisplayIndex>
       <Name>LastPlayed</Name>
-      <Width>98</Width>
-      <Visible>true</Visible>
+      <Width>96</Width>
+      <Visible>false</Visible>
     </ColumnSetting>
   </SettingList>
 </ColumnSettings>
