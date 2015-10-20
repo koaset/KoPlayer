@@ -122,7 +122,10 @@ namespace KoPlayer.Forms
         private void UpdateShowingPlayList()
         {
             if (showingPlayList != null)
+            {
+                songGridView.DataSource = null;
                 songGridView.DataSource = showingPlayList.GetAll();
+            }
         }
 
         private void LoadPlayLists()
@@ -305,7 +308,14 @@ namespace KoPlayer.Forms
                 progressBar.Maximum = 100;
                 statusStrip1.Items.Add(progressBar);
                 library.ReportProgress += library_ReportProgress;
+                library.LibraryChanged += library_LibraryChanged;
             }
+        }
+
+        void library_LibraryChanged(object sender, LibraryChangedEventArgs e)
+        {
+            if (showingPlayList == library)
+                UpdateShowingPlayList();
         }
 
         void library_ReportProgress(object sender, ReportProgressEventArgs e)
@@ -754,17 +764,10 @@ namespace KoPlayer.Forms
             {
                 if (showingPlayList != partyMix)
                 {
-                    try
-                    {
-                        ResetSearchBox();
-                        showingPlayList.Sort(songGridView.Columns[e.ColumnIndex].HeaderText);
-                        UpdateShowingPlayList();
-                        songGridView.Columns[e.ColumnIndex].HeaderCell.SortGlyphDirection = library.SortOrder;
-                    }
-                    catch
-                    {
- 
-                    }
+                    ResetSearchBox();
+                    showingPlayList.Sort(songGridView.Columns[e.ColumnIndex].HeaderText);
+                    UpdateShowingPlayList();
+                    songGridView.Columns[e.ColumnIndex].HeaderCell.SortGlyphDirection = library.SortOrder;
                 }
             }
             else if (e.Button == System.Windows.Forms.MouseButtons.Right)
@@ -957,8 +960,17 @@ namespace KoPlayer.Forms
 
         private void ResetSearchBox()
         {
-            searchBox.Text = searchBoxDefault;
-            searchBox.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
+            if (songGridView.InvokeRequired)
+                songGridView.Invoke(new MethodInvoker(delegate
+                    {
+                        searchBox.Text = searchBoxDefault;
+                        searchBox.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
+                    }));
+            else
+            {
+                searchBox.Text = searchBoxDefault;
+                searchBox.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
+            }
         }
 
 

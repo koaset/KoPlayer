@@ -28,7 +28,7 @@ namespace KoPlayer.PlayLists
         void RemoveFolder(string path);
         void Sort(string field);
         SortOrder SortOrder { get; }
-        BindingList<Song> GetAll();
+        List<Song> GetAll();
         void Save();
     }
 

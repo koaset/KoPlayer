@@ -3,3 +3,4 @@ Create settings menu
 Right click song or playlist menu
 Reload song tags on play, otherwise do something
 Tag editing
+Keyboard shortcuts

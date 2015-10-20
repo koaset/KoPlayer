@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Xml.Serialization;
 
 namespace KoPlayer.PlayLists
 {
@@ -24,12 +25,15 @@ namespace KoPlayer.PlayLists
         [System.ComponentModel.Browsable(false)]
         public int DiscNumber { get; set; }
         [System.ComponentModel.DisplayName("Rating")]
+        [XmlIgnore]
+        public string RatingString { get { return RatingIntToString(Rating); } }
+        [System.ComponentModel.Browsable(false)]
         public int Rating { get; set; }
         [System.ComponentModel.DisplayName("Play Count")]
         public int PlayCount { get; set; }
         [System.ComponentModel.DisplayName("Length")]
         public string Length { get; set; }
-        [System.ComponentModel.DisplayName("DateAdded")]
+        [System.ComponentModel.DisplayName("Date Added")]
         public DateTime DateAdded { get; set; }
         [System.ComponentModel.DisplayName("Last Played")]
         public DateTime LastPlayed { get; set; }
@@ -75,9 +79,15 @@ namespace KoPlayer.PlayLists
                     case "genre":
                         return Genre;
                     case "rating":
-                        return Rating.ToString();
+                        return RatingString;
                     case "length":
                         return Length;
+                    case "play count":
+                        return PlayCount.ToString();
+                    case "date added":
+                        return DateAdded.ToShortTimeString();
+                    case "last played":
+                        return LastPlayed.ToShortDateString();
                     default:
                         return null;
                 }
@@ -103,7 +113,6 @@ namespace KoPlayer.PlayLists
             else
                 throw new ArgumentException("Object is not a Song");
         }
-
 
         private void Read(string path)
         {
@@ -143,6 +152,20 @@ namespace KoPlayer.PlayLists
             if (duration.Seconds < 10)
                 ret += "0";
             ret += duration.Seconds;
+            return ret;
+        }
+
+        private static int RatingStringToInt(string rating)
+        {
+            return rating.Length;
+        }
+
+        private static string RatingIntToString(int rating)
+        {
+            string ret = "";
+            for (int i = 0; i < 5; i++)
+                if (i < rating)
+                    ret += "★";
             return ret;
         }
     }

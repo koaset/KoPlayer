@@ -152,7 +152,6 @@ namespace KoPlayer.PlayLists
             {
                 MessageBox.Show("Add folder to playlist exception: " + ex.ToString());
             }
-            //UpdateBindingList();
         }
 
         public void RemoveFolder(string path)
@@ -165,7 +164,7 @@ namespace KoPlayer.PlayLists
  
         }
 
-        public BindingList<Song> GetAll()
+        public List<Song> GetAll()
         {
             if (songPaths.Count == 0)
                 return null;
@@ -173,7 +172,7 @@ namespace KoPlayer.PlayLists
             foreach (string songPath in songPaths)
                 if (libraryDictionary.ContainsKey(songPath))
                     songs.Add(libraryDictionary[songPath]);
-            return new BindingList<Song>(songs);
+            return songs;
         }
 
         public Song Get(string path)
