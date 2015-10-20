@@ -176,15 +176,14 @@
             // volumeTrackBar
             // 
             this.volumeTrackBar.AutoSize = false;
-            this.volumeTrackBar.LargeChange = 10;
             this.volumeTrackBar.Location = new System.Drawing.Point(193, 62);
-            this.volumeTrackBar.Maximum = 100;
+            this.volumeTrackBar.Maximum = 50;
             this.volumeTrackBar.Name = "volumeTrackBar";
             this.volumeTrackBar.Size = new System.Drawing.Size(118, 27);
             this.volumeTrackBar.TabIndex = 5;
             this.volumeTrackBar.TickFrequency = 25;
             this.volumeTrackBar.TickStyle = System.Windows.Forms.TickStyle.None;
-            this.volumeTrackBar.Value = 25;
+            this.volumeTrackBar.Value = 10;
             this.volumeTrackBar.ValueChanged += new System.EventHandler(this.volumeTrackBar_ValueChanged);
             this.volumeTrackBar.MouseWheel += new System.Windows.Forms.MouseEventHandler(this.volumeTrackBar_MouseWheel);
             // 
@@ -232,7 +231,6 @@
             this.Column1.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
             this.Column1.HeaderText = "Column1";
             this.Column1.Name = "Column1";
-            this.Column1.ReadOnly = false;
             // 
             // previousButton
             // 
@@ -357,6 +355,7 @@
             this.songGridView.DragDrop += new System.Windows.Forms.DragEventHandler(this.songGridView_DragDrop);
             this.songGridView.DragEnter += new System.Windows.Forms.DragEventHandler(this.songGridView_DragEnter);
             this.songGridView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.songGridView_KeyDown);
+            this.songGridView.MouseDown += new System.Windows.Forms.MouseEventHandler(this.songGridView_MouseDown);
             // 
             // playListBindingSource
             // 
@@ -386,7 +385,6 @@
             this.MinimumSize = new System.Drawing.Size(1000, 600);
             this.Name = "MainForm";
             this.Text = "KoPlayer";
-            this.Activated += new System.EventHandler(this.MainForm_Activated);
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
             this.Load += new System.EventHandler(this.MainForm_Load);
             this.Resize += new System.EventHandler(this.MainForm_Resize);

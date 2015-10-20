@@ -155,12 +155,12 @@ namespace KoPlayer.PlayLists
             return ret;
         }
 
-        private static int RatingStringToInt(string rating)
+        public static int RatingStringToInt(string rating)
         {
             return rating.Length;
         }
 
-        private static string RatingIntToString(int rating)
+        public static string RatingIntToString(int rating)
         {
             string ret = "";
             for (int i = 0; i < 5; i++)

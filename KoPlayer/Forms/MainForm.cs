@@ -55,6 +55,7 @@ namespace KoPlayer.Forms
         private System.Timers.Timer searchLibraryTimer;
         private int searchLibraryTimerInterval = 500;
         private PlayList renamePlaylist;
+        private Song clickedSong;
         #endregion
 
         #region Constructor & Load event
@@ -232,20 +233,9 @@ namespace KoPlayer.Forms
         private void preferencesToolStripMenuItem_Click(object sender, EventArgs e)
         {
             settingsWindow = new SettingsWindow(this);
-            settingsWindow.FormClosed += settingsWindow_FormClosed;
-            this.Enabled = false;
-        }
-
-        void settingsWindow_FormClosed(object sender, FormClosedEventArgs e)
-        {
-            this.Enabled = true;
+            settingsWindow.StartPosition = FormStartPosition.CenterParent;
+            settingsWindow.ShowDialog();
             this.settings.Save(SETTINGSPATH);
-        }
-
-        private void MainForm_Activated(object sender, EventArgs e)
-        {
-            if (settingsWindow != null && this.Enabled == false)
-                settingsWindow.Focus();
         }
         #endregion
 
@@ -567,6 +557,40 @@ namespace KoPlayer.Forms
             if (deleted)
                 SetPlayListGridView();
         }
+
+        private void RenamePlayList()
+        {
+            this.renamePlaylist = GetPlayList(playListGridView.CurrentCell.Value.ToString()) as PlayList;
+            playListGridView.BeginEdit(true);
+        }
+
+        private void playListGridView_CellEndEdit(object sender, DataGridViewCellEventArgs e)
+        {
+            string currentName = playListGridView.CurrentCell.Value.ToString();
+            string oldName = this.renamePlaylist.Name;
+            string oldPath = this.renamePlaylist.Path;
+            bool acceptable = true;
+            foreach (IPlayList pl in playLists)
+            {
+                if (currentName.ToLower() == pl.Name.ToLower())
+                    if (currentName.ToLower() != oldName.ToLower())
+                        acceptable = false;
+            }
+            if (acceptable)
+            {
+                if (currentName.ToLower() != oldName.ToLower())
+                {
+                    renamePlaylist.Name = currentName;
+                    try
+                    {
+                        System.IO.File.Move(oldPath, renamePlaylist.Path);
+                    }
+                    catch { }
+                }
+            }
+            else
+                playListGridView.BeginEdit(true);
+        }
         #endregion
 
         #region Playlist selection
@@ -579,11 +603,14 @@ namespace KoPlayer.Forms
         {
             if (showingPlayList != playList)
             {
-                ResetSearchBox();
+                if (playList != library)
+                    ResetSearchBox();
                 showingPlayList.Save();
                 showingPlayList = playList;
                 UpdateShowingPlayList();
                 songGridView.ClearSelection();
+                playListGridView.Rows[playLists.IndexOf(playList)].Cells[0].Selected = true;
+                playListGridView.Update();
                 if (showingPlayList == partyMix)
                     PopulatePartyMix();
             }
@@ -993,7 +1020,6 @@ namespace KoPlayer.Forms
         {
             searchLibraryTimer.Stop();
 
-            ChangeToPlayList(library);
             if (searchBox.Text != searchBoxDefault)
                 if (searchBox.Text.Length > 0 || searchBox.Text.Length == 0)
                 {
@@ -1006,6 +1032,7 @@ namespace KoPlayer.Forms
 
         private void DoSearch()
         {
+            ChangeToPlayList(library);
             if (searchBox.Text.Length > 0)
                 songGridView.DataSource = library.Search(searchBox.Text);
             else if (searchBox.Text.Length == 0)
@@ -1026,13 +1053,21 @@ namespace KoPlayer.Forms
         }
         #endregion
 
+        #region Right click menus
+        private MenuItem CreateMenuItem(string name, System.EventHandler clickEvent)
+        {
+            MenuItem item = new MenuItem(name);
+            item.Click += clickEvent;
+            return item;
+        }
+
         #region Playlist gridview right click menu
         private void playListGridView_MouseDown(object sender, MouseEventArgs e)
         {
             if (e.Button == System.Windows.Forms.MouseButtons.Right)
             {
-                ContextMenu m = new ContextMenu();
-                m.MenuItems.Add(CreateMenuItem("Create new playlist", newPlaylistToolStripMenuItem_Click));
+                ContextMenu cm = new ContextMenu();
+                cm.MenuItems.Add(CreateMenuItem("Create new playlist", newPlaylistToolStripMenuItem_Click));
 
                 int rowIndex = playListGridView.HitTest(e.X, e.Y).RowIndex;
 
@@ -1044,11 +1079,11 @@ namespace KoPlayer.Forms
 
                     if (rowIndex > 1)
                     {
-                        m.MenuItems.Add(CreateMenuItem("Delete playlist", playListGridViewRightClickMenuDelete));
-                        m.MenuItems.Add(CreateMenuItem("Rename playlist", playListGridViewRightClickRename));
+                        cm.MenuItems.Add(CreateMenuItem("Delete playlist", playListGridViewRightClickMenuDelete));
+                        cm.MenuItems.Add(CreateMenuItem("Rename playlist", playListGridViewRightClickRename));
                     }
                 }
-                m.Show(playListGridView, new Point(e.X, e.Y));
+                cm.Show(playListGridView, new Point(e.X, e.Y));
             }
         }
 
@@ -1060,47 +1095,43 @@ namespace KoPlayer.Forms
         {
             RenamePlayList();
         }
-
-        private MenuItem CreateMenuItem(string name, System.EventHandler clickEvent)
-        {
-            MenuItem item = new MenuItem(name);
-            item.Click += clickEvent;
-            return item;
-        }
         #endregion
 
-        private void RenamePlayList()
-        {
-            this.renamePlaylist = GetPlayList(playListGridView.CurrentCell.Value.ToString()) as PlayList;
-            playListGridView.BeginEdit(true);
-        }
+        #region Song gridview right click menu
 
-        private void playListGridView_CellEndEdit(object sender, DataGridViewCellEventArgs e)
+        private void songGridView_MouseDown(object sender, MouseEventArgs e)
         {
-            string currentName = playListGridView.CurrentCell.Value.ToString();
-            string oldName = this.renamePlaylist.Name;
-            string oldPath = this.renamePlaylist.Path;
-            bool acceptable = true;
-            foreach (IPlayList pl in playLists)
+            if (e.Button == System.Windows.Forms.MouseButtons.Right)
             {
-                if (currentName.ToLower() == pl.Name.ToLower())
-                    if (currentName.ToLower() != oldName.ToLower())
-                        acceptable = false;
-            }
-            if (acceptable)
-            {
-                if (currentName.ToLower() != oldName.ToLower())
+                int rowIndex = songGridView.HitTest(e.X, e.Y).RowIndex;
+                if (rowIndex >= 0)
                 {
-                    renamePlaylist.Name = currentName;
-                    try
-                    {
-                        System.IO.File.Move(oldPath, renamePlaylist.Path);
-                    }
-                    catch { }
+                    this.clickedSong = songGridView.Rows[rowIndex].DataBoundItem as Song;
+                    if (songGridView.Rows[rowIndex].Cells[0].Selected != true)
+                        songGridView.ClearSelection();
+                    songGridView.Rows[rowIndex].Cells[0].Selected = true;
+
+                    ContextMenu cm = new ContextMenu();
+                    cm.MenuItems.Add(CreateMenuItem("Delete", songGridViewRightClickDelete));
+                    cm.MenuItems.Add(CreateMenuItem("Properties", songGridViewRightClickProperties));
+                    cm.Show(this, this.PointToClient(Cursor.Position));
                 }
             }
-            else
-                playListGridView.BeginEdit(true);
         }
+
+        private void songGridViewRightClickDelete(object sender, EventArgs e)
+        {
+            DeleteSongs(songGridView.SelectedRows);
+        }
+
+        private void songGridViewRightClickProperties(object sender, EventArgs e)
+        {
+            SongInfoPopup popUp = new SongInfoPopup(this.clickedSong);
+            popUp.StartPosition = FormStartPosition.CenterParent;
+            popUp.ShowDialog();
+        }
+
+        #endregion
+        #endregion
     }
 }

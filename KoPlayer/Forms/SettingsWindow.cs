@@ -21,7 +21,6 @@ namespace KoPlayer.Forms
             this.callingForm = callingForm;
             this.tempSettings = Settings.Copy(callingForm.Settings);
             InitializeComponent();
-            this.Show();
         }
 
         private void PreferencesWindow_Load(object sender, EventArgs e)

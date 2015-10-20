@@ -115,7 +115,7 @@ namespace KoPlayer.PlayLists
                 songList.AddRange(sortedDictionary[key]);
             }
 
-            this.songs = new List<Song>(songList);
+            this.songs = songList;
         }
 
         private Dictionary<string, List<Song>> GetDictionary(string field)
