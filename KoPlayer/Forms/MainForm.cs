@@ -95,7 +95,7 @@ namespace KoPlayer.Forms
             songGridView.RowTemplate.Height = settings.RowHeight;
             songGridView.DefaultCellStyle.Font = new Font(settings.FontName, settings.FontSize, GraphicsUnit.Point);
 
-            UpdateShowingPlayList();
+            UpdateShowingPlayList(true);
             songGridView.AutoGenerateColumns = false;
 
             columnSettings = ColumnSettings.Load(COLUMNSETTINGSPATH);
@@ -121,12 +121,14 @@ namespace KoPlayer.Forms
         #endregion
 
         #region Playlist methods
-        private void UpdateShowingPlayList()
+        private void UpdateShowingPlayList(bool getAll)
         {
             if (showingPlayList != null)
             {
-                songGridView.DataSource = null;
-                songGridView.DataSource = showingPlayList.GetAll();
+                if (getAll)
+                    songGridView.DataSource = showingPlayList.GetAllSongs();
+                else
+                    songGridView.DataSource = showingPlayList.GetSongs();
             }
         }
 
@@ -204,9 +206,9 @@ namespace KoPlayer.Forms
                 if (showingPlayList == partyMix)
                 {
                     if (songGridView.InvokeRequired)
-                        songGridView.Invoke(new MethodInvoker(delegate { UpdateShowingPlayList(); }));
+                        songGridView.Invoke(new MethodInvoker(delegate { UpdateShowingPlayList(true); }));
                     else
-                        UpdateShowingPlayList();
+                        UpdateShowingPlayList(true);
                     songGridView.ClearSelection();
                     SetPartyMixColors();
                 }
@@ -282,7 +284,7 @@ namespace KoPlayer.Forms
                 if (showingPlayList != library)
                 {
                     showingPlayList.Add(path);
-                    UpdateShowingPlayList();
+                    UpdateShowingPlayList(true);
                 }
             }
         }
@@ -306,7 +308,7 @@ namespace KoPlayer.Forms
         void library_LibraryChanged(object sender, LibraryChangedEventArgs e)
         {
             if (showingPlayList == library)
-                UpdateShowingPlayList();
+                UpdateShowingPlayList(false);
         }
 
         void library_ReportProgress(object sender, ReportProgressEventArgs e)
@@ -508,7 +510,7 @@ namespace KoPlayer.Forms
             if (showingPlayList == partyMix)
                 PopulatePartyMix();
             showingPlayList.Save();
-            UpdateShowingPlayList();
+            UpdateShowingPlayList(true);
         }
 
         private List<int> GetSortedRowIndexes(DataGridViewSelectedRowCollection rows)
@@ -607,10 +609,10 @@ namespace KoPlayer.Forms
                     ResetSearchBox();
                 showingPlayList.Save();
                 showingPlayList = playList;
-                UpdateShowingPlayList();
                 songGridView.ClearSelection();
                 playListGridView.Rows[playLists.IndexOf(playList)].Cells[0].Selected = true;
-                playListGridView.Update();
+                UpdateShowingPlayList(true);
+                SetSortGlyph();
                 if (showingPlayList == partyMix)
                     PopulatePartyMix();
             }
@@ -790,10 +792,9 @@ namespace KoPlayer.Forms
             {
                 if (showingPlayList != partyMix)
                 {
-                    ResetSearchBox();
-                    showingPlayList.Sort(songGridView.Columns[e.ColumnIndex].HeaderText);
-                    UpdateShowingPlayList();
-                    songGridView.Columns[e.ColumnIndex].HeaderCell.SortGlyphDirection = library.SortOrder;
+                    showingPlayList.Sort(e.ColumnIndex, songGridView.Columns[e.ColumnIndex].HeaderText);
+                    UpdateShowingPlayList(false);
+                    SetSortGlyph();
                 }
             }
             else if (e.Button == System.Windows.Forms.MouseButtons.Right)
@@ -809,6 +810,14 @@ namespace KoPlayer.Forms
                 }
                 cm.Show(this, this.PointToClient(Cursor.Position));
             }
+        }
+
+        private void SetSortGlyph()
+        {
+            foreach (DataGridViewColumn column in songGridView.Columns)
+                column.HeaderCell.SortGlyphDirection = SortOrder.None;
+            if (showingPlayList.SortColumnIndex >= 0)
+                songGridView.Columns[showingPlayList.SortColumnIndex].HeaderCell.SortGlyphDirection = showingPlayList.SortOrder;
         }
 
         private void columnHeaderContextMenu_Click(object sender, EventArgs e)
@@ -860,7 +869,7 @@ namespace KoPlayer.Forms
             IPlayList newPlayList = new PlayList(library, name);
             playLists.Add(newPlayList);
             SetPlayListGridView();
-            songGridView.DataSource = newPlayList.GetAll();
+            songGridView.DataSource = newPlayList.GetSongs();
         }
         #endregion
 
@@ -906,7 +915,7 @@ namespace KoPlayer.Forms
                         if (showingPlayList == partyMix)
                             PopulatePartyMix();
                         else
-                            songGridView.DataSource = pl.GetAll();
+                            songGridView.DataSource = pl.GetSongs();
                     }
                 }
             }
@@ -937,7 +946,7 @@ namespace KoPlayer.Forms
                             pl.Add(s.Path);
                         }
                         if (pl == showingPlayList)
-                            UpdateShowingPlayList();
+                            UpdateShowingPlayList(true);
                     }
                 }
             }
@@ -979,7 +988,7 @@ namespace KoPlayer.Forms
         {
             if (searchBox.Text.Length == 0)
             {
-                UpdateShowingPlayList();
+                UpdateShowingPlayList(true);
                 ResetSearchBox();
             }
         }
@@ -1034,9 +1043,14 @@ namespace KoPlayer.Forms
         {
             ChangeToPlayList(library);
             if (searchBox.Text.Length > 0)
+            {
                 songGridView.DataSource = library.Search(searchBox.Text);
+                UpdateShowingPlayList(false);
+            }
             else if (searchBox.Text.Length == 0)
-                UpdateShowingPlayList();
+                UpdateShowingPlayList(true);
+            SetSortGlyph();
+            
         }
 
         private void searchBox_KeyDown(object sender, KeyEventArgs e)
@@ -1047,8 +1061,9 @@ namespace KoPlayer.Forms
                 if (e.KeyCode == Keys.Escape)
                 {
                     ResetSearchBox();
-                    UpdateShowingPlayList();
+                    UpdateShowingPlayList(true);
                 }
+                SetSortGlyph();
             }
         }
         #endregion

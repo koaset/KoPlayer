@@ -15,6 +15,7 @@ namespace KoPlayer.PlayLists
         string Path { get; }
         int NumSongs {get;}
         int CurrentIndex { get; set; }
+        int SortColumnIndex { get; set; }
         void Add(string path);
         void Add(Song song);
         void Add(List<Song> song);
@@ -26,9 +27,10 @@ namespace KoPlayer.PlayLists
         Song GetRandom();
         void AddFolder(string path);
         void RemoveFolder(string path);
-        void Sort(string field);
+        void Sort(int columnIndex, string field);
         SortOrder SortOrder { get; }
-        List<Song> GetAll();
+        BindingList<Song> GetSongs();
+        BindingList<Song> GetAllSongs();
         void Save();
     }
 

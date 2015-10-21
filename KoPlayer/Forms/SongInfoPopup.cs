@@ -32,8 +32,9 @@ namespace KoPlayer.Forms
             this.genre_box.Text = song.Genre;
             this.rating_numupdownstring.Value = song.Rating;
             this.playcount_box.Text = song.PlayCount.ToString();
-            this.dateadded_box.Text = song.DateAdded.ToShortTimeString();
-            this.lastplayed_box.Text = song.LastPlayed.ToShortTimeString();
+            this.dateadded_box.Text = song.DateAdded.ToShortDateString() + " " + song.DateAdded.ToShortTimeString();
+            if (song.LastPlayed.Ticks != 0)
+                this.lastplayed_box.Text = song.LastPlayed.ToShortDateString() + " " + song.LastPlayed.ToShortTimeString();
             this.path_box.Text = song.Path;
         }
 

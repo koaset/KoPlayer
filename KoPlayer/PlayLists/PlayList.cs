@@ -17,6 +17,7 @@ namespace KoPlayer.PlayLists
         [XmlIgnore]
         public string Path { get { return @"Playlists\" + Name + ".xml"; } }
         public string Name { get; set; }
+        public int SortColumnIndex { get; set; }
 
         private const string EXTENSION = ".mp3";
 
@@ -159,12 +160,12 @@ namespace KoPlayer.PlayLists
             throw new NotImplementedException();
         }
 
-        public void Sort(string field)
+        public void Sort(int columnindex, string field)
         {
  
         }
 
-        public List<Song> GetAll()
+        public BindingList<Song> GetSongs()
         {
             if (songPaths.Count == 0)
                 return null;
@@ -172,7 +173,12 @@ namespace KoPlayer.PlayLists
             foreach (string songPath in songPaths)
                 if (libraryDictionary.ContainsKey(songPath))
                     songs.Add(libraryDictionary[songPath]);
-            return songs;
+            return new BindingList<Song>(songs);
+        }
+
+        public BindingList<Song> GetAllSongs()
+        {
+            return GetSongs();
         }
 
         public Song Get(string path)

@@ -1,4 +1,4 @@
-Make sorting apply to currently showing tracks
+Make sorting possible in playlists
 Create settings menu
 Right click song or playlist menu
 Reload song tags on play, otherwise do something
