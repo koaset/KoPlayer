@@ -77,6 +77,8 @@
       <DependentUpon>SongInfoPopup.cs</DependentUpon>
     </Compile>
     <Compile Include="PlayLists\Library.cs" />
+    <Compile Include="PlayLists\Searching.cs" />
+    <Compile Include="PlayLists\Sorting.cs" />
     <Compile Include="Settings\ColumnSettings.cs" />
     <Compile Include="PlayLists\IPlayList.cs" />
     <Compile Include="PlayLists\PlayList.cs" />

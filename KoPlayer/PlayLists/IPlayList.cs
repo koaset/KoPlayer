@@ -17,11 +17,11 @@ namespace KoPlayer.PlayLists
         int CurrentIndex { get; set; }
         int SortColumnIndex { get; set; }
         void Add(string path);
-        void Add(Song song);
         void Add(List<Song> song);
-        void Remove(int index);
-        void Remove(string path);
-        void Remove(Song song);
+        void Remove(int indexes);
+        void Remove(List<int> indexes);
+        void Remove(List<Song> songs);
+        void RemoveAll();
         Song GetNext();
         Song GetPrevious();
         Song GetRandom();

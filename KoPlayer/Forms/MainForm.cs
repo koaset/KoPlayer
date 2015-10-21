@@ -308,7 +308,8 @@ namespace KoPlayer.Forms
         void library_LibraryChanged(object sender, LibraryChangedEventArgs e)
         {
             if (showingPlayList == library)
-                UpdateShowingPlayList(false);
+                UpdateShowingPlayList(true);
+            PopulatePartyMix();
         }
 
         void library_ReportProgress(object sender, ReportProgressEventArgs e)
@@ -356,10 +357,10 @@ namespace KoPlayer.Forms
             if (tagFile.Tag.Pictures.Length > 0)
             {
                 MemoryStream ms = new MemoryStream(tagFile.Tag.Pictures[0].Data.Data);
-                pictureBox1.Image = System.Drawing.Image.FromStream(ms);
+                albumArtBox.Image = System.Drawing.Image.FromStream(ms);
             }
             else
-                pictureBox1.Image = null;
+                albumArtBox.Image = null;
         }
 
         private void UpdateSongInfoLabel()
@@ -498,19 +499,38 @@ namespace KoPlayer.Forms
 
         private void DeleteSongs(DataGridViewSelectedRowCollection rows)
         {
-            List<int> indexList = GetSortedRowIndexes(rows);
-            foreach (int i in indexList)
+            if (songGridView.AreAllCellsSelected(false))
+                showingPlayList.RemoveAll();
+            else
             {
-                if (currentlyPlaying != null)
-                    if (playingPlayList.CurrentIndex == i)
-                        StopPlaying();
-                showingPlayList.Remove(i);
+                List<int> indexList = GetSortedRowIndexes(rows);
+                foreach (int i in indexList)
+                {
+                    if (currentlyPlaying != null)
+                    {
+                        if (showingPlayList == library)
+                        {
+                            if (currentlyPlaying == (Song)songGridView.Rows[i].DataBoundItem)
+                            {
+                                StopPlaying();
+                                albumArtBox.Image = null;
+                            }
+                        }
+                        else
+                            if (playingPlayList.CurrentIndex == i)
+                            {
+                                StopPlaying();
+                                albumArtBox.Image = null;
+                            }
+                    }
+                }
+                showingPlayList.Remove(indexList);
             }
-            
+
             if (showingPlayList == partyMix)
                 PopulatePartyMix();
             showingPlayList.Save();
-            UpdateShowingPlayList(true);
+            UpdateShowingPlayList(false);
         }
 
         private List<int> GetSortedRowIndexes(DataGridViewSelectedRowCollection rows)
@@ -1011,7 +1031,7 @@ namespace KoPlayer.Forms
 
         private void searchBox_TextChanged(object sender, EventArgs e)
         {
-            if (searchBox.Text != searchBoxDefault && searchBox.Text.Length > 0)
+            if (searchBox.Text != searchBoxDefault)
             {
                 if (searchLibraryTimer != null)
                 {

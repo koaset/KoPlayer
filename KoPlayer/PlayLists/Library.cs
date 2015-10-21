@@ -24,22 +24,18 @@ namespace KoPlayer.PlayLists
         public int SortColumnIndex { get; set; }
         public Dictionary<string, Song> Dictionary { get { return pathDictionary; } }
 
-        public static readonly string[] sortColumns = { "title", "artist", 
-                                                           "album", "genre", 
-                                                           "rating", "play count", 
-                                                           "length", "date added", 
-                                                           "last played"};
-        private List<Dictionary<string, List<Song>>> sortDictionaries;
-
         private const string PATH = "Library.xml";
         private const string EXTENSION = ".mp3";
 
         private BindingList<Song> outputSongs;
         private Dictionary<string, Song> pathDictionary;
+        private List<Dictionary<string, List<Song>>> sortDictionaries;
+        private List<Song> newSongs;
 
         public SortOrder SortOrder { get { return sortOrder; } }
         private SortOrder sortOrder;
         private string sortField = "";
+        private bool raiseLibraryChangedEvent = true;
 
         public int NumSongs
         {
@@ -58,20 +54,12 @@ namespace KoPlayer.PlayLists
                 this.outputSongs = new BindingList<Song>(songs);
             else
                 this.outputSongs = new BindingList<Song>();
-            this.pathDictionary = SongListToDictionary();
+            this.pathDictionary = SongListToPathDictionary();
             this.CurrentIndex = 0;
             ResetSortVariables();
 
             sortDictionaries = new List<Dictionary<string, List<Song>>>();
-
-            CreateSortDictionaries(this.outputSongs);
-        }
-
-        private void CreateSortDictionaries(BindingList<Song> sourceList)
-        {
-            sortDictionaries.Clear();
-            for (int i = 0; i < sortColumns.Length; i++)
-                sortDictionaries.Add(CreateFieldDictionary(sourceList, sortColumns[i]));
+            Sorting.CreateSortDictionaries(this.outputSongs, this.sortDictionaries);
         }
 
         public Song Get(string path)
@@ -92,48 +80,7 @@ namespace KoPlayer.PlayLists
                 this.sortOrder = SortOrder.Ascending;
             this.SortColumnIndex = columnIndex;
             this.sortField = field;
-            SortOutput(field, this.sortOrder);
-        }
-
-        private void SortOutput(string field, SortOrder sortOrder)
-        {
-            this.sortOrder = sortOrder;
-            
-            Dictionary<string, List<Song>> sortDictionary = GetDictionary(field);
-            if (sortDictionary == null)
-                throw new PlayListException("Invalid field name");
-
-            SortedDictionary<string, List<Song>> sortedDictionary;
-            sortedDictionary = new SortedDictionary<string, List<Song>>(sortDictionary);
-
-            IEnumerable<string> keys = sortedDictionary.Keys;
-            if (sortOrder == SortOrder.Descending)
-                keys = keys.Reverse();
-            
-            List<Song> songList = new List<Song>();
-
-            foreach (string key in keys)
-            {
-                if (field.ToLower() == "album" || field.ToLower() == "artist")
-                {
-                    sortedDictionary[key].Sort(delegate(Song song1, Song song2)
-                    {
-                        return song1.CompareTo(song2);
-                    });
-                }
-                songList.AddRange(sortedDictionary[key]);
-            }
-            this.outputSongs = new BindingList<Song>(songList);
-        }
-
-        private Dictionary<string, List<Song>> GetDictionary(string field)
-        {
-            for (int i = 0; i < sortColumns.Length; i++)
-            {
-                if (field.ToLower() == sortColumns[i].ToLower())
-                    return sortDictionaries[i];
-            }
-            return null;
+            Sorting.Sort(field, this.sortOrder, this.sortDictionaries, ref this.outputSongs);
         }
 
         private Dictionary<string, List<Song>> GetPathListDictionary()
@@ -157,7 +104,7 @@ namespace KoPlayer.PlayLists
         {
             ResetSortVariables();
             this.outputSongs = new BindingList<Song>(pathDictionary.Values.ToList());
-            CreateSortDictionaries(this.outputSongs);
+            Sorting.CreateSortDictionaries(this.outputSongs, this.sortDictionaries);
             return GetSongs();
         }
 
@@ -179,7 +126,7 @@ namespace KoPlayer.PlayLists
                 {
                     outputSongs.Add(song);
                     this.pathDictionary.Add(song.Path, song);
-                    AddSongToFieldDictionaries(song);
+                    Sorting.AddSongToSortDictionaries(song, sortDictionaries);
                     OnLibraryChanged(new LibraryChangedEventArgs());
                 }
         }
@@ -192,10 +139,18 @@ namespace KoPlayer.PlayLists
 
         public void Remove(int index)
         {
-            RemoveSongFromFieldDictionaries(outputSongs[index]);
+            Sorting.RemoveSongFromSortDictionaries(outputSongs[index], sortDictionaries);
             this.pathDictionary.Remove(outputSongs[index].Path);
             outputSongs.Remove(outputSongs[index]);
-            
+            OnLibraryChanged(new LibraryChangedEventArgs());
+        }
+
+        public void Remove(List<int> indexes)
+        {
+            raiseLibraryChangedEvent = false;
+            foreach (int i in indexes)
+                Remove(i);
+            raiseLibraryChangedEvent = true;
             OnLibraryChanged(new LibraryChangedEventArgs());
         }
 
@@ -204,16 +159,32 @@ namespace KoPlayer.PlayLists
             Remove(song.Path);
         }
 
+        public void Remove(List<Song> songs)
+        {
+            this.outputSongs.RaiseListChangedEvents = false;
+            this.outputSongs.RaiseListChangedEvents = false;
+            foreach (Song s in songs)
+                Remove(s.Path);
+            this.outputSongs.RaiseListChangedEvents = true;
+            OnLibraryChanged(new LibraryChangedEventArgs());
+        }
+
         public void Remove(string path)
         {
             Song toBeRemoved = null;
             foreach (Song s in outputSongs)
                 if (s.Path == path)
                     toBeRemoved = s;
-            RemoveSongFromFieldDictionaries(toBeRemoved);
+            Sorting.RemoveSongFromSortDictionaries(toBeRemoved, sortDictionaries);
             outputSongs.Remove(toBeRemoved);
             this.pathDictionary.Remove(toBeRemoved.Path);
-            OnLibraryChanged(new LibraryChangedEventArgs());
+        }
+
+        public void RemoveAll()
+        {
+            this.outputSongs = new BindingList<Song>();
+            this.pathDictionary.Clear();
+            Sorting.CreateSortDictionaries(this.outputSongs, this.sortDictionaries);
         }
 
         public Song GetNext()
@@ -249,7 +220,8 @@ namespace KoPlayer.PlayLists
 
 
         public void AddFolder(string path)
-        {            
+        {
+            this.newSongs = new List<Song>();
             BackgroundWorker addFilesWorker = new BackgroundWorker();
             addFilesWorker.WorkerSupportsCancellation = false;
             addFilesWorker.WorkerReportsProgress = true;
@@ -257,33 +229,28 @@ namespace KoPlayer.PlayLists
             addFilesWorker.ProgressChanged += addFilesWorker_ProgressChanged;
             addFilesWorker.RunWorkerCompleted += addFilesWorker_RunWorkerCompleted;
             addFilesWorker.RunWorkerAsync(path);
+            this.outputSongs.RaiseListChangedEvents = false;
         }
 
         void addFilesWorker_DoWork(object sender, DoWorkEventArgs e)
         {
             BackgroundWorker worker = sender as BackgroundWorker;
             string path = e.Argument as string;
-            try
+
+            string[] mp3Files = Directory.GetFiles(path, "*" + EXTENSION, SearchOption.AllDirectories);
+            int count = 0;
+            foreach (string fileName in mp3Files)
             {
-                string[] mp3Files = Directory.GetFiles(path, "*" + EXTENSION, SearchOption.AllDirectories);
-                int count = 0;
-                foreach (string fileName in mp3Files)
+                if (!Exists(fileName))
                 {
-                    if (!Exists(fileName))
-                    {
-                        Song newSong = new Song(fileName);
-                        this.outputSongs.Add(newSong);
-                        this.pathDictionary.Add(fileName, newSong);
-                        if (count % 50 == 0)
-                            worker.ReportProgress((int)(100 * count / mp3Files.Length));
-                    }
-                    count++;
+                    Song newSong = new Song(fileName);
+                    this.newSongs.Add(newSong);
+                    if (count % 50 == 0)
+                        worker.ReportProgress((int)(100 * count / mp3Files.Length));
                 }
+                count++;
             }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Add folder exception: " + ex.ToString());
-            }
+            
             worker.ReportProgress(100);
         }
 
@@ -300,14 +267,24 @@ namespace KoPlayer.PlayLists
 
         protected virtual void OnLibraryChanged(LibraryChangedEventArgs e)
         {
-            if (LibraryChanged != null)
-                LibraryChanged(this, e);
+            this.outputSongs.ResetBindings();
+            if (raiseLibraryChangedEvent)
+                if (LibraryChanged != null)
+                    LibraryChanged(this, e);
         }
 
         void addFilesWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
+            List<Song> newLibrary = new List<Song>(this.outputSongs.ToList());
+            newLibrary.AddRange(newSongs);
+            this.outputSongs = new BindingList<Song>(newLibrary);
+            foreach (Song s in newSongs)
+                if (!pathDictionary.Keys.Contains(s.Path))
+                    pathDictionary.Add(s.Path, s);
+            this.outputSongs.RaiseListChangedEvents = true;
             Save();
-            CreateSortDictionaries(this.outputSongs);
+            Sorting.CreateSortDictionaries(this.outputSongs, this.sortDictionaries);
+            this.outputSongs.ResetBindings();
             OnLibraryChanged(new LibraryChangedEventArgs());
         }
 
@@ -368,11 +345,11 @@ namespace KoPlayer.PlayLists
         {
             ResetSortVariables();
             searchString = searchString.ToLower().Trim();
-            CreateSortDictionaries(new BindingList<Song>(pathDictionary.Values.ToList()));
+            Sorting.CreateSortDictionaries(new BindingList<Song>(pathDictionary.Values.ToList()), this.sortDictionaries);
             this.outputSongs = new BindingList<Song>();
             for (int i = 0; i < 4; i++)
                 AddUniqueSearchResults(searchString, sortDictionaries[i]);
-            CreateSortDictionaries(this.outputSongs);
+            Sorting.CreateSortDictionaries(this.outputSongs, this.sortDictionaries);
             return this.outputSongs;
         }
 
@@ -386,8 +363,8 @@ namespace KoPlayer.PlayLists
         private void AddUniqueSearchResults(string searchString,
             Dictionary<string, List<Song>> dictionary)
         {
-            List<string> keysToAdd = WholeStringKeySearch(searchString, dictionary);
-
+            List<string> keysToAdd = Searching.WholeStringKeySearch(searchString, dictionary);
+            
             foreach (string keyToAdd in keysToAdd)
             {
                 List<Song> currentList = dictionary[keyToAdd];
@@ -397,140 +374,7 @@ namespace KoPlayer.PlayLists
             }
         }
 
-        /// <summary>
-        /// Divides the search string into words and returns all keys where the field contains all words
-        /// </summary>
-        /// <param name="searchString"></param>
-        /// <param name="dictionary"></param>
-        /// <returns></returns>
-        private List<string> SeparateWordAndSearch(string searchString,
-            Dictionary<string, List<Song>> dictionary)
-        {
-            string[] searchTerms = searchString.Split(' ');
-            List<List<string>> matchingKeyLists = new List<List<string>>();
-            foreach (string term in searchTerms)
-            {
-                if (term.Length > 0)
-                {
-                    List<string> matchingKeyList = dictionary.Where(x => x.Key.ToLower().Contains(term)).Select(x => x.Key).ToList();
-                    matchingKeyLists.Add(matchingKeyList);
-                }
-            }
-
-            List<string> keysToAdd = new List<string>();
-
-            if (matchingKeyLists.Count > 1)
-            {
-                List<string> comparer = matchingKeyLists[0];
-                matchingKeyLists.Remove(comparer);
-                foreach (string key in comparer)
-                {
-                    bool inAll = true;
-                    foreach (List<string> otherList in matchingKeyLists)
-                    {
-                        if (!otherList.Contains(key))
-                            inAll = false;
-                    }
-                    if (inAll)
-                        keysToAdd.Add(key);
-                }
-            }
-            else
-                keysToAdd.AddRange(matchingKeyLists[0]);
-            return keysToAdd;
-        }
-
-        /// <summary>
-        /// Divides the search string into words and returns all keys contaning any word
-        /// </summary>
-        /// <param name="searchString"></param>
-        /// <param name="dictionary"></param>
-        /// <returns></returns>
-        private List<string> SeparateWordOrSearch(string searchString,
-            Dictionary<string, List<Song>> dictionary)
-        {
-            string[] searchTerms = searchString.Split(' ');
-            List<List<string>> matchingKeyLists = new List<List<string>>();
-            foreach (string term in searchTerms)
-            {
-                if (term.Length > 0)
-                {
-                    List<string> matchingKeyList = dictionary.Where(x => x.Key.ToLower().Contains(term)).Select(x => x.Key).ToList();
-                    matchingKeyLists.Add(matchingKeyList);
-                }
-            }
-            List<string> keysToAdd = new List<string>();
-
-            //Must contain any search term in any field
-            
-            keysToAdd.AddRange(matchingKeyLists[0]);
-            matchingKeyLists.Remove(matchingKeyLists[0]);
-            if (matchingKeyLists.Count > 0)
-            {
-                foreach (List<string> matchingKeyList in matchingKeyLists)
-                    foreach (string key in matchingKeyList)
-                        if (!keysToAdd.Contains(key))
-                            keysToAdd.Add(key);
-            }
-            return keysToAdd;
-        }
-
-        /// <summary>
-        /// Gets all keys containing the whole search string in one piece
-        /// </summary>
-        /// <param name="searchString"></param>
-        /// <param name="dictionary"></param>
-        /// <returns></returns>
-        private List<string> WholeStringKeySearch(string searchString,
-            Dictionary<string, List<Song>> dictionary)
-        {
-            return dictionary.Where(x => x.Key.ToLower().Contains(searchString)).Select(x => x.Key).ToList();
-        }
-
-        private static Dictionary<string, List<Song>> CreateFieldDictionary(BindingList<Song> sourceList, string field)
-        {
-            Dictionary<string, List<Song>> fieldDictionary = new Dictionary<string, List<Song>>();
-            foreach (Song s in sourceList)
-                AddToFieldDictionary(fieldDictionary, field, s);
-            return fieldDictionary;
-        }
-
-        private static void AddToFieldDictionary(Dictionary<string, List<Song>> dictionary, string field, Song song)
-        {
-            if (song[field] != null && dictionary.ContainsKey(song[field]))
-                dictionary[song[field]].Add(song);
-            else
-            {
-                List<Song> newEntry = new List<Song>();
-                newEntry.Add(song);
-                if (song[field] != null)
-                    dictionary.Add(song[field], newEntry);
-            }
-        }
-
-        private void AddSongToFieldDictionaries(Song song)
-        {
-            for (int i = 0; i < sortColumns.Length; i++)
-                AddToFieldDictionary(sortDictionaries[i], sortColumns[i], song);
-        }
-
-        private static void RemoveFromFieldDictionary(Dictionary<string, List<Song>> dictionary, string field, Song song)
-        {
-            if (dictionary.ContainsKey(song[field]))
-            {
-                dictionary[song[field]].Remove(song);
-                if (dictionary[song[field]].Count == 0)
-                    dictionary.Remove(song[field]);
-            }
-        }
-
-        private void RemoveSongFromFieldDictionaries(Song song)
-        {
-            for (int i = 0; i < sortColumns.Length; i++)
-                RemoveFromFieldDictionary(sortDictionaries[i], sortColumns[i], song);
-        }
-
-        private Dictionary<string, Song> SongListToDictionary()
+        private Dictionary<string, Song> SongListToPathDictionary()
         {
             return outputSongs.ToDictionary(x => x.Path, x => x);
         }
