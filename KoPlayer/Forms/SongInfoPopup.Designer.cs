@@ -294,6 +294,7 @@
             this.previous_button.TabIndex = 29;
             this.previous_button.Text = "Previous";
             this.previous_button.UseVisualStyleBackColor = true;
+            this.previous_button.Click += new System.EventHandler(this.previous_button_Click);
             // 
             // next_button
             // 
@@ -303,6 +304,7 @@
             this.next_button.TabIndex = 30;
             this.next_button.Text = "Next";
             this.next_button.UseVisualStyleBackColor = true;
+            this.next_button.Click += new System.EventHandler(this.next_button_Click);
             // 
             // rating_numupdownstring
             // 

@@ -29,6 +29,7 @@ namespace KoPlayer.Forms
         public const string PARTYMIXFILEPATH = @"Playlists\Party Mix.xml";
         private const string COLUMNSETTINGSPATH = @"Settings\column_settings.xml";
         private const string DEFAULTCOLUMNSETTINGSPATH = @"Settings\default_column_settings.xml";
+        private static readonly int[] ratingHotkeys = { 220, 49, 50, 51, 52, 53 };
 
         public Settings Settings { get { return settings; } set { settings = value; } }
         public Random Random { get { return random; } }
@@ -55,7 +56,7 @@ namespace KoPlayer.Forms
         private System.Timers.Timer searchLibraryTimer;
         private int searchLibraryTimerInterval = 500;
         private PlayList renamePlaylist;
-        private Song clickedSong;
+        private int clickedIndex;
         #endregion
 
         #region Constructor & Load event
@@ -129,6 +130,8 @@ namespace KoPlayer.Forms
                     songGridView.DataSource = showingPlayList.GetAllSongs();
                 else
                     songGridView.DataSource = showingPlayList.GetSongs();
+                if (showingPlayList == partyMix)
+                    SetPartyMixColors();
             }
         }
 
@@ -210,7 +213,6 @@ namespace KoPlayer.Forms
                     else
                         UpdateShowingPlayList(true);
                     songGridView.ClearSelection();
-                    SetPartyMixColors();
                 }
             }
         }
@@ -491,46 +493,86 @@ namespace KoPlayer.Forms
         private void songGridView_KeyDown(object sender, KeyEventArgs e)
         {
             if (songGridView.Focused)
-                if (e.KeyCode == Keys.Delete)
+            {
+                if (e.Control)
+                {
+                    if (ratingHotkeys.Contains(e.KeyValue))
+                        RateSongs(songGridView.SelectedRows, Array.IndexOf(ratingHotkeys, (int)e.KeyValue));
+
+                }
+                else if (e.KeyCode == Keys.Enter)
+                {
+                    PlaySong(songGridView.SelectedRows[0].DataBoundItem as Song, showingPlayList);
+                }
+                else if (e.KeyCode == Keys.Delete)
                 {
                     DeleteSongs(songGridView.SelectedRows);
                 }
+            }
+        }
+
+        private void RateSongs(DataGridViewSelectedRowCollection rows, int rating)
+        {
+            foreach (DataGridViewRow row in rows)
+            {
+                Song s = row.DataBoundItem as Song;
+                s.Rating = rating;
+            }
+            songGridView.Refresh();
+            showingPlayList.Save();
         }
 
         private void DeleteSongs(DataGridViewSelectedRowCollection rows)
         {
-            if (songGridView.AreAllCellsSelected(false))
-                showingPlayList.RemoveAll();
-            else
+            bool shouldDelete = true;
+            if (rows.Count > 25)
             {
-                List<int> indexList = GetSortedRowIndexes(rows);
-                foreach (int i in indexList)
-                {
-                    if (currentlyPlaying != null)
-                    {
-                        if (showingPlayList == library)
-                        {
-                            if (currentlyPlaying == (Song)songGridView.Rows[i].DataBoundItem)
-                            {
-                                StopPlaying();
-                                albumArtBox.Image = null;
-                            }
-                        }
-                        else
-                            if (playingPlayList.CurrentIndex == i)
-                            {
-                                StopPlaying();
-                                albumArtBox.Image = null;
-                            }
-                    }
-                }
-                showingPlayList.Remove(indexList);
-            }
+                string queryMessage = "You are about to delete " + rows.Count + " songs from the ";
+                if (showingPlayList != library)
+                    queryMessage += "playlist";
+                else
+                    queryMessage += "library";
+                queryMessage += ".\nAre you sure?";
 
-            if (showingPlayList == partyMix)
-                PopulatePartyMix();
-            showingPlayList.Save();
-            UpdateShowingPlayList(false);
+                DialogResult dialogResult = MessageBox.Show(queryMessage, "", MessageBoxButtons.OKCancel);
+                if (dialogResult == DialogResult.Cancel)
+                    shouldDelete = false;
+            }
+            if (shouldDelete)
+            {
+                if (songGridView.AreAllCellsSelected(false))
+                    showingPlayList.RemoveAll();
+                else
+                {
+                    List<int> indexList = GetSortedRowIndexes(rows);
+                    foreach (int i in indexList)
+                    {
+                        if (currentlyPlaying != null)
+                        {
+                            if (showingPlayList == library)
+                            {
+                                if (currentlyPlaying == (Song)songGridView.Rows[i].DataBoundItem)
+                                {
+                                    StopPlaying();
+                                    albumArtBox.Image = null;
+                                }
+                            }
+                            else
+                                if (playingPlayList.CurrentIndex == i)
+                                {
+                                    StopPlaying();
+                                    albumArtBox.Image = null;
+                                }
+                        }
+                    }
+                    showingPlayList.Remove(indexList);
+                }
+
+                if (showingPlayList == partyMix)
+                    PopulatePartyMix();
+                showingPlayList.Save();
+                UpdateShowingPlayList(false);
+            }
         }
 
         private List<int> GetSortedRowIndexes(DataGridViewSelectedRowCollection rows)
@@ -631,10 +673,11 @@ namespace KoPlayer.Forms
                 showingPlayList = playList;
                 songGridView.ClearSelection();
                 playListGridView.Rows[playLists.IndexOf(playList)].Cells[0].Selected = true;
-                UpdateShowingPlayList(true);
                 SetSortGlyph();
                 if (showingPlayList == partyMix)
                     PopulatePartyMix();
+                else
+                    UpdateShowingPlayList(true);
             }
         }
         #endregion
@@ -1138,21 +1181,78 @@ namespace KoPlayer.Forms
         {
             if (e.Button == System.Windows.Forms.MouseButtons.Right)
             {
-                int rowIndex = songGridView.HitTest(e.X, e.Y).RowIndex;
-                if (rowIndex >= 0)
+                this.clickedIndex = songGridView.HitTest(e.X, e.Y).RowIndex;
+                if (this.clickedIndex >= 0)
                 {
-                    this.clickedSong = songGridView.Rows[rowIndex].DataBoundItem as Song;
-                    if (songGridView.Rows[rowIndex].Cells[0].Selected != true)
+                    if (songGridView.Rows[this.clickedIndex].Cells[0].Selected != true)
                         songGridView.ClearSelection();
-                    songGridView.Rows[rowIndex].Cells[0].Selected = true;
+                    songGridView.Rows[this.clickedIndex].Cells[0].Selected = true;
 
-                    ContextMenu cm = new ContextMenu();
-                    cm.MenuItems.Add(CreateMenuItem("Delete", songGridViewRightClickDelete));
-                    cm.MenuItems.Add(CreateMenuItem("Properties", songGridViewRightClickProperties));
+                    ContextMenu cm = CreateSongRightClickMen();
                     cm.Show(this, this.PointToClient(Cursor.Position));
                 }
             }
         }
+
+        private ContextMenu CreateSongRightClickMen()
+        {
+            ContextMenu cm = new ContextMenu();
+            cm.MenuItems.Add(CreateMenuItem("Properties", songGridViewRightClickProperties));
+            MenuItem ratingMenu = new MenuItem("Set Rating");
+            #region Rating menu
+            ratingMenu.MenuItems.Add("Rate 0 (ctrl + §)");
+            ratingMenu.MenuItems.Add("Rate 1 (ctrl + 1)");
+            ratingMenu.MenuItems.Add("Rate 2 (ctrl + 2)");
+            ratingMenu.MenuItems.Add("Rate 3 (ctrl + 3)");
+            ratingMenu.MenuItems.Add("Rate 4 (ctrl + 4)");
+            ratingMenu.MenuItems.Add("Rate 5 (ctrl + 5)");
+            ratingMenu.MenuItems[0].Click += rate0_Click;
+            ratingMenu.MenuItems[1].Click += rate1_Click;
+            ratingMenu.MenuItems[2].Click += rate2_Click;
+            ratingMenu.MenuItems[3].Click += rate3_Click;
+            ratingMenu.MenuItems[4].Click += rate4_Click;
+            ratingMenu.MenuItems[5].Click += rate5_Click;
+            #endregion
+            cm.MenuItems.Add(ratingMenu);
+            cm.MenuItems.Add(CreateMenuItem("Delete", songGridViewRightClickDelete));
+            return cm;
+        }
+
+        #region Right click menu events
+
+        #region Rating menu events
+        void rate0_Click(object sender, EventArgs e)
+        {
+            RateSongs(songGridView.SelectedRows, 0);
+        }
+
+        void rate1_Click(object sender, EventArgs e)
+        {
+            RateSongs(songGridView.SelectedRows, 1);
+        }
+
+        void rate2_Click(object sender, EventArgs e)
+        {
+            RateSongs(songGridView.SelectedRows, 2);
+        }
+
+        void rate3_Click(object sender, EventArgs e)
+        {
+            RateSongs(songGridView.SelectedRows, 3);
+        }
+
+        void rate4_Click(object sender, EventArgs e)
+        {
+            RateSongs(songGridView.SelectedRows, 4);
+        }
+
+        void rate5_Click(object sender, EventArgs e)
+        {
+            RateSongs(songGridView.SelectedRows, 5);
+        }
+        #endregion
+
+
 
         private void songGridViewRightClickDelete(object sender, EventArgs e)
         {
@@ -1161,11 +1261,13 @@ namespace KoPlayer.Forms
 
         private void songGridViewRightClickProperties(object sender, EventArgs e)
         {
-            SongInfoPopup popUp = new SongInfoPopup(this.clickedSong);
+            Song clickedSong = songGridView.Rows[clickedIndex].DataBoundItem as Song;
+            SongInfoPopup popUp = new SongInfoPopup(clickedSong, this.clickedIndex, this.showingPlayList);
             popUp.StartPosition = FormStartPosition.CenterParent;
             popUp.ShowDialog();
+            songGridView.Refresh();
         }
-
+        #endregion
         #endregion
         #endregion
     }

@@ -158,6 +158,9 @@ namespace KoPlayer.PlayLists
         public void RemoveAll()
         {
             this.songPaths = new List<string>();
+            this.outputSongs = new BindingList<Song>();
+            this.CurrentIndex = 0;
+            Sorting.CreateSortDictionaries(this.outputSongs, this.sortDictionaries);
         }
 
         public Song GetNext()
