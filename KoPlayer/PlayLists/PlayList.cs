@@ -133,15 +133,21 @@ namespace KoPlayer.PlayLists
             outputSongs.Remove(this.outputSongs[index]);
         }
 
+        public void Remove(string path)
+        {
+            int index;
+            while ((index = songPaths.IndexOf(path)) > -1)
+            {
+                if (CurrentIndex > index)
+                    CurrentIndex--;
+                songPaths.RemoveAt(index);
+            }
+        }
+
         public void Remove(List<int> indexes)
         {
             foreach (int i in indexes)
                 Remove(i);
-        }
-
-        public void Remove(string path)
-        {
-            throw new NotImplementedException();
         }
 
         public void Remove(Song song)
@@ -294,6 +300,14 @@ namespace KoPlayer.PlayLists
             }
             PlayList pl = new PlayList(library, loadedPlayList.Name, loadedPlayList.songPaths);
             library.LibraryChanged += pl.library_LibraryChanged;
+
+            List<string> toBeRemoved = new List<string>();
+            foreach (string filePath in pl.songPaths)
+                if (!library.Dictionary.Keys.Contains(filePath))
+                    toBeRemoved.Add(filePath);
+            foreach (string filePath in toBeRemoved)
+                pl.Remove(filePath);
+
             return pl;
         }
     }

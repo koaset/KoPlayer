@@ -360,6 +360,7 @@
             this.Controls.Add(this.title_box);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "SongInfoPopup";
+            this.ShowInTaskbar = false;
             this.Text = "Song Properties";
             this.Load += new System.EventHandler(this.SongInfoPopup_Load);
             ((System.ComponentModel.ISupportInitialize)(this.rating_numupdownstring)).EndInit();

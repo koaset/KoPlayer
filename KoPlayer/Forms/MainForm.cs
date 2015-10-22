@@ -35,6 +35,7 @@ namespace KoPlayer.Forms
         #region Properties
         public Settings Settings { get { return settings; } set { settings = value; } }
         public Random Random { get { return random; } }
+        public Song CurrentlyPlaying { get { return this.currentlyPlaying; } }
         #endregion
 
         #region Fields
@@ -143,6 +144,7 @@ namespace KoPlayer.Forms
         {
             playLists = new List<IPlayList>();
             playLists.Add(library);
+
             partyMix = PlayList.Load(PARTYMIXFILEPATH, library);
             if (partyMix == null)
             {
@@ -150,6 +152,7 @@ namespace KoPlayer.Forms
                 partyMix.Save();
             }
             playLists.Add(partyMix);
+
             string[] playListFiles = Directory.GetFiles(PLAYLISTDIRECTORYPATH, "*.xml", SearchOption.AllDirectories);
             foreach (string playListPath in playListFiles)
                 if (playListPath != PARTYMIXFILEPATH)
@@ -770,7 +773,6 @@ namespace KoPlayer.Forms
             else
                 songLength_Label.Text = Song.DurationFromTimeSpanToString(musicPlayer.Length);
         }
-        #endregion
 
         #region Set control value methods
         private void SetSearchBarValue(int value)
@@ -806,6 +808,7 @@ namespace KoPlayer.Forms
                 volumeTrackBar.Value = value;
             }
         }
+        #endregion
         #endregion
 
         #region Searchbar events
@@ -1229,6 +1232,8 @@ namespace KoPlayer.Forms
                 cm.MenuItems.Add(CreateMenuItem("Pause", songGridViewRightClickPause));
             if (musicPlayer.PlaybackState == PlaybackState.Paused)
                 cm.MenuItems.Add(CreateMenuItem("Resume", songGridViewRightClickResume));
+            cm.MenuItems.Add(CreateMenuItem("Queue next in party mix", songGridViewRightClickAddToPartyMixNext));
+            cm.MenuItems.Add(CreateMenuItem("Add songs to party mix", songGridViewRightClickAddToPartyMixBottom));
             MenuItem ratingMenu = new MenuItem("Set Rating");
             #region Rating menu
             ratingMenu.MenuItems.Add("Rate 0 (ctrl + §)");
@@ -1301,6 +1306,26 @@ namespace KoPlayer.Forms
                 PlayMusic();
         }
 
+        private void songGridViewRightClickAddToPartyMixNext(object sender, EventArgs e)
+        {
+            List<Song> songs = new List<Song>();
+            foreach (DataGridViewRow row in songGridView.SelectedRows)
+                songs.Add((Song)row.DataBoundItem);
+            partyMix.Insert(partyMix.CurrentIndex + 1, songs);
+
+            if (showingPlayList == partyMix)
+                UpdateShowingPlayList(true);
+        }
+
+        private void songGridViewRightClickAddToPartyMixBottom(object sender, EventArgs e)
+        {
+            foreach (DataGridViewRow row in songGridView.SelectedRows)
+                partyMix.Add((Song)row.DataBoundItem);
+
+            if (showingPlayList == partyMix)
+                UpdateShowingPlayList(true);
+        }
+
         private void songGridViewRightClickDelete(object sender, EventArgs e)
         {
             DeleteSongs(songGridView.SelectedRows);
@@ -1322,7 +1347,7 @@ namespace KoPlayer.Forms
             }
             if (exists)
             {
-                SongInfoPopup popUp = new SongInfoPopup(clickedSong, this.clickedIndex, this.showingPlayList, this.currentlyPlaying);
+                SongInfoPopup popUp = new SongInfoPopup(this, clickedSong, this.clickedIndex, this.showingPlayList);
                 popUp.SavePlayingSong += popUp_SavePlayingSong;
                 popUp.StartPosition = FormStartPosition.CenterParent;
                 popUp.ShowDialog();

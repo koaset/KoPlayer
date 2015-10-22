@@ -20,14 +20,15 @@ namespace KoPlayer.Forms
         private Song song;
         private int currentIndex;
         private IPlayList currentPlayList;
-        private Song currentlyPlaying;
+        private MainForm mainForm;
 
-        public SongInfoPopup(Song song, int clickedIndex, IPlayList currentPlayList, Song currentlyPlaying)
+        public SongInfoPopup(MainForm mainForm, Song song, int clickedIndex, IPlayList currentPlayList)
         {
+            this.mainForm = mainForm;
             this.song = song;
             this.currentIndex = clickedIndex;
             this.currentPlayList = currentPlayList;
-            this.currentlyPlaying = currentlyPlaying;
+
             InitializeComponent();
         }
 
@@ -86,7 +87,7 @@ namespace KoPlayer.Forms
         {
             this.song.Rating = (int)this.rating_numupdownstring.Value;
 
-            if (this.song != currentlyPlaying)
+            if (this.song != this.mainForm.CurrentlyPlaying)
             {
                 this.song.Title = this.title_box.Text;
                 this.song.Artist = this.artist_box.Text;
