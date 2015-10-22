@@ -35,7 +35,7 @@
       <DisplayIndex>6</DisplayIndex>
       <Name>PlayCount</Name>
       <Width>84</Width>
-      <Visible>false</Visible>
+      <Visible>true</Visible>
     </ColumnSetting>
     <ColumnSetting>
       <DisplayIndex>1</DisplayIndex>

@@ -189,12 +189,18 @@ namespace KoPlayer.PlayLists
         {
             using (TagLib.File track = TagLib.File.Create(Path))
             {
-                track.Tag.Title = this.Title;
+                if (this.Title != null && this.Title != "")
+                    track.Tag.Title = this.Title;
+                if (this.Artist != null && this.Artist != "")
                 track.Tag.Performers[0] = this.Artist;
-                track.Tag.Album = this.Album;
-                track.Tag.Genres[0] = this.Genre;
-                track.Tag.Track = (uint)this.TrackNumber;
-                track.Tag.Disc = (uint)this.DiscNumber;
+                if (this.Album != null && this.Album != "")
+                    track.Tag.Album = this.Album;
+                if (this.Genre != null  && this.Genre != "")
+                    track.Tag.Genres[0] = this.Genre;
+                if (this.TrackNumber > 0)
+                    track.Tag.Track = (uint)this.TrackNumber;
+                if (this.DiscNumber > 0)
+                    track.Tag.Disc = (uint)this.DiscNumber;
                 track.Save();
             }
         }

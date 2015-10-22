@@ -4,6 +4,7 @@ using KoPlayer.PlayLists;
 using KoPlayer.Forms;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -52,6 +53,8 @@ namespace KoPlayer.Forms
         private int clickedIndex;
         private Song songToSave;
         private KeyboardHook hook;
+        private TimeSpan oldPosition;
+        private TimeSpan currentSongTimePlayed;
         #endregion
 
         #region Constructor & Load event
@@ -388,6 +391,20 @@ namespace KoPlayer.Forms
         #region Playback control methods
         private void PlaySong(Song song, IPlayList inPlayList)
         {
+            if (currentSongTimePlayed.Ticks > 0.95 * musicPlayer.Length.Ticks)
+            {
+                currentSongTimePlayed = TimeSpan.Zero;
+                currentlyPlaying.LastPlayed = DateTime.Now;
+                currentlyPlaying.PlayCount++;
+
+                //SCROBBLE HERE IF ENABLED
+
+                if (songGridView.InvokeRequired)
+                    songGridView.Invoke(new MethodInvoker(delegate { songGridView.Refresh(); }));
+                else
+                    songGridView.Refresh();
+            }
+
             bool play = true;
             try
             {
@@ -778,6 +795,8 @@ namespace KoPlayer.Forms
             searchBarTimer = new System.Timers.Timer(searchBarTimerInterval);
             searchBarTimer.Elapsed += searchBarTimer_Elapsed;
             SetSearchBarValue(0);
+            this.currentSongTimePlayed = TimeSpan.Zero;
+            this.oldPosition = TimeSpan.Zero;
         }
 
         private void searchBarTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
@@ -787,6 +806,11 @@ namespace KoPlayer.Forms
 
             UpdateSearchBar(length, position);
             UpdateCurrentTimeLabel(length, position);
+
+            if (Math.Abs(position.Seconds - oldPosition.Seconds) < 5)
+                currentSongTimePlayed += position - oldPosition;
+
+            this.oldPosition = position;
 
             if ((searchBarTimer.Enabled && musicPlayer.PlaybackState == PlaybackState.Stopped)
                 || searchBarTimer.Enabled && position > length)
@@ -812,14 +836,16 @@ namespace KoPlayer.Forms
             if (position > length)
                 position = length;
 
-            if (currentTime_Label.InvokeRequired && !currentTime_Label.IsDisposed)
+            if (currentTime_Label.InvokeRequired)
                 currentTime_Label.Invoke(new MethodInvoker(
                     delegate 
                     {
-                        currentTime_Label.Text = Song.DurationFromTimeSpanToString(musicPlayer.Position);
+                        if (!currentTime_Label.IsDisposed)
+                            currentTime_Label.Text = Song.DurationFromTimeSpanToString(musicPlayer.Position);
                     }));
             else
-                currentTime_Label.Text = Song.DurationFromTimeSpanToString(musicPlayer.Position);
+                if (!currentTime_Label.IsDisposed)
+                    currentTime_Label.Text = Song.DurationFromTimeSpanToString(musicPlayer.Position);
         }
 
         private void UpdateSongLengthLabel()
@@ -1314,6 +1340,7 @@ namespace KoPlayer.Forms
             ratingMenu.MenuItems[5].Click += rate5_Click;
             #endregion
             cm.MenuItems.Add(ratingMenu);
+            cm.MenuItems.Add(CreateMenuItem("Show file in explorer", songGridViewRightClickShowExplorer));
             cm.MenuItems.Add(CreateMenuItem("Delete", songGridViewRightClickDelete));
             cm.MenuItems.Add(CreateMenuItem("Properties", songGridViewRightClickProperties));
             return cm;
@@ -1388,6 +1415,12 @@ namespace KoPlayer.Forms
 
             if (showingPlayList == partyMix)
                 UpdateShowingPlayList(true);
+        }
+
+        private void songGridViewRightClickShowExplorer(object sender, EventArgs e)
+        {
+            Song clickedSong = songGridView.Rows[clickedIndex].DataBoundItem as Song;
+            Process.Start("explorer.exe", @"/select, " + clickedSong.Path);
         }
 
         private void songGridViewRightClickDelete(object sender, EventArgs e)

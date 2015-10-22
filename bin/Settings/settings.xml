@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <Settings xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  <FormWidth>1058</FormWidth>
+  <FormWidth>1143</FormWidth>
   <FormHeight>729</FormHeight>
   <StartupPlayList>Library</StartupPlayList>
   <Partymix_SourcePlayListName>Library</Partymix_SourcePlayListName>

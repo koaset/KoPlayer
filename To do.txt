@@ -1,7 +1,3 @@
-Create settings menu
+settings menu
 smart playlists
-
-A way to decide when a song has been played. Required for:
 last.fm scrobbling
-updating playcount
-updating lastplayed
