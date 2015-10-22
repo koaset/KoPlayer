@@ -94,8 +94,7 @@ namespace KoPlayer.Forms
                 showingPlayList = library;
             playingPlayList = showingPlayList;
 
-            songGridView.RowTemplate.Height = settings.RowHeight;
-            songGridView.DefaultCellStyle.Font = new Font(settings.FontName, settings.FontSize, GraphicsUnit.Point);
+            SetSongGridViewStyle();
 
             UpdateShowingPlayList(true);
             songGridView.AutoGenerateColumns = false;
@@ -120,6 +119,12 @@ namespace KoPlayer.Forms
             PopulatePartyMix();
             UpdateTrayIconText();
         }
+
+        private void SetSongGridViewStyle()
+        {
+            songGridView.RowTemplate.Height = settings.RowHeight;
+            songGridView.DefaultCellStyle.Font = new Font(settings.FontName, settings.FontSize, GraphicsUnit.Point);
+        }
         #endregion
 
         #region Playlist methods
@@ -128,7 +133,9 @@ namespace KoPlayer.Forms
             if (showingPlayList != null)
             {
                 if (getAll)
+                {
                     songGridView.DataSource = showingPlayList.GetAllSongs();
+                }
                 else
                     songGridView.DataSource = showingPlayList.GetSongs();
                 if (showingPlayList == partyMix)
@@ -199,24 +206,20 @@ namespace KoPlayer.Forms
                 settings.Partymix_SourcePlayListName = library.Name;
             }
 
+            while (partyMix.CurrentIndex > settings.Partymix_NumPrevious)
+                partyMix.Remove(0);
+
             if (source.NumSongs > 0)
-            {
-                while (partyMix.CurrentIndex > settings.Partymix_NumPrevious)
-                    partyMix.Remove(0);
-
                 while (partyMix.NumSongs - partyMix.CurrentIndex < settings.Partymix_NumNext + 1)
-                {
                     partyMix.Add(source.GetRandom());
-                }
 
-                if (showingPlayList == partyMix)
-                {
-                    if (songGridView.InvokeRequired)
-                        songGridView.Invoke(new MethodInvoker(delegate { UpdateShowingPlayList(true); }));
-                    else
-                        UpdateShowingPlayList(true);
-                    songGridView.ClearSelection();
-                }
+            if (showingPlayList == partyMix)
+            {
+                if (songGridView.InvokeRequired)
+                    songGridView.Invoke(new MethodInvoker(delegate { UpdateShowingPlayList(true); }));
+                else
+                    UpdateShowingPlayList(true);
+                songGridView.ClearSelection();
             }
         }
 
@@ -239,10 +242,32 @@ namespace KoPlayer.Forms
         #region Settings window
         private void preferencesToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            settingsWindow = new SettingsWindow(this);
+            hook.Dispose();
+            settingsWindow = new SettingsWindow(this, this.playLists);
             settingsWindow.StartPosition = FormStartPosition.CenterParent;
-            settingsWindow.ShowDialog();
             this.settings.Save(SETTINGSPATH);
+            
+            if (settingsWindow.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                SetSettings();
+            else
+                this.settings = Settings.Load(SETTINGSPATH);
+            SetUpGlobalHotkeys();
+        }
+
+        private void SetSettings()
+        {
+            SetSongGridViewStyle();
+
+            PopulatePartyMix();
+
+            //last.fm
+
+            UpdateShowingPlayList(true);
+            ResetSearchBox();
+            songGridView.Refresh();
+            songGridView.Focus();
+
+            settings.Save(SETTINGSPATH);
         }
         #endregion
 
@@ -526,6 +551,24 @@ namespace KoPlayer.Forms
                 PlaySong((Song)songGridView.Rows[e.RowIndex].DataBoundItem, showingPlayList);
             }
         }
+
+        #region Menu items
+        private void playPauseToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            PlayOrPause();
+        }
+
+        private void playNextToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            PlayNextSong();
+        }
+
+        private void playPreviousToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            PlayPreviousSong();
+        }
+        #endregion
+
         #endregion
 
         #region Local Hotkeys
@@ -628,6 +671,9 @@ namespace KoPlayer.Forms
 
         private void SetUpGlobalHotkeys()
         {
+            if (hook != null)
+                hook.Dispose();
+
             hook = new KeyboardHook();
             hook.KeyPressed += hook_KeyPressed;
             try
@@ -647,7 +693,6 @@ namespace KoPlayer.Forms
         void hook_KeyPressed(object sender, KeyPressedEventArgs e)
         {
             foreach (GlobalHotkey hk in settings.GlobalHotkeys)
-            {
                 if (e.Modifier == hk.Modifier)
                     if (e.Key == hk.Key)
                         switch (hk.Action)
@@ -671,7 +716,6 @@ namespace KoPlayer.Forms
                                 PlayNextSong();
                                 break;
                         }
-            }
         }
 
         private void IncreaseVolume()
@@ -781,8 +825,7 @@ namespace KoPlayer.Forms
                 SetSortGlyph();
                 if (showingPlayList == partyMix)
                     PopulatePartyMix();
-                else
-                    UpdateShowingPlayList(true);
+                UpdateShowingPlayList(true);
             }
         }
         #endregion
@@ -964,6 +1007,11 @@ namespace KoPlayer.Forms
         private void previousButton_Click(object sender, EventArgs e)
         {
             PlayPreviousSong();
+        }
+
+        private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("KoPlayer 0.9\n(C) Karl-Oskar Smed, 2015\nhttps://github.com/koaset/KoPlayer");
         }
         #endregion
 
@@ -1457,6 +1505,7 @@ namespace KoPlayer.Forms
             songToSave = e.savingSong;
         }
         #endregion
+
         #endregion
         #endregion
     }

@@ -71,11 +71,41 @@
     <Compile Include="Forms\RatingBox.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Forms\SettingsControls\LastFMSettingsControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Forms\SettingsControls\LastFMSettingsControl.Designer.cs">
+      <DependentUpon>LastFMSettingsControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\SettingsControls\GlobalHotkeySettingsControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Forms\SettingsControls\GlobalHotkeySettingsControl.Designer.cs">
+      <DependentUpon>GlobalHotkeySettingsControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\SettingsControls\HotkeySettingsControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Forms\SettingsControls\HotkeySettingsControl.Designer.cs">
+      <DependentUpon>HotkeySettingsControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\SettingsControls\PartyMixSettingsControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Forms\SettingsControls\PartyMixSettingsControl.Designer.cs">
+      <DependentUpon>PartyMixSettingsControl.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\SongInfoPopup.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\SongInfoPopup.Designer.cs">
       <DependentUpon>SongInfoPopup.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\SettingsControls\SongListSettingsControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Forms\SettingsControls\SongListSettingsControl.Designer.cs">
+      <DependentUpon>SongListSettingsControl.cs</DependentUpon>
     </Compile>
     <Compile Include="PlayLists\Library.cs" />
     <Compile Include="PlayLists\Searching.cs" />
@@ -105,11 +135,26 @@
     <EmbeddedResource Include="Forms\MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Forms\SettingsControls\LastFMSettingsControl.resx">
+      <DependentUpon>LastFMSettingsControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\SettingsControls\GlobalHotkeySettingsControl.resx">
+      <DependentUpon>GlobalHotkeySettingsControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\SettingsControls\HotkeySettingsControl.resx">
+      <DependentUpon>HotkeySettingsControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\SettingsControls\PartyMixSettingsControl.resx">
+      <DependentUpon>PartyMixSettingsControl.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\SettingsWindow.resx">
       <DependentUpon>SettingsWindow.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\SongInfoPopup.resx">
       <DependentUpon>SongInfoPopup.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\SettingsControls\SongListSettingsControl.resx">
+      <DependentUpon>SongListSettingsControl.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

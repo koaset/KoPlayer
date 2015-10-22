@@ -13,6 +13,11 @@ namespace KoPlayer
 {
     public class Settings
     {
+        public static int RowHeightMin = 15;
+        public static int RowHeightMax = 30;
+        public static float FontSizeMin = 7f;
+        public static float FontSizeMax = 12f;
+
         public int FormWidth = 1000;
         public int FormHeight = 600;
 
@@ -20,8 +25,11 @@ namespace KoPlayer
         public int RowHeight { get { return rowHeight; }
             set 
             {
-                if (rowHeight < 15)
-                    rowHeight = 15;
+                if (rowHeight < RowHeightMin)
+                    rowHeight = RowHeightMin;
+                else if
+                    (rowHeight > RowHeightMax)
+                    rowHeight = RowHeightMax;
                 else
                     rowHeight = value;
             }
@@ -34,10 +42,10 @@ namespace KoPlayer
         public float FontSize { get { return fontSize; }
             set
             {
-                if (fontSize < 7f)
-                    fontSize = 7f;
-                else if (fontSize > 12f)
-                    fontSize = 12f;
+                if (fontSize < FontSizeMin)
+                    fontSize = FontSizeMin;
+                else if (fontSize > FontSizeMax)
+                    fontSize = FontSizeMax;
                 else
                     fontSize = value;
             }
@@ -113,21 +121,6 @@ namespace KoPlayer
             }
             return loadedSettings;
         }
-
-        /*public static Settings Copy(Settings settings)
-        {
-            Settings ret = new Settings();
-            ret.FontName = settings.FontName;
-            ret.FontSize = settings.FontSize;
-            ret.FormHeight = settings.FormHeight;
-            ret.FormWidth = settings.FormWidth;
-            ret.Partymix_NumNext = settings.Partymix_NumNext;
-            ret.Partymix_NumPrevious = settings.Partymix_NumPrevious;
-            ret.Partymix_SourcePlayListName = settings.Partymix_SourcePlayListName;
-            ret.rowHeight = settings.rowHeight;
-            ret.StartupPlayList = settings.StartupPlayList;
-            return ret;
-        }*/
     }
 
     public enum GlobalHotkeyAction
