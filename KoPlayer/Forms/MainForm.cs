@@ -1,24 +1,13 @@
-﻿#region Using statements
+﻿using CSCore.CoreAudioAPI;
+using CSCore.SoundOut;
+using KoPlayer.PlayLists;
+using KoPlayer.Forms;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Reflection;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using KoPlayer.PlayLists;
-using System.Threading;
 using System.IO;
-using CSCore.Codecs;
-using CSCore.CoreAudioAPI;
-using CSCore.SoundOut;
-using CSCore.Streams;
-using KoPlayer;
-#endregion
+using System.Linq;
+using System.Windows.Forms;
 
 namespace KoPlayer.Forms
 {
@@ -62,6 +51,7 @@ namespace KoPlayer.Forms
         private PlayList renamePlaylist;
         private int clickedIndex;
         private Song songToSave;
+        private KeyboardHook hook;
         #endregion
 
         #region Constructor & Load event
@@ -80,6 +70,9 @@ namespace KoPlayer.Forms
 
             var enumerator = new MMDeviceEnumerator();
             defaultAudioDevice = enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Console);
+
+            SetUpGlobalHotkeys();
+
             InitializeComponent();
         }
 
@@ -518,16 +511,15 @@ namespace KoPlayer.Forms
         }
         #endregion
 
-        #region Delete Songs
+        #region Local Hotkeys
         private void songGridView_KeyDown(object sender, KeyEventArgs e)
         {
             if (songGridView.Focused)
             {
                 if (e.Control)
                 {
-                    if (settings.RatingHotkeys.Contains(e.KeyValue))
-                        if (songGridView.Focused)
-                            RateSongs(songGridView.SelectedRows, Array.IndexOf(settings.RatingHotkeys, (int)e.KeyValue));
+                    if (settings.RatingHotkeys.Contains(e.KeyCode))
+                        RateSongs(songGridView.SelectedRows, Array.IndexOf(settings.RatingHotkeys, e.KeyCode));
                 }
                 else if (e.KeyCode == Keys.Enter)
                 {
@@ -613,6 +605,73 @@ namespace KoPlayer.Forms
             indexList.Reverse();
             return indexList;
         }
+        #endregion
+
+        #region Global hotkeys
+
+        private void SetUpGlobalHotkeys()
+        {
+            hook = new KeyboardHook();
+            hook.KeyPressed += hook_KeyPressed;
+            try
+            {
+                foreach (GlobalHotkey hk in settings.GlobalHotkeys)
+                    hook.RegisterHotKey(hk.Modifier, hk.Key);
+            }
+            catch
+            {
+                hook.Dispose();
+                hook = new KeyboardHook();
+                hook.KeyPressed += hook_KeyPressed;
+                MessageBox.Show("Unable to set global hotkeys.\nTry closing other applications that use them and restart.");
+            }
+        }
+
+        void hook_KeyPressed(object sender, KeyPressedEventArgs e)
+        {
+            foreach (GlobalHotkey hk in settings.GlobalHotkeys)
+            {
+                if (e.Modifier == hk.Modifier)
+                    if (e.Key == hk.Key)
+                        switch (hk.Action)
+                        {
+                            case GlobalHotkeyAction.IncreaseVolume:
+                                IncreaseVolume();
+                                break;
+                            case GlobalHotkeyAction.DecreaseVolume:
+                                DecreaseVolume();
+                                break;
+                            case GlobalHotkeyAction.PlayOrPause:
+                                PlayOrPause();
+                                break;
+                            case GlobalHotkeyAction.ShowSongInfoPopup:
+                                ShowCurrentSongPopup();
+                                break;
+                            case GlobalHotkeyAction.PlayPreviousSong:
+                                PlayPreviousSong();
+                                break;
+                            case GlobalHotkeyAction.PlayNextSong:
+                                PlayNextSong();
+                                break;
+                        }
+            }
+        }
+
+        private void IncreaseVolume()
+        {
+            SetVolumeBarValue(volumeTrackBar.Value + volumeTrackBar.SmallChange);
+        }
+
+        private void DecreaseVolume()
+        {
+            SetVolumeBarValue(volumeTrackBar.Value - volumeTrackBar.SmallChange);
+        }
+
+        private void ShowCurrentSongPopup()
+        {
+            //Do popup stuff
+        }
+
         #endregion
 
         #region Playlist manipulatiom methods
@@ -805,7 +864,12 @@ namespace KoPlayer.Forms
             }
             else
             {
-                volumeTrackBar.Value = value;
+                if (value > volumeTrackBar.Maximum)
+                    volumeTrackBar.Value = volumeTrackBar.Maximum;
+                else if (value < volumeTrackBar.Minimum)
+                    volumeTrackBar.Value = volumeTrackBar.Minimum;
+                else
+                    volumeTrackBar.Value = value;
             }
         }
         #endregion

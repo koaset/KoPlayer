@@ -13,13 +13,13 @@ namespace KoPlayer.Forms
 {
     public partial class SettingsWindow : Form
     {
-        private Settings tempSettings;
+        //private Settings tempSettings;
         private MainForm callingForm;
 
         public SettingsWindow(MainForm callingForm)
         {
             this.callingForm = callingForm;
-            this.tempSettings = Settings.Copy(callingForm.Settings);
+            //this.tempSettings = Settings.Copy(callingForm.Settings);
             InitializeComponent();
         }
 
@@ -30,7 +30,7 @@ namespace KoPlayer.Forms
 
         private void save_Button_Click(object sender, EventArgs e)
         {
-            callingForm.Settings = tempSettings;
+            //callingForm.Settings = tempSettings;
             this.Close();
         }
 

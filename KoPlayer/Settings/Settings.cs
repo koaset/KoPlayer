@@ -7,6 +7,7 @@ using System.IO;
 using System.Xml.Serialization;
 using System.Windows.Forms;
 using System.Threading;
+using KoPlayer.Forms;
 
 namespace KoPlayer
 {
@@ -48,7 +49,17 @@ namespace KoPlayer
         public int Partymix_NumPrevious = 5;
         public int Partymix_NumNext = 15;
 
-        public int[] RatingHotkeys = { 220, 49, 50, 51, 52, 53 };
+        public Keys[] RatingHotkeys = { (Keys)220, Keys.D1, Keys.D2, Keys.D3, Keys.D4, Keys.D5 };
+
+        public GlobalHotkey[] GlobalHotkeys = { new GlobalHotkey(GlobalHotkeyAction.IncreaseVolume, Keys.Insert, ModifierKeys.Control),
+                                                new GlobalHotkey(GlobalHotkeyAction.DecreaseVolume, Keys.Delete, ModifierKeys.Control),
+                                                new GlobalHotkey(GlobalHotkeyAction.PlayOrPause, Keys.Home, ModifierKeys.Control),
+                                                new GlobalHotkey(GlobalHotkeyAction.ShowSongInfoPopup, Keys.End, ModifierKeys.Control),
+                                                new GlobalHotkey(GlobalHotkeyAction.PlayPreviousSong, Keys.PageUp, ModifierKeys.Control),
+                                                new GlobalHotkey(GlobalHotkeyAction.PlayNextSong, Keys.PageDown, ModifierKeys.Control)};
+        [XmlIgnore]
+        public string[] GlobalHotkeyNames = { "Increase volume", "Decrease volume", "Play / Pause",
+                                            "Show song info popup", "Play previous song", "Play next song"};
 
         public Settings()
         {
@@ -103,7 +114,7 @@ namespace KoPlayer
             return loadedSettings;
         }
 
-        public static Settings Copy (Settings settings)
+        /*public static Settings Copy(Settings settings)
         {
             Settings ret = new Settings();
             ret.FontName = settings.FontName;
@@ -116,6 +127,30 @@ namespace KoPlayer
             ret.rowHeight = settings.rowHeight;
             ret.StartupPlayList = settings.StartupPlayList;
             return ret;
+        }*/
+    }
+
+    public enum GlobalHotkeyAction
+    {
+        IncreaseVolume,
+        DecreaseVolume,
+        PlayOrPause,
+        ShowSongInfoPopup,
+        PlayPreviousSong,
+        PlayNextSong,
+    }
+
+    public struct GlobalHotkey
+    {
+        public GlobalHotkeyAction Action;
+        public Keys Key;
+        public ModifierKeys Modifier;
+
+        public GlobalHotkey(GlobalHotkeyAction action, Keys key, ModifierKeys modifier)
+        {
+            this.Action = action;
+            this.Key = key;
+            this.Modifier = modifier;
         }
     }
 }

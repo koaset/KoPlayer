@@ -67,6 +67,7 @@
       <DependentUpon>DataGridViewPlus.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\Fixes.cs" />
+    <Compile Include="Forms\KeyboardHook.cs" />
     <Compile Include="Forms\RatingBox.cs">
       <SubType>Component</SubType>
     </Compile>

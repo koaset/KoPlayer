@@ -1,5 +1,4 @@
 Create settings menu
-Global Keyboard shortcuts
 smart playlists
 
 A way to decide when a song has been played. Required for:
