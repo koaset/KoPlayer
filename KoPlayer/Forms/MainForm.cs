@@ -24,15 +24,18 @@ namespace KoPlayer.Forms
 {
     public partial class MainForm : Form
     {
+        #region Constants
         public const string SETTINGSPATH = @"Settings\settings.xml";
         public const string PLAYLISTDIRECTORYPATH = @"Playlists\";
         public const string PARTYMIXFILEPATH = @"Playlists\Party Mix.xml";
         private const string COLUMNSETTINGSPATH = @"Settings\column_settings.xml";
         private const string DEFAULTCOLUMNSETTINGSPATH = @"Settings\default_column_settings.xml";
-        private static readonly int[] ratingHotkeys = { 220, 49, 50, 51, 52, 53 };
+        #endregion
 
+        #region Properties
         public Settings Settings { get { return settings; } set { settings = value; } }
         public Random Random { get { return random; } }
+        #endregion
 
         #region Fields
         private SettingsWindow settingsWindow;
@@ -57,6 +60,7 @@ namespace KoPlayer.Forms
         private int searchLibraryTimerInterval = 500;
         private PlayList renamePlaylist;
         private int clickedIndex;
+        private Song songToSave;
         #endregion
 
         #region Constructor & Load event
@@ -388,32 +392,54 @@ namespace KoPlayer.Forms
         #region Playback control methods
         private void PlaySong(Song song, IPlayList inPlayList)
         {
-            if (inPlayList == partyMix)
-                PopulatePartyMix();
-
-            ResetSearchBarTimer();
-
-            musicPlayer.Volume = 0;
-            musicPlayer.Stop();
-            searchBarTimer.Stop();
-
+            bool play = true;
             try
             {
-                musicPlayer.Open(song.Path, defaultAudioDevice);
-                PlayMusic();
+                song.Reload();
             }
-            catch (Exception ex)
+            catch (SongReloadException ex)
             {
-                MessageBox.Show("Play music exception: " + ex.ToString());
+                play = false;
+                MessageBox.Show(ex.ToString() + "\nSong will be removed from the library.");
+                library.Remove(song);
             }
 
-            currentlyPlaying = song;
-            playingPlayList = inPlayList;
+            if (play)
+            {
+                if (inPlayList == partyMix)
+                    PopulatePartyMix();
 
-            UpdateTrayIconText();
-            UpdateSongImage();
-            UpdateSongLengthLabel();
-            UpdateSongInfoLabel();
+                ResetSearchBarTimer();
+
+                musicPlayer.Volume = 0;
+                musicPlayer.Stop();
+                searchBarTimer.Stop();
+
+                try
+                {
+                    musicPlayer.Open(song.Path, defaultAudioDevice);
+                    PlayMusic();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Play music exception: " + ex.ToString());
+                }
+
+                currentlyPlaying = song;
+                playingPlayList = inPlayList;
+
+                UpdateTrayIconText();
+                UpdateSongImage();
+                UpdateSongLengthLabel();
+                UpdateSongInfoLabel();
+
+                if (songToSave != null)
+                    if (songToSave.Path != currentlyPlaying.Path)
+                    {
+                        songToSave.SaveTags();
+                        songToSave = null;
+                    }
+            }
         }
 
         private void PlayMusic()
@@ -496,9 +522,9 @@ namespace KoPlayer.Forms
             {
                 if (e.Control)
                 {
-                    if (ratingHotkeys.Contains(e.KeyValue))
-                        RateSongs(songGridView.SelectedRows, Array.IndexOf(ratingHotkeys, (int)e.KeyValue));
-
+                    if (settings.RatingHotkeys.Contains(e.KeyValue))
+                        if (songGridView.Focused)
+                            RateSongs(songGridView.SelectedRows, Array.IndexOf(settings.RatingHotkeys, (int)e.KeyValue));
                 }
                 else if (e.KeyCode == Keys.Enter)
                 {
@@ -1169,6 +1195,7 @@ namespace KoPlayer.Forms
         {
             DeletePlayList(playListGridView.SelectedCells[0]);
         }
+
         private void playListGridViewRightClickRename(object sender, EventArgs e)
         {
             RenamePlayList();
@@ -1197,7 +1224,11 @@ namespace KoPlayer.Forms
         private ContextMenu CreateSongRightClickMen()
         {
             ContextMenu cm = new ContextMenu();
-            cm.MenuItems.Add(CreateMenuItem("Properties", songGridViewRightClickProperties));
+            cm.MenuItems.Add(CreateMenuItem("Play Song", songGridViewRightClickPlay));
+            if (musicPlayer.PlaybackState == PlaybackState.Playing)
+                cm.MenuItems.Add(CreateMenuItem("Pause", songGridViewRightClickPause));
+            if (musicPlayer.PlaybackState == PlaybackState.Paused)
+                cm.MenuItems.Add(CreateMenuItem("Resume", songGridViewRightClickResume));
             MenuItem ratingMenu = new MenuItem("Set Rating");
             #region Rating menu
             ratingMenu.MenuItems.Add("Rate 0 (ctrl + §)");
@@ -1215,6 +1246,7 @@ namespace KoPlayer.Forms
             #endregion
             cm.MenuItems.Add(ratingMenu);
             cm.MenuItems.Add(CreateMenuItem("Delete", songGridViewRightClickDelete));
+            cm.MenuItems.Add(CreateMenuItem("Properties", songGridViewRightClickProperties));
             return cm;
         }
 
@@ -1252,7 +1284,22 @@ namespace KoPlayer.Forms
         }
         #endregion
 
+        private void songGridViewRightClickPlay(object sender, EventArgs e)
+        {
+            PlaySong((Song)songGridView.Rows[clickedIndex].DataBoundItem, showingPlayList);
+        }
 
+        private void songGridViewRightClickPause(object sender, EventArgs e)
+        {
+            if (musicPlayer.PlaybackState == PlaybackState.Playing)
+                PauseMusic();
+        }
+
+        private void songGridViewRightClickResume(object sender, EventArgs e)
+        {
+            if (musicPlayer.PlaybackState == PlaybackState.Paused)
+                PlayMusic();
+        }
 
         private void songGridViewRightClickDelete(object sender, EventArgs e)
         {
@@ -1262,10 +1309,30 @@ namespace KoPlayer.Forms
         private void songGridViewRightClickProperties(object sender, EventArgs e)
         {
             Song clickedSong = songGridView.Rows[clickedIndex].DataBoundItem as Song;
-            SongInfoPopup popUp = new SongInfoPopup(clickedSong, this.clickedIndex, this.showingPlayList);
-            popUp.StartPosition = FormStartPosition.CenterParent;
-            popUp.ShowDialog();
+            bool exists = true;
+            try
+            {
+                clickedSong.Reload();
+            }
+            catch (SongReloadException ex)
+            {
+                exists = false;
+                MessageBox.Show(ex.ToString() + "\nSong will be removed from the library.");
+                library.Remove(clickedSong);
+            }
+            if (exists)
+            {
+                SongInfoPopup popUp = new SongInfoPopup(clickedSong, this.clickedIndex, this.showingPlayList, this.currentlyPlaying);
+                popUp.SavePlayingSong += popUp_SavePlayingSong;
+                popUp.StartPosition = FormStartPosition.CenterParent;
+                popUp.ShowDialog();
+            }
             songGridView.Refresh();
+        }
+
+        private void popUp_SavePlayingSong(object sender, SavePlayingSongEventArgs e)
+        {
+            songToSave = e.savingSong;
         }
         #endregion
         #endregion

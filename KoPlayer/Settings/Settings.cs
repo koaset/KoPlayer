@@ -48,6 +48,8 @@ namespace KoPlayer
         public int Partymix_NumPrevious = 5;
         public int Partymix_NumNext = 15;
 
+        public int[] RatingHotkeys = { 220, 49, 50, 51, 52, 53 };
+
         public Settings()
         {
 

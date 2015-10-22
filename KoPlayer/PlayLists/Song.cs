@@ -94,6 +94,41 @@ namespace KoPlayer.PlayLists
             }
         }
 
+        public void Reload()
+        {
+            TagLib.File track = null;
+            try
+            {
+                track = TagLib.File.Create(this.Path);
+            }
+            catch
+            {
+                throw new SongReloadException();
+            }
+
+            Title = track.Tag.Title;
+            if (Title == null)
+                Title = "";
+
+            if (Artist != null && track.Tag.Performers.Length > 0)
+                Artist = track.Tag.Performers[0];
+            else
+                Artist = "";
+
+            Album = track.Tag.Album;
+            if (Album == null)
+                Album = "";
+
+            Genre = track.Tag.FirstGenre;
+            if (Genre == null)
+                Genre = "";
+
+            TrackNumber = (int)track.Tag.Track;
+            DiscNumber = (int)track.Tag.Disc;
+
+            Length = DurationFromTimeSpanToString(track.Properties.Duration);
+        }
+
         public int CompareTo(object obj)
         {
             if (obj == null) return 1;
@@ -147,6 +182,20 @@ namespace KoPlayer.PlayLists
             catch (Exception e)
             {
                 MessageBox.Show("Song read exception: " + e.ToString());
+            }
+        }
+
+        public void SaveTags()
+        {
+            using (TagLib.File track = TagLib.File.Create(Path))
+            {
+                track.Tag.Title = this.Title;
+                track.Tag.Performers[0] = this.Artist;
+                track.Tag.Album = this.Album;
+                track.Tag.Genres[0] = this.Genre;
+                track.Tag.Track = (uint)this.TrackNumber;
+                track.Tag.Disc = (uint)this.DiscNumber;
+                track.Save();
             }
         }
 

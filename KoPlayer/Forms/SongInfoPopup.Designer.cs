@@ -99,16 +99,20 @@
             // tracknr_box
             // 
             this.tracknr_box.Location = new System.Drawing.Point(98, 156);
+            this.tracknr_box.MaxLength = 2;
             this.tracknr_box.Name = "tracknr_box";
-            this.tracknr_box.Size = new System.Drawing.Size(33, 20);
+            this.tracknr_box.Size = new System.Drawing.Size(30, 20);
             this.tracknr_box.TabIndex = 3;
+            this.tracknr_box.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.tracknr_box_KeyPress);
             // 
             // discnr_box
             // 
             this.discnr_box.Location = new System.Drawing.Point(155, 156);
+            this.discnr_box.MaxLength = 2;
             this.discnr_box.Name = "discnr_box";
             this.discnr_box.Size = new System.Drawing.Size(30, 20);
             this.discnr_box.TabIndex = 4;
+            this.discnr_box.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.discnr_box_KeyPress);
             // 
             // title_label
             // 

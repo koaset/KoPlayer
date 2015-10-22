@@ -11,17 +11,23 @@ using KoPlayer.PlayLists;
 
 namespace KoPlayer.Forms
 {
+    public delegate void SavePlayingSongEventHandler(object sender, SavePlayingSongEventArgs e);
+
     public partial class SongInfoPopup : Form
     {
+        public event SavePlayingSongEventHandler SavePlayingSong;
+
         private Song song;
         private int currentIndex;
         private IPlayList currentPlayList;
+        private Song currentlyPlaying;
 
-        public SongInfoPopup(Song song, int clickedIndex, IPlayList currentPlayList)
+        public SongInfoPopup(Song song, int clickedIndex, IPlayList currentPlayList, Song currentlyPlaying)
         {
             this.song = song;
             this.currentIndex = clickedIndex;
             this.currentPlayList = currentPlayList;
+            this.currentlyPlaying = currentlyPlaying;
             InitializeComponent();
         }
 
@@ -63,12 +69,14 @@ namespace KoPlayer.Forms
 
         private void next_button_Click(object sender, EventArgs e)
         {
+            SaveCurrentSong();
             GetNextOrPrevious(true);
             LoadSong();
         }
 
         private void previous_button_Click(object sender, EventArgs e)
         {
+            SaveCurrentSong();
             GetNextOrPrevious(false);
             LoadSong();
         }
@@ -77,6 +85,27 @@ namespace KoPlayer.Forms
         private void SaveCurrentSong()
         {
             this.song.Rating = (int)this.rating_numupdownstring.Value;
+
+            if (this.song != currentlyPlaying)
+            {
+                this.song.Title = this.title_box.Text;
+                this.song.Artist = this.artist_box.Text;
+                this.song.Album = this.album_box.Text;
+                this.song.TrackNumber = Convert.ToInt32(this.tracknr_box.Text);
+                this.song.DiscNumber = Convert.ToInt32(this.discnr_box.Text);
+                this.song.Genre = this.genre_box.Text;
+                this.song.Rating = (int)this.rating_numupdownstring.Value;
+                song.SaveTags();
+            }
+            else
+                OnSavePlayingSong(this.song);
+            
+        }
+
+        private void OnSavePlayingSong(Song song)
+        {
+            if (SavePlayingSong != null)
+                SavePlayingSong(this, new SavePlayingSongEventArgs(song));
         }
 
         private void GetNextOrPrevious(bool getNext)
@@ -94,6 +123,34 @@ namespace KoPlayer.Forms
 
             this.currentIndex = currentPlayList.CurrentIndex;
             currentPlayList.CurrentIndex = oldIndex;
+        }
+
+        private void tracknr_box_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            CheckIfNumber(e);
+        }
+
+        private void discnr_box_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            CheckIfNumber(e);
+        }
+
+        private void CheckIfNumber(KeyPressEventArgs e)
+        {
+            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
+            {
+                e.Handled = true;
+            }
+        }
+    }
+
+    public class SavePlayingSongEventArgs : EventArgs
+    {
+        public Song savingSong { get; set; }
+        public SavePlayingSongEventArgs(Song savingSong)
+            : base()
+        {
+            this.savingSong = savingSong;
         }
     }
 }

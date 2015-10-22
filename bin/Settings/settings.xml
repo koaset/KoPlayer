@@ -1,11 +1,19 @@
 <?xml version="1.0"?>
 <Settings xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  <FormWidth>1059</FormWidth>
-  <FormHeight>625</FormHeight>
+  <FormWidth>1058</FormWidth>
+  <FormHeight>730</FormHeight>
   <StartupPlayList>Library</StartupPlayList>
   <Partymix_SourcePlayListName>Library</Partymix_SourcePlayListName>
   <Partymix_NumPrevious>5</Partymix_NumPrevious>
   <Partymix_NumNext>15</Partymix_NumNext>
+  <RatingHotkeys>
+    <int>220</int>
+    <int>49</int>
+    <int>50</int>
+    <int>51</int>
+    <int>52</int>
+    <int>53</int>
+  </RatingHotkeys>
   <RowHeight>17</RowHeight>
   <FontName>Microsoft Sans Serif</FontName>
   <FontSize>8</FontSize>

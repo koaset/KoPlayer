@@ -1,5 +1,3 @@
 Create settings menu
-Reload song tags on play, otherwise do something
-Tag editing (saving to file)
 Global Keyboard shortcuts
 last.fm scrobbling

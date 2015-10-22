@@ -1,23 +1,6 @@
 <?xml version="1.0"?>
 <PlayList xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  <songPaths>
-    <string>D:\Musik\Spelmusik\OC ReMix\Phantasy_Star_2_Burnt_Mota_OC_ReMix.mp3</string>
-    <string>D:\Musik\Anime-musik\Fate-Stay Night\Fate-Stay Night OST\18 - Shikkoku no Juujika.mp3</string>
-    <string>D:\Musik\Dream Theater\Six Degrees Of Inner Turbulence\CD2\06_Solitary_Shell.mp3</string>
-    <string>D:\Musik\ButaTome\Chess\02 - âTü[âJâX.mp3</string>
-    <string>D:\Musik\Spelmusik\OC ReMix\Legend_of_Zelda_Ocarina_of_Time_Requiem_for_a_Damaged_Spirit_OC_ReMix.mp3</string>
-    <string>D:\Musik\Tchaikovsky\The Best of Tchaikovsky\10 The Seasons, Op. 37b - Barcarole (June).mp3</string>
-    <string>D:\Musik\Spelmusik\OC ReMix\Final_Fantasy_7_JENOVA_Celestial_OC_ReMix.mp3</string>
-    <string>D:\Musik\Shadow Gallery\Room V [Limited Edition]\Disc 1\05 - Birth Of A Daughter.mp3</string>
-    <string>D:\Musik\Spelmusik\OC ReMix\Dark_Cloud_2_A_Starlit_Temple_for_Two_OC_ReMix.mp3</string>
-    <string>D:\Musik\Spelmusik\Final Fantasy\Final Fantasy USA Mystic Quest Sound Collections\24-Last Castle.mp3</string>
-    <string>D:\Musik\ALiCE'S EMOTiON\Atomic Ray\track 14.mp3</string>
-    <string>D:\Musik\Spelmusik\OC ReMix\Lemmings_Lounge_Lemmings_OC_ReMix.mp3</string>
-    <string>D:\Musik\Anime-musik\Chobits\12 - Raison d'etre.mp3</string>
-    <string>D:\Musik\Spelmusik\R-Type\Super R-Type OST\super R type snes ost\02 counter attack 91(stage 2).mp3</string>
-    <string>D:\Musik\Sabaton\Carolus Rex (Limited Edition)\CD 2 (Swedish)\6. Sabaton - Karolinens Bön.mp3</string>
-    <string>D:\Musik\Spelmusik\OC ReMix\Final_Fantasy_Omerta_OC_ReMix.mp3</string>
-  </songPaths>
+  <songPaths />
   <Name>Party Mix</Name>
   <CurrentIndex>0</CurrentIndex>
 </PlayList>
