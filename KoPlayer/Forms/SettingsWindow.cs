@@ -40,7 +40,7 @@ namespace KoPlayer.Forms
             treeNodes.Add(CreateTreeNode("Party Mix"));
             treeNodes.Add(CreateTreeNode("Hot Keys"));
             treeNodes[treeNodes.Count - 1].Nodes.Add(CreateTreeNode("Global")); ;
-            treeNodes.Add(CreateTreeNode("Last.fm Scrobbler"));
+            //treeNodes.Add(CreateTreeNode("Last.fm Scrobbler"));
             settingsCategoryView.Nodes.AddRange(treeNodes.ToArray());
             settingsCategoryView.Select();
         }

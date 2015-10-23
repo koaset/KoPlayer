@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.IO;
-using System.Xml.Serialization;
-using System.Windows.Forms;
 using System.ComponentModel;
+using System.IO;
+using System.Linq;
+using System.Windows.Forms;
+using System.Xml.Serialization;
 
 namespace KoPlayer.PlayLists
 {
@@ -209,11 +208,6 @@ namespace KoPlayer.PlayLists
             }
         }
 
-        public void RemoveFolder(string path)
-        {
-            throw new NotImplementedException();
-        }
-
         public void Sort(int columnIndex, string field)
         {
             if (this.SortColumnIndex == columnIndex)
@@ -247,11 +241,6 @@ namespace KoPlayer.PlayLists
             BindingList<Song> outputSongs = GetSongsFromLibrary();
             Sorting.CreateSortDictionaries(outputSongs, this.sortDictionaries);
             return outputSongs;
-        }
-
-        public Song Get(string path)
-        {
-            throw new NotImplementedException();
         }
 
         public Song GetRandom()

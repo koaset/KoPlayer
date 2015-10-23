@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml;
-using System.Xml.Serialization;
-using System.IO;
-using System.Windows.Forms;
 using System.ComponentModel;
+using System.IO;
+using System.Linq;
+using System.Windows.Forms;
+using System.Xml.Serialization;
 
 namespace KoPlayer.PlayLists
 {
@@ -60,11 +57,6 @@ namespace KoPlayer.PlayLists
 
             sortDictionaries = new List<Dictionary<string, List<Song>>>();
             Sorting.CreateSortDictionaries(this.outputSongs, this.sortDictionaries);
-        }
-
-        public Song Get(string path)
-        {
-            throw new NotImplementedException();
         }
 
         public void Sort(int columnIndex, string field)
@@ -278,12 +270,16 @@ namespace KoPlayer.PlayLists
             List<Song> newLibrary = new List<Song>(this.outputSongs.ToList());
             newLibrary.AddRange(newSongs);
             this.outputSongs = new BindingList<Song>(newLibrary);
+
             foreach (Song s in newSongs)
                 if (!pathDictionary.Keys.Contains(s.Path))
                     pathDictionary.Add(s.Path, s);
+
             this.outputSongs.RaiseListChangedEvents = true;
             Save();
+
             Sorting.CreateSortDictionaries(this.outputSongs, this.sortDictionaries);
+
             this.outputSongs.ResetBindings();
             OnLibraryChanged(new LibraryChangedEventArgs());
         }
@@ -294,11 +290,6 @@ namespace KoPlayer.PlayLists
                 if (s.Path == path)
                     return true;
             return false;
-        }
-
-        public void RemoveFolder(string path)
-        {
-            throw new NotImplementedException();
         }
 
         public void Save()
@@ -345,11 +336,15 @@ namespace KoPlayer.PlayLists
         {
             ResetSortVariables();
             searchString = searchString.ToLower().Trim();
+
             Sorting.CreateSortDictionaries(new BindingList<Song>(pathDictionary.Values.ToList()), this.sortDictionaries);
             this.outputSongs = new BindingList<Song>();
+
             for (int i = 0; i < 4; i++)
                 AddUniqueSearchResults(searchString, sortDictionaries[i]);
+
             Sorting.CreateSortDictionaries(this.outputSongs, this.sortDictionaries);
+
             return this.outputSongs;
         }
 
