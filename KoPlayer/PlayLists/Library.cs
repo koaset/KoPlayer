@@ -19,7 +19,7 @@ namespace KoPlayer.Playlists
         public string Name { get { return "Library"; } }
         public string Path { get { return PATH; } }
         public int SortColumnIndex { get; set; }
-        public Dictionary<string, Song> Dictionary { get { return pathDictionary; } }
+        public Dictionary<string, Song> PathDictionary { get { return pathDictionary; } }
 
         private const string PATH = "Library.xml";
         private const string EXTENSION = ".mp3";
@@ -33,6 +33,15 @@ namespace KoPlayer.Playlists
         private SortOrder sortOrder;
         private string sortField = "";
         private bool raiseLibraryChangedEvent = true;
+
+        public Dictionary<string, List<Song>> GetSortDictionary(string field)
+        {
+            field = field.ToLower();
+            if (Sorting.SortColumns.Contains(field))
+                return sortDictionaries[Array.IndexOf(Sorting.SortColumns, field)];
+            else
+                throw new PlaylistException("Sortdictionary field does not exist");
+        }
 
         public int NumSongs
         {
@@ -85,6 +94,11 @@ namespace KoPlayer.Playlists
                 ret.Add(s, list);
             }
             return ret;
+        }
+
+        public void UpdateSortDictionaries()
+        {
+            Sorting.CreateSortDictionaries(this.outputSongs, this.sortDictionaries);
         }
 
         public BindingList<Song> GetSongs()

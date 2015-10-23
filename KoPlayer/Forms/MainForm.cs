@@ -17,7 +17,7 @@ namespace KoPlayer.Forms
         #region Constants
         public const string SETTINGSPATH = @"Settings\settings.xml";
         public const string PLAYLISTDIRECTORYPATH = @"Playlists\";
-        public const string PARTYMIXFILEPATH = @"Playlists\Party Mix.xml";
+        public const string PARTYMIXFILEPATH = @"Playlists\Party Mix.pl";
         private const string COLUMNSETTINGSPATH = @"Settings\column_settings.xml";
         private const string DEFAULTCOLUMNSETTINGSPATH = @"Settings\default_column_settings.xml";
         #endregion
@@ -50,7 +50,8 @@ namespace KoPlayer.Forms
         private System.Timers.Timer searchLibraryTimer;
         private int searchLibraryTimerInterval = 500;
         private Playlist renamePlaylist;
-        private int clickedIndex;
+        private int clickedSongIndex;
+        private int clickedPlaylistIndex;
         private Song songToSave;
         private KeyboardHook hook;
         private TimeSpan oldPosition;
@@ -81,7 +82,6 @@ namespace KoPlayer.Forms
 
         private void MainForm_Load(object sender, EventArgs e)
         {
-
             this.trayIcon.Icon = ((System.Drawing.Icon)(this.Icon));
             this.Width = settings.FormWidth;
             this.Height = settings.FormHeight;
@@ -156,7 +156,7 @@ namespace KoPlayer.Forms
             }
             playlists.Add(partyMix);
 
-            string[] playlistFiles = Directory.GetFiles(PLAYLISTDIRECTORYPATH, "*.xml", SearchOption.AllDirectories);
+            string[] playlistFiles = Directory.GetFiles(PLAYLISTDIRECTORYPATH, "*.pl", SearchOption.AllDirectories);
             foreach (string playlistPath in playlistFiles)
                 if (playlistPath != PARTYMIXFILEPATH)
                 {
@@ -164,6 +164,14 @@ namespace KoPlayer.Forms
                     if (pl != null)
                         playlists.Add(pl);
                 }
+
+            playlistFiles = Directory.GetFiles(PLAYLISTDIRECTORYPATH, "*.fpl", SearchOption.AllDirectories);
+            foreach (string playlistPath in playlistFiles)
+            {
+                RatingFilterPlaylist pl = RatingFilterPlaylist.Load(playlistPath, library);
+                if (pl != null)
+                    playlists.Add(pl);
+            }
         }
 
         private void SetPlaylistGridView()
@@ -601,6 +609,7 @@ namespace KoPlayer.Forms
             }
             songGridView.Refresh();
             showingPlaylist.Save();
+            library.UpdateSortDictionaries();
         }
 
         private void DeleteSongs(DataGridViewSelectedRowCollection rows)
@@ -1080,6 +1089,16 @@ namespace KoPlayer.Forms
 
         private void CreateNewPlaylist()
         {
+            string name = GetNewPlaylistName(false);
+
+            IPlaylist newPlaylist = new Playlist(library, name);
+            playlists.Add(newPlaylist);
+            SetPlaylistGridView();
+            ChangeToPlaylist(newPlaylist);
+        }
+
+        string GetNewPlaylistName(bool filter)
+        {
             string name = "";
             int i = 0;
             bool taken;
@@ -1087,7 +1106,12 @@ namespace KoPlayer.Forms
             {
                 taken = false;
                 i++;
-                name = "New playlist " + i;
+
+                if (!filter)
+                    name = "New playlist " + i;
+                else
+                    name = "New filter playlist " + i;
+
                 foreach (IPlaylist pl in playlists)
                 {
                     if (pl.Name.ToLower() == name.ToLower())
@@ -1096,10 +1120,30 @@ namespace KoPlayer.Forms
             }
             while (taken);
 
-            IPlaylist newPlaylist = new Playlist(library, name);
+            return name;
+        }
+
+        private void newRatingFilterPlaylistToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            RatingFilterPlaylistPopup popup = new RatingFilterPlaylistPopup();
+            popup.SetStartPosition();
+
+            DialogResult dr = popup.ShowDialog();
+            if (dr == System.Windows.Forms.DialogResult.OK)
+            {
+                RatingFilterInfo filterInfo = popup.GetResult();
+                CreateNewRatingFilterPlaylist(filterInfo.AllowedRating, filterInfo.IncludeHigher);
+            }
+        }
+
+        private void CreateNewRatingFilterPlaylist(int ratingCutoff, bool includeHigher)
+        {
+            string name = GetNewPlaylistName(true);
+
+            IPlaylist newPlaylist = new RatingFilterPlaylist(library, name, ratingCutoff, includeHigher);
             playlists.Add(newPlaylist);
             SetPlaylistGridView();
-            songGridView.DataSource = newPlaylist.GetSongs();
+            ChangeToPlaylist(newPlaylist);
         }
         #endregion
 
@@ -1312,20 +1356,24 @@ namespace KoPlayer.Forms
             if (e.Button == System.Windows.Forms.MouseButtons.Right)
             {
                 ContextMenu cm = new ContextMenu();
-                cm.MenuItems.Add(CreateMenuItem("Create new playlist", newPlaylistToolStripMenuItem_Click));
+                cm.MenuItems.Add(CreateMenuItem("New playlist", newPlaylistToolStripMenuItem_Click));
+                cm.MenuItems.Add(CreateMenuItem("New rating filter playlist",
+                    newRatingFilterPlaylistToolStripMenuItem_Click));
 
-                int rowIndex = playlistGridView.HitTest(e.X, e.Y).RowIndex;
+                clickedPlaylistIndex = playlistGridView.HitTest(e.X, e.Y).RowIndex;
 
-                if (rowIndex >= 0)
+                if (clickedPlaylistIndex >= 0)
                 {
                     playlistGridView.ClearSelection();
-                    playlistGridView.Rows[rowIndex].Selected = true;
-                    playlistGridView.Rows[rowIndex].Cells[0].Selected = true;
+                    playlistGridView.Rows[clickedPlaylistIndex].Selected = true;
+                    playlistGridView.Rows[clickedPlaylistIndex].Cells[0].Selected = true;
 
-                    if (rowIndex > 1)
+                    if (clickedPlaylistIndex > 1)
                     {
-                        cm.MenuItems.Add(CreateMenuItem("Delete playlist", playlistGridViewRightClickMenuDelete));
+                        if (playlists[clickedPlaylistIndex].GetType() == typeof(RatingFilterPlaylist))
+                            cm.MenuItems.Add("Edit rating filter playlist", editRatingFilterPlaylist);
                         cm.MenuItems.Add(CreateMenuItem("Rename playlist", playlistGridViewRightClickRename));
+                        cm.MenuItems.Add(CreateMenuItem("Delete playlist", playlistGridViewRightClickMenuDelete));
                     }
                 }
                 cm.Show(playlistGridView, new Point(e.X, e.Y));
@@ -1341,6 +1389,28 @@ namespace KoPlayer.Forms
         {
             RenamePlaylist();
         }
+
+        private void editRatingFilterPlaylist(object sender, EventArgs e)
+        {
+            RatingFilterPlaylist clickedPlaylist = playlists[clickedPlaylistIndex] as RatingFilterPlaylist;
+            if (clickedPlaylist != null)
+            {
+                RatingFilterPlaylistPopup popup = new RatingFilterPlaylistPopup(clickedPlaylist);
+                popup.SetStartPosition();
+
+                DialogResult dr = popup.ShowDialog();
+                if (dr == System.Windows.Forms.DialogResult.OK)
+                {
+                    RatingFilterInfo filterInfo = popup.GetResult();
+                    clickedPlaylist.AllowedRating = filterInfo.AllowedRating;
+                    clickedPlaylist.IncludeHigher = filterInfo.IncludeHigher;
+                    if (showingPlaylist != clickedPlaylist)
+                        ChangeToPlaylist(clickedPlaylist);
+                    else
+                        UpdateShowingPlaylist(true);
+                }
+            }
+        }
         #endregion
 
         #region Song gridview right click menu
@@ -1349,12 +1419,12 @@ namespace KoPlayer.Forms
         {
             if (e.Button == System.Windows.Forms.MouseButtons.Right)
             {
-                this.clickedIndex = songGridView.HitTest(e.X, e.Y).RowIndex;
-                if (this.clickedIndex >= 0)
+                this.clickedSongIndex = songGridView.HitTest(e.X, e.Y).RowIndex;
+                if (this.clickedSongIndex >= 0)
                 {
-                    if (songGridView.Rows[this.clickedIndex].Cells[0].Selected != true)
+                    if (songGridView.Rows[this.clickedSongIndex].Cells[0].Selected != true)
                         songGridView.ClearSelection();
-                    songGridView.Rows[this.clickedIndex].Cells[0].Selected = true;
+                    songGridView.Rows[this.clickedSongIndex].Cells[0].Selected = true;
 
                     ContextMenu cm = CreateSongRightClickMen();
                     cm.Show(this, this.PointToClient(Cursor.Position));
@@ -1430,7 +1500,7 @@ namespace KoPlayer.Forms
 
         private void songGridViewRightClickPlay(object sender, EventArgs e)
         {
-            PlaySong((Song)songGridView.Rows[clickedIndex].DataBoundItem, showingPlaylist);
+            PlaySong((Song)songGridView.Rows[clickedSongIndex].DataBoundItem, showingPlaylist);
         }
 
         private void songGridViewRightClickPause(object sender, EventArgs e)
@@ -1467,7 +1537,7 @@ namespace KoPlayer.Forms
 
         private void songGridViewRightClickShowExplorer(object sender, EventArgs e)
         {
-            Song clickedSong = songGridView.Rows[clickedIndex].DataBoundItem as Song;
+            Song clickedSong = songGridView.Rows[clickedSongIndex].DataBoundItem as Song;
             Process.Start("explorer.exe", @"/select, " + clickedSong.Path);
         }
 
@@ -1478,7 +1548,7 @@ namespace KoPlayer.Forms
 
         private void songGridViewRightClickProperties(object sender, EventArgs e)
         {
-            Song clickedSong = songGridView.Rows[clickedIndex].DataBoundItem as Song;
+            Song clickedSong = songGridView.Rows[clickedSongIndex].DataBoundItem as Song;
             bool exists = true;
             try
             {
@@ -1492,7 +1562,7 @@ namespace KoPlayer.Forms
             }
             if (exists)
             {
-                SongInfoPopup popUp = new SongInfoPopup(this, clickedSong, this.clickedIndex, this.showingPlaylist);
+                SongInfoPopup popUp = new SongInfoPopup(this, clickedSong, this.clickedSongIndex, this.showingPlaylist);
                 popUp.SavePlayingSong += popUp_SavePlayingSong;
                 popUp.StartPosition = FormStartPosition.CenterParent;
                 popUp.ShowDialog();

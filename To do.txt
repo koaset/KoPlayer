@@ -1,2 +1,2 @@
-smart playlists
+Password storing
 last.fm scrobbling

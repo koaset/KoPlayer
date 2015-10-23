@@ -14,7 +14,7 @@ namespace KoPlayer.Playlists
         public static Random r = new Random();
 
         [XmlIgnore]
-        public string Path { get { return @"Playlists\" + Name + ".xml"; } }
+        public virtual string Path { get { return @"Playlists\" + Name + ".pl"; } }
         public string Name { get; set; }
         [XmlIgnore]
         public int SortColumnIndex { get; set; }
@@ -24,7 +24,7 @@ namespace KoPlayer.Playlists
 
         private const string EXTENSION = ".mp3";
 
-        private BindingList<Song> outputSongs;
+        protected BindingList<Song> outputSongs;
         public List<string> songPaths;
         protected Dictionary<string, Song> libraryDictionary;
 
@@ -32,7 +32,7 @@ namespace KoPlayer.Playlists
         private SortOrder sortOrder;
         private string sortField = "";
 
-        private List<Dictionary<string, List<Song>>> sortDictionaries;
+        protected List<Dictionary<string, List<Song>>> sortDictionaries;
 
         protected Playlist() { }
 
@@ -44,7 +44,7 @@ namespace KoPlayer.Playlists
 
         public Playlist(Library library, string name, List<string> songPaths)
         {
-            this.libraryDictionary = library.Dictionary;
+            this.libraryDictionary = library.PathDictionary;
             library.LibraryChanged += library_LibraryChanged;
             this.Name = name;
             this.songPaths = songPaths;
@@ -66,7 +66,7 @@ namespace KoPlayer.Playlists
             return ret;
         }
 
-        void library_LibraryChanged(object sender, LibraryChangedEventArgs e)
+        protected void library_LibraryChanged(object sender, LibraryChangedEventArgs e)
         {
             List<int> toBeRemoved = new List<int>();
             for (int i = 0; i < songPaths.Count; i++)
@@ -235,7 +235,7 @@ namespace KoPlayer.Playlists
             return outputSongs;
         }
 
-        public BindingList<Song> GetAllSongs()
+        public virtual BindingList<Song> GetAllSongs()
         {
             ResetSortVariables();
             BindingList<Song> outputSongs = GetSongsFromLibrary();
@@ -243,12 +243,12 @@ namespace KoPlayer.Playlists
             return outputSongs;
         }
 
-        public Song GetRandom()
+        public virtual Song GetRandom()
         {
             return libraryDictionary[songPaths[Playlist.r.Next(0, songPaths.Count)]];
         }
 
-        public void Save()
+        public virtual void Save()
         {
             try
             {
@@ -292,7 +292,7 @@ namespace KoPlayer.Playlists
 
             List<string> toBeRemoved = new List<string>();
             foreach (string filePath in pl.songPaths)
-                if (!library.Dictionary.Keys.Contains(filePath))
+                if (!library.PathDictionary.Keys.Contains(filePath))
                     toBeRemoved.Add(filePath);
             foreach (string filePath in toBeRemoved)
                 pl.Remove(filePath);
