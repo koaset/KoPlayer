@@ -584,12 +584,7 @@ namespace KoPlayer.Forms
         {
             if (songGridView.Focused)
             {
-                if (e.Control)
-                {
-                    if (settings.RatingHotkeys.Contains(e.KeyCode))
-                        RateSongs(songGridView.SelectedRows, Array.IndexOf(settings.RatingHotkeys, e.KeyCode));
-                }
-                else if (e.KeyCode == Keys.Enter)
+                if (e.KeyCode == Keys.Enter)
                 {
                     PlaySong(songGridView.SelectedRows[0].DataBoundItem as Song, showingPlaylist);
                 }
@@ -888,13 +883,14 @@ namespace KoPlayer.Forms
             if (position > length)
                 position = length;
 
-            if (currentTime_Label.InvokeRequired)
-                currentTime_Label.Invoke(new MethodInvoker(
-                    delegate 
-                    {
-                        if (!currentTime_Label.IsDisposed)
-                            currentTime_Label.Text = Song.DurationFromTimeSpanToString(musicPlayer.Position);
-                    }));
+            if (!currentTime_Label.IsDisposed)
+                if (currentTime_Label.InvokeRequired)
+                    currentTime_Label.Invoke(new MethodInvoker(
+                        delegate 
+                        {
+                            if (!currentTime_Label.IsDisposed)
+                                currentTime_Label.Text = Song.DurationFromTimeSpanToString(musicPlayer.Position);
+                        }));
             else
                 if (!currentTime_Label.IsDisposed)
                     currentTime_Label.Text = Song.DurationFromTimeSpanToString(musicPlayer.Position);
@@ -1575,6 +1571,18 @@ namespace KoPlayer.Forms
             songToSave = e.savingSong;
         }
         #endregion
+
+        private void MainForm_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (musicPlayer.PlaybackState == PlaybackState.Playing)
+                if (e.Control)
+                    if (settings.RatingHotkeys.Contains(e.KeyCode))
+                    {
+                        currentlyPlaying.Rating = Array.IndexOf(settings.RatingHotkeys, e.KeyCode);
+                        if (playingPlaylist == showingPlaylist)
+                            songGridView.Refresh();
+                    }
+        }
 
         #endregion
         #endregion

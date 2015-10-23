@@ -25,7 +25,7 @@ namespace KoPlayer.Forms.SettingsControls
             foreach (Keys key in settings.RatingHotkeys)
             {
                 ListViewItem newItem = new ListViewItem();
-                newItem.Text = "Rate " + Array.IndexOf(settings.RatingHotkeys, key);
+                newItem.Text = "Rate playing " + Array.IndexOf(settings.RatingHotkeys, key);
                 newItem.SubItems.Add("Ctrl + " + (char)((int)key));
                 command_list.Items.Add(newItem);
             }

@@ -142,21 +142,21 @@
             // playPauseToolStripMenuItem
             // 
             this.playPauseToolStripMenuItem.Name = "playPauseToolStripMenuItem";
-            this.playPauseToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.playPauseToolStripMenuItem.Size = new System.Drawing.Size(144, 22);
             this.playPauseToolStripMenuItem.Text = "Play / Pause";
             this.playPauseToolStripMenuItem.Click += new System.EventHandler(this.playPauseToolStripMenuItem_Click);
             // 
             // playNextToolStripMenuItem
             // 
             this.playNextToolStripMenuItem.Name = "playNextToolStripMenuItem";
-            this.playNextToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.playNextToolStripMenuItem.Size = new System.Drawing.Size(144, 22);
             this.playNextToolStripMenuItem.Text = "Play Next";
             this.playNextToolStripMenuItem.Click += new System.EventHandler(this.playNextToolStripMenuItem_Click);
             // 
             // playPreviousToolStripMenuItem
             // 
             this.playPreviousToolStripMenuItem.Name = "playPreviousToolStripMenuItem";
-            this.playPreviousToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.playPreviousToolStripMenuItem.Size = new System.Drawing.Size(144, 22);
             this.playPreviousToolStripMenuItem.Text = "Play Previous";
             this.playPreviousToolStripMenuItem.Click += new System.EventHandler(this.playPreviousToolStripMenuItem_Click);
             // 
@@ -171,7 +171,7 @@
             // aboutToolStripMenuItem
             // 
             this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
-            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(107, 22);
             this.aboutToolStripMenuItem.Text = "About";
             this.aboutToolStripMenuItem.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
             // 
@@ -394,6 +394,7 @@
             this.Controls.Add(this.volumeTrackBar);
             this.Controls.Add(this.albumArtBox);
             this.Controls.Add(this.menuStrip1);
+            this.KeyPreview = true;
             this.MainMenuStrip = this.menuStrip1;
             this.MaximumSize = new System.Drawing.Size(1920, 1280);
             this.MinimumSize = new System.Drawing.Size(1000, 600);
@@ -401,6 +402,7 @@
             this.Text = "KoPlayer";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
             this.Load += new System.EventHandler(this.MainForm_Load);
+            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.MainForm_KeyDown);
             this.Resize += new System.EventHandler(this.MainForm_Resize);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
