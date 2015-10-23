@@ -3,7 +3,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Windows.Forms;
 
-namespace KoPlayer.PlayLists
+namespace KoPlayer.Playlists
 {
     public static class Sorting
     {
@@ -31,7 +31,7 @@ namespace KoPlayer.PlayLists
             Dictionary<string, List<Song>> sortDictionary = GetDictionary(field, sortDictionaries);
 
             if (sortDictionary == null)
-                throw new PlayListException("Invalid field name");
+                throw new PlaylistException("Invalid field name");
 
             //Create a dictionary sorted on they keys
             SortedDictionary<string, List<Song>> sortedDictionary;

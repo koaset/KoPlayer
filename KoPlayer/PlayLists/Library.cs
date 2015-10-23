@@ -6,12 +6,12 @@ using System.Linq;
 using System.Windows.Forms;
 using System.Xml.Serialization;
 
-namespace KoPlayer.PlayLists
+namespace KoPlayer.Playlists
 {
     public delegate void ReportProgressEventHandler(object sender, ReportProgressEventArgs e);
     public delegate void LibraryChangedEventHandler(object sender, LibraryChangedEventArgs e);
 
-    public class Library : IPlayList
+    public class Library : IPlaylist
     {
         public event ReportProgressEventHandler ReportProgress;
         public event LibraryChangedEventHandler LibraryChanged;
@@ -207,7 +207,7 @@ namespace KoPlayer.PlayLists
 
         public Song GetRandom()
         {
-            return outputSongs[PlayList.r.Next(0, outputSongs.Count)];
+            return outputSongs[Playlist.r.Next(0, outputSongs.Count)];
         }
 
 

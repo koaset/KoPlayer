@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml.Serialization;
 
-namespace KoPlayer.PlayLists
+namespace KoPlayer.Playlists
 {
     public class Song : IComparable
     {

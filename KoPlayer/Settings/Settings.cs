@@ -51,9 +51,9 @@ namespace KoPlayer
             }
         }
 
-        public string StartupPlayList = "Library";
+        public string StartupPlaylist = "Library";
 
-        public string Partymix_SourcePlayListName = "Library";
+        public string Partymix_SourcePlaylistName = "Library";
         public int Partymix_NumPrevious = 5;
         public int Partymix_NumNext = 15;
 

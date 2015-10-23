@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using KoPlayer.PlayLists;
+using KoPlayer.Playlists;
 
 namespace KoPlayer.Forms
 {
@@ -19,15 +19,15 @@ namespace KoPlayer.Forms
 
         private Song song;
         private int currentIndex;
-        private IPlayList currentPlayList;
+        private IPlaylist currentPlaylist;
         private MainForm mainForm;
 
-        public SongInfoPopup(MainForm mainForm, Song song, int clickedIndex, IPlayList currentPlayList)
+        public SongInfoPopup(MainForm mainForm, Song song, int clickedIndex, IPlaylist currentPlaylist)
         {
             this.mainForm = mainForm;
             this.song = song;
             this.currentIndex = clickedIndex;
-            this.currentPlayList = currentPlayList;
+            this.currentPlaylist = currentPlaylist;
 
             InitializeComponent();
         }
@@ -114,16 +114,16 @@ namespace KoPlayer.Forms
             //Index juggling required as GetNext() and GetPrevious() increments playing playlist index
             //The methods also jump to the beginning/end of a playlist if you pass the end/beginning
             //So this way is probably more convenient
-            int oldIndex = currentPlayList.CurrentIndex;
-            currentPlayList.CurrentIndex = this.currentIndex;
+            int oldIndex = currentPlaylist.CurrentIndex;
+            currentPlaylist.CurrentIndex = this.currentIndex;
 
             if (getNext)
-                song = currentPlayList.GetNext();
+                song = currentPlaylist.GetNext();
             else
-                song = currentPlayList.GetPrevious();
+                song = currentPlaylist.GetPrevious();
 
-            this.currentIndex = currentPlayList.CurrentIndex;
-            currentPlayList.CurrentIndex = oldIndex;
+            this.currentIndex = currentPlaylist.CurrentIndex;
+            currentPlaylist.CurrentIndex = oldIndex;
         }
 
         private void tracknr_box_KeyPress(object sender, KeyPressEventArgs e)

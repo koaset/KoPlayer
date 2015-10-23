@@ -2,7 +2,7 @@
 <Settings xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <formWidth>1109</formWidth>
   <formHeight>684</formHeight>
-  <partymix_SourcePlayListPath>Playlists\PartyMix.xml</partymix_SourcePlayListPath>
+  <partymix_SourcePlaylistPath>Playlists\PartyMix.xml</partymix_SourcePlaylistPath>
   <partymix_NumPrevious>5</partymix_NumPrevious>
   <partymix_NumNext>15</partymix_NumNext>
   <partymix_Index>0</partymix_Index>

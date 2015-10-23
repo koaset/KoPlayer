@@ -7,9 +7,9 @@ using System.Xml.Serialization;
 using System.ComponentModel;
 using System.Windows.Forms;
 
-namespace KoPlayer.PlayLists
+namespace KoPlayer.Playlists
 {
-    public interface IPlayList
+    public interface IPlaylist
     {
         string Name { get; }
         string Path { get; }
@@ -33,9 +33,9 @@ namespace KoPlayer.PlayLists
         void Save();
     }
 
-    public class PlayListException : Exception
+    public class PlaylistException : Exception
     {
-        public PlayListException(string message)
+        public PlaylistException(string message)
             : base(message)
         { }
     }

@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using KoPlayer.PlayLists;
+using KoPlayer.Playlists;
 using KoPlayer.Forms;
 using KoPlayer.Forms.SettingsControls;
 
@@ -18,12 +18,12 @@ namespace KoPlayer.Forms
         private Settings settings;
         private MainForm callingForm;
         private Control showingSettings;
-        private List<IPlayList> playLists;
+        private List<IPlaylist> playlists;
 
-        public SettingsWindow(MainForm callingForm, List<IPlayList> playLists)
+        public SettingsWindow(MainForm callingForm, List<IPlaylist> playlists)
         {
             this.callingForm = callingForm;
-            this.playLists = playLists;
+            this.playlists = playlists;
             this.settings = callingForm.Settings;
             InitializeComponent();
         }
@@ -79,7 +79,7 @@ namespace KoPlayer.Forms
                     SetAndAddControl(new SongListSettingsControl(this.settings));
                     break;
                 case "Party Mix":
-                    SetAndAddControl(new PartyMixSettingsControl(this.settings, this.playLists));
+                    SetAndAddControl(new PartyMixSettingsControl(this.settings, this.playlists));
                     break;
                 case "Hot Keys":
                     SetAndAddControl(new HotkeySettingsControl(this.settings));

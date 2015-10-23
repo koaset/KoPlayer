@@ -107,13 +107,13 @@
     <Compile Include="Forms\SettingsControls\SongListSettingsControl.Designer.cs">
       <DependentUpon>SongListSettingsControl.cs</DependentUpon>
     </Compile>
-    <Compile Include="PlayLists\Library.cs" />
-    <Compile Include="PlayLists\Searching.cs" />
-    <Compile Include="PlayLists\Sorting.cs" />
+    <Compile Include="Playlists\Library.cs" />
+    <Compile Include="Playlists\Searching.cs" />
+    <Compile Include="Playlists\Sorting.cs" />
     <Compile Include="Settings\ColumnSettings.cs" />
-    <Compile Include="PlayLists\IPlayList.cs" />
-    <Compile Include="PlayLists\PlayList.cs" />
-    <Compile Include="PlayLists\Song.cs" />
+    <Compile Include="Playlists\IPlaylist.cs" />
+    <Compile Include="Playlists\Playlist.cs" />
+    <Compile Include="Playlists\Song.cs" />
     <Compile Include="Forms\MainForm.cs">
       <SubType>Form</SubType>
     </Compile>

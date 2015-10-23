@@ -1,6 +1,6 @@
 ﻿using CSCore.CoreAudioAPI;
 using CSCore.SoundOut;
-using KoPlayer.PlayLists;
+using KoPlayer.Playlists;
 using KoPlayer.Forms;
 using System;
 using System.Collections.Generic;
@@ -31,10 +31,10 @@ namespace KoPlayer.Forms
         #region Fields
         private SettingsWindow settingsWindow;
         private Library library;
-        private IPlayList showingPlayList;
-        private IPlayList playingPlayList;
-        private PlayList partyMix;
-        private List<IPlayList> playLists;
+        private IPlaylist showingPlaylist;
+        private IPlaylist playingPlaylist;
+        private Playlist partyMix;
+        private List<IPlaylist> playlists;
         private Settings settings;
         private ColumnSettings columnSettings;
         private Song currentlyPlaying;
@@ -49,7 +49,7 @@ namespace KoPlayer.Forms
         private string searchBoxDefault = "Search Library";
         private System.Timers.Timer searchLibraryTimer;
         private int searchLibraryTimerInterval = 500;
-        private PlayList renamePlaylist;
+        private Playlist renamePlaylist;
         private int clickedIndex;
         private Song songToSave;
         private KeyboardHook hook;
@@ -87,16 +87,16 @@ namespace KoPlayer.Forms
             this.Height = settings.FormHeight;
 
             ResetSearchBarTimer();
-            LoadPlayLists();
+            LoadPlaylists();
 
-            showingPlayList = GetPlayList(settings.StartupPlayList);
-            if (showingPlayList == null)
-                showingPlayList = library;
-            playingPlayList = showingPlayList;
+            showingPlaylist = GetPlaylist(settings.StartupPlaylist);
+            if (showingPlaylist == null)
+                showingPlaylist = library;
+            playingPlaylist = showingPlaylist;
 
             SetSongGridViewStyle();
 
-            UpdateShowingPlayList(true);
+            UpdateShowingPlaylist(true);
             songGridView.AutoGenerateColumns = false;
 
             columnSettings = ColumnSettings.Load(COLUMNSETTINGSPATH);
@@ -115,7 +115,7 @@ namespace KoPlayer.Forms
                 songGridView.Columns[cs.Name].SortMode = DataGridViewColumnSortMode.Automatic;
             }
 
-            SetPlayListGridView();
+            SetPlaylistGridView();
             PopulatePartyMix();
             UpdateTrayIconText();
         }
@@ -128,69 +128,69 @@ namespace KoPlayer.Forms
         #endregion
 
         #region Playlist methods
-        private void UpdateShowingPlayList(bool getAll)
+        private void UpdateShowingPlaylist(bool getAll)
         {
-            if (showingPlayList != null)
+            if (showingPlaylist != null)
             {
                 if (getAll)
                 {
-                    songGridView.DataSource = showingPlayList.GetAllSongs();
+                    songGridView.DataSource = showingPlaylist.GetAllSongs();
                 }
                 else
-                    songGridView.DataSource = showingPlayList.GetSongs();
-                if (showingPlayList == partyMix)
+                    songGridView.DataSource = showingPlaylist.GetSongs();
+                if (showingPlaylist == partyMix)
                     SetPartyMixColors();
             }
         }
 
-        private void LoadPlayLists()
+        private void LoadPlaylists()
         {
-            playLists = new List<IPlayList>();
-            playLists.Add(library);
+            playlists = new List<IPlaylist>();
+            playlists.Add(library);
 
-            partyMix = PlayList.Load(PARTYMIXFILEPATH, library);
+            partyMix = Playlist.Load(PARTYMIXFILEPATH, library);
             if (partyMix == null)
             {
-                partyMix = new PlayList(library, "Party Mix");
+                partyMix = new Playlist(library, "Party Mix");
                 partyMix.Save();
             }
-            playLists.Add(partyMix);
+            playlists.Add(partyMix);
 
-            string[] playListFiles = Directory.GetFiles(PLAYLISTDIRECTORYPATH, "*.xml", SearchOption.AllDirectories);
-            foreach (string playListPath in playListFiles)
-                if (playListPath != PARTYMIXFILEPATH)
+            string[] playlistFiles = Directory.GetFiles(PLAYLISTDIRECTORYPATH, "*.xml", SearchOption.AllDirectories);
+            foreach (string playlistPath in playlistFiles)
+                if (playlistPath != PARTYMIXFILEPATH)
                 {
-                    PlayList pl = PlayList.Load(playListPath, library);
+                    Playlist pl = Playlist.Load(playlistPath, library);
                     if (pl != null)
-                        playLists.Add(pl);
+                        playlists.Add(pl);
                 }
         }
 
-        private void SetPlayListGridView()
+        private void SetPlaylistGridView()
         {
-            playListGridView.Rows.Clear();
-            playListGridView.AllowUserToAddRows = true;
-            foreach (IPlayList playList in playLists)
+            playlistGridView.Rows.Clear();
+            playlistGridView.AllowUserToAddRows = true;
+            foreach (IPlaylist playlist in playlists)
             {
-                DataGridViewRow row = (DataGridViewRow)playListGridView.Rows[0].Clone();
-                row.Cells[0].Value = playList.Name;
-                playListGridView.Rows.Add(row);
+                DataGridViewRow row = (DataGridViewRow)playlistGridView.Rows[0].Clone();
+                row.Cells[0].Value = playlist.Name;
+                playlistGridView.Rows.Add(row);
             }
-            playListGridView.AllowUserToAddRows = false;
+            playlistGridView.AllowUserToAddRows = false;
 
-            foreach (DataGridViewRow row in playListGridView.Rows)
+            foreach (DataGridViewRow row in playlistGridView.Rows)
             {
-                if (row.Cells[0].Value.ToString().ToLower() == showingPlayList.Name.ToLower())
+                if (row.Cells[0].Value.ToString().ToLower() == showingPlaylist.Name.ToLower())
                     row.Selected = true;
                 else
                     row.Selected = false;
             }
-            playListGridView.Update();
+            playlistGridView.Update();
         }
 
-        private IPlayList GetPlayList(string name)
+        private IPlaylist GetPlaylist(string name)
         {
-            foreach (IPlayList pl in playLists)
+            foreach (IPlaylist pl in playlists)
                 if (pl.Name.ToLower() == name.ToLower())
                     return pl;
             return null;
@@ -199,11 +199,11 @@ namespace KoPlayer.Forms
         #region Party mix
         private void PopulatePartyMix()
         {
-            IPlayList source = GetPlayList(settings.Partymix_SourcePlayListName);
+            IPlaylist source = GetPlaylist(settings.Partymix_SourcePlaylistName);
             if (source == null)
             {
                 source = library;
-                settings.Partymix_SourcePlayListName = library.Name;
+                settings.Partymix_SourcePlaylistName = library.Name;
             }
 
             while (partyMix.CurrentIndex > settings.Partymix_NumPrevious)
@@ -213,12 +213,12 @@ namespace KoPlayer.Forms
                 while (partyMix.NumSongs - partyMix.CurrentIndex < settings.Partymix_NumNext + 1)
                     partyMix.Add(source.GetRandom());
 
-            if (showingPlayList == partyMix)
+            if (showingPlaylist == partyMix)
             {
                 if (songGridView.InvokeRequired)
-                    songGridView.Invoke(new MethodInvoker(delegate { UpdateShowingPlayList(true); }));
+                    songGridView.Invoke(new MethodInvoker(delegate { UpdateShowingPlaylist(true); }));
                 else
-                    UpdateShowingPlayList(true);
+                    UpdateShowingPlaylist(true);
                 songGridView.ClearSelection();
             }
         }
@@ -243,7 +243,7 @@ namespace KoPlayer.Forms
         private void preferencesToolStripMenuItem_Click(object sender, EventArgs e)
         {
             hook.Dispose();
-            settingsWindow = new SettingsWindow(this, this.playLists);
+            settingsWindow = new SettingsWindow(this, this.playlists);
             settingsWindow.StartPosition = FormStartPosition.CenterParent;
             this.settings.Save(SETTINGSPATH);
             
@@ -262,7 +262,7 @@ namespace KoPlayer.Forms
 
             //last.fm
 
-            UpdateShowingPlayList(true);
+            UpdateShowingPlaylist(true);
             ResetSearchBox();
             songGridView.Refresh();
             songGridView.Focus();
@@ -281,13 +281,13 @@ namespace KoPlayer.Forms
         {
             settings.FormWidth = this.Width;
             settings.FormHeight = this.Height;
-            settings.StartupPlayList = library.Name;
+            settings.StartupPlaylist = library.Name;
             settings.Save(SETTINGSPATH);
 
             columnSettings = new ColumnSettings(songGridView.Columns);
             columnSettings.Save(COLUMNSETTINGSPATH);
 
-            foreach (IPlayList pl in playLists)
+            foreach (IPlaylist pl in playlists)
                 pl.Save();
 
             searchBarTimer.Stop();
@@ -311,10 +311,10 @@ namespace KoPlayer.Forms
             {
                 string path = dialog.FileName;
                 library.Add(path);
-                if (showingPlayList != library)
+                if (showingPlaylist != library)
                 {
-                    showingPlayList.Add(path);
-                    UpdateShowingPlayList(true);
+                    showingPlaylist.Add(path);
+                    UpdateShowingPlaylist(true);
                 }
             }
         }
@@ -337,8 +337,8 @@ namespace KoPlayer.Forms
 
         void library_LibraryChanged(object sender, LibraryChangedEventArgs e)
         {
-            if (showingPlayList == library)
-                UpdateShowingPlayList(true);
+            if (showingPlaylist == library)
+                UpdateShowingPlaylist(true);
             PopulatePartyMix();
         }
 
@@ -414,7 +414,7 @@ namespace KoPlayer.Forms
         #endregion
 
         #region Playback control methods
-        private void PlaySong(Song song, IPlayList inPlayList)
+        private void PlaySong(Song song, IPlaylist inPlaylist)
         {
             if (currentSongTimePlayed.Ticks > 0.95 * musicPlayer.Length.Ticks)
             {
@@ -444,7 +444,7 @@ namespace KoPlayer.Forms
 
             if (play)
             {
-                if (inPlayList == partyMix)
+                if (inPlaylist == partyMix)
                     PopulatePartyMix();
 
                 ResetSearchBarTimer();
@@ -464,7 +464,7 @@ namespace KoPlayer.Forms
                 }
 
                 currentlyPlaying = song;
-                playingPlayList = inPlayList;
+                playingPlaylist = inPlaylist;
 
                 UpdateTrayIconText();
                 UpdateSongImage();
@@ -513,16 +513,16 @@ namespace KoPlayer.Forms
 
         private void PlayNextSong()
         {
-            Song nextSong = playingPlayList.GetNext();
+            Song nextSong = playingPlaylist.GetNext();
             if (nextSong != null)
-                PlaySong(nextSong, playingPlayList);
+                PlaySong(nextSong, playingPlaylist);
         }
 
         private void PlayPreviousSong()
         {
-            Song previousSong = playingPlayList.GetPrevious();
+            Song previousSong = playingPlaylist.GetPrevious();
             if (previousSong != null)
-                PlaySong(previousSong, playingPlayList);
+                PlaySong(previousSong, playingPlaylist);
         }
 
         private void PlayOrPause()
@@ -537,9 +537,9 @@ namespace KoPlayer.Forms
             }
             else if (musicPlayer.PlaybackState == PlaybackState.Stopped)
             {
-                if (songGridView.Rows.Count > showingPlayList.CurrentIndex)
-                    if (songGridView.Rows[showingPlayList.CurrentIndex].DataBoundItem != null)
-                        PlaySong(songGridView.Rows[showingPlayList.CurrentIndex].DataBoundItem as Song, showingPlayList);
+                if (songGridView.Rows.Count > showingPlaylist.CurrentIndex)
+                    if (songGridView.Rows[showingPlaylist.CurrentIndex].DataBoundItem != null)
+                        PlaySong(songGridView.Rows[showingPlaylist.CurrentIndex].DataBoundItem as Song, showingPlaylist);
             }
         }
 
@@ -547,8 +547,8 @@ namespace KoPlayer.Forms
         {
             if (e.RowIndex >= 0)
             {
-                showingPlayList.CurrentIndex = e.RowIndex;
-                PlaySong((Song)songGridView.Rows[e.RowIndex].DataBoundItem, showingPlayList);
+                showingPlaylist.CurrentIndex = e.RowIndex;
+                PlaySong((Song)songGridView.Rows[e.RowIndex].DataBoundItem, showingPlaylist);
             }
         }
 
@@ -583,7 +583,7 @@ namespace KoPlayer.Forms
                 }
                 else if (e.KeyCode == Keys.Enter)
                 {
-                    PlaySong(songGridView.SelectedRows[0].DataBoundItem as Song, showingPlayList);
+                    PlaySong(songGridView.SelectedRows[0].DataBoundItem as Song, showingPlaylist);
                 }
                 else if (e.KeyCode == Keys.Delete)
                 {
@@ -600,7 +600,7 @@ namespace KoPlayer.Forms
                 s.Rating = rating;
             }
             songGridView.Refresh();
-            showingPlayList.Save();
+            showingPlaylist.Save();
         }
 
         private void DeleteSongs(DataGridViewSelectedRowCollection rows)
@@ -609,7 +609,7 @@ namespace KoPlayer.Forms
             if (rows.Count > 25)
             {
                 string queryMessage = "You are about to delete " + rows.Count + " songs from the ";
-                if (showingPlayList != library)
+                if (showingPlaylist != library)
                     queryMessage += "playlist";
                 else
                     queryMessage += "library";
@@ -622,7 +622,7 @@ namespace KoPlayer.Forms
             if (shouldDelete)
             {
                 if (songGridView.AreAllCellsSelected(false))
-                    showingPlayList.RemoveAll();
+                    showingPlaylist.RemoveAll();
                 else
                 {
                     List<int> indexList = GetSortedRowIndexes(rows);
@@ -630,7 +630,7 @@ namespace KoPlayer.Forms
                     {
                         if (currentlyPlaying != null)
                         {
-                            if (showingPlayList == library)
+                            if (showingPlaylist == library)
                             {
                                 if (currentlyPlaying == (Song)songGridView.Rows[i].DataBoundItem)
                                 {
@@ -639,20 +639,20 @@ namespace KoPlayer.Forms
                                 }
                             }
                             else
-                                if (playingPlayList.CurrentIndex == i)
+                                if (playingPlaylist.CurrentIndex == i)
                                 {
                                     StopPlaying();
                                     albumArtBox.Image = null;
                                 }
                         }
                     }
-                    showingPlayList.Remove(indexList);
+                    showingPlaylist.Remove(indexList);
                 }
 
-                if (showingPlayList == partyMix)
+                if (showingPlaylist == partyMix)
                     PopulatePartyMix();
-                showingPlayList.Save();
-                UpdateShowingPlayList(false);
+                showingPlaylist.Save();
+                UpdateShowingPlaylist(false);
             }
         }
 
@@ -736,29 +736,29 @@ namespace KoPlayer.Forms
         #endregion
 
         #region Playlist manipulatiom methods
-        private void playListGridView_KeyDown(object sender, KeyEventArgs e)
+        private void playlistGridView_KeyDown(object sender, KeyEventArgs e)
         {
-            if (playListGridView.Focused)
+            if (playlistGridView.Focused)
                 if (e.KeyCode == Keys.Delete)
                 {
-                    DeletePlayList(playListGridView.SelectedCells[0]);
+                    DeletePlaylist(playlistGridView.SelectedCells[0]);
                 }
         }
 
-        private void DeletePlayList(DataGridViewCell cell)
+        private void DeletePlaylist(DataGridViewCell cell)
         {
             bool deleted = false;
-            IPlayList pl = playLists[cell.RowIndex];
+            IPlaylist pl = playlists[cell.RowIndex];
             if (pl != library && pl != partyMix)
             {
-                if (pl == showingPlayList)
-                    ChangeToPlayList(library);
-                if (pl == playingPlayList)
+                if (pl == showingPlaylist)
+                    ChangeToPlaylist(library);
+                if (pl == playingPlaylist)
                 {
                     StopPlaying();
-                    playingPlayList = library;
+                    playingPlaylist = library;
                 }
-                playLists.Remove(pl);
+                playlists.Remove(pl);
                 try
                 {
                     File.Delete(pl.Path);
@@ -768,22 +768,22 @@ namespace KoPlayer.Forms
             }
             
             if (deleted)
-                SetPlayListGridView();
+                SetPlaylistGridView();
         }
 
-        private void RenamePlayList()
+        private void RenamePlaylist()
         {
-            this.renamePlaylist = GetPlayList(playListGridView.CurrentCell.Value.ToString()) as PlayList;
-            playListGridView.BeginEdit(true);
+            this.renamePlaylist = GetPlaylist(playlistGridView.CurrentCell.Value.ToString()) as Playlist;
+            playlistGridView.BeginEdit(true);
         }
 
-        private void playListGridView_CellEndEdit(object sender, DataGridViewCellEventArgs e)
+        private void playlistGridView_CellEndEdit(object sender, DataGridViewCellEventArgs e)
         {
-            string currentName = playListGridView.CurrentCell.Value.ToString();
+            string currentName = playlistGridView.CurrentCell.Value.ToString();
             string oldName = this.renamePlaylist.Name;
             string oldPath = this.renamePlaylist.Path;
             bool acceptable = true;
-            foreach (IPlayList pl in playLists)
+            foreach (IPlaylist pl in playlists)
             {
                 if (currentName.ToLower() == pl.Name.ToLower())
                     if (currentName.ToLower() != oldName.ToLower())
@@ -802,30 +802,30 @@ namespace KoPlayer.Forms
                 }
             }
             else
-                playListGridView.BeginEdit(true);
+                playlistGridView.BeginEdit(true);
         }
         #endregion
 
         #region Playlist selection
-        private void playListGridView_CellClick(object sender, DataGridViewCellEventArgs e)
+        private void playlistGridView_CellClick(object sender, DataGridViewCellEventArgs e)
         {
-            ChangeToPlayList(playLists[e.RowIndex]);
+            ChangeToPlaylist(playlists[e.RowIndex]);
         }
 
-        private void ChangeToPlayList(IPlayList playList)
+        private void ChangeToPlaylist(IPlaylist playlist)
         {
-            if (showingPlayList != playList)
+            if (showingPlaylist != playlist)
             {
-                if (playList != library)
+                if (playlist != library)
                     ResetSearchBox();
-                showingPlayList.Save();
-                showingPlayList = playList;
+                showingPlaylist.Save();
+                showingPlaylist = playlist;
                 songGridView.ClearSelection();
-                playListGridView.Rows[playLists.IndexOf(playList)].Cells[0].Selected = true;
+                playlistGridView.Rows[playlists.IndexOf(playlist)].Cells[0].Selected = true;
                 SetSortGlyph();
-                if (showingPlayList == partyMix)
+                if (showingPlaylist == partyMix)
                     PopulatePartyMix();
-                UpdateShowingPlayList(true);
+                UpdateShowingPlaylist(true);
             }
         }
         #endregion
@@ -1020,10 +1020,10 @@ namespace KoPlayer.Forms
         {
             if (e.Button == System.Windows.Forms.MouseButtons.Left)
             {
-                if (showingPlayList != partyMix)
+                if (showingPlaylist != partyMix)
                 {
-                    showingPlayList.Sort(e.ColumnIndex, songGridView.Columns[e.ColumnIndex].HeaderText);
-                    UpdateShowingPlayList(false);
+                    showingPlaylist.Sort(e.ColumnIndex, songGridView.Columns[e.ColumnIndex].HeaderText);
+                    UpdateShowingPlaylist(false);
                     SetSortGlyph();
                 }
             }
@@ -1046,8 +1046,8 @@ namespace KoPlayer.Forms
         {
             foreach (DataGridViewColumn column in songGridView.Columns)
                 column.HeaderCell.SortGlyphDirection = SortOrder.None;
-            if (showingPlayList.SortColumnIndex >= 0)
-                songGridView.Columns[showingPlayList.SortColumnIndex].HeaderCell.SortGlyphDirection = showingPlayList.SortOrder;
+            if (showingPlaylist.SortColumnIndex >= 0)
+                songGridView.Columns[showingPlaylist.SortColumnIndex].HeaderCell.SortGlyphDirection = showingPlaylist.SortOrder;
         }
 
         private void columnHeaderContextMenu_Click(object sender, EventArgs e)
@@ -1075,10 +1075,10 @@ namespace KoPlayer.Forms
         #region New playlist
         private void newPlaylistToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            CreateNewPlayList();
+            CreateNewPlaylist();
         }
 
-        private void CreateNewPlayList()
+        private void CreateNewPlaylist()
         {
             string name = "";
             int i = 0;
@@ -1088,7 +1088,7 @@ namespace KoPlayer.Forms
                 taken = false;
                 i++;
                 name = "New playlist " + i;
-                foreach (IPlayList pl in playLists)
+                foreach (IPlaylist pl in playlists)
                 {
                     if (pl.Name.ToLower() == name.ToLower())
                         taken = true;
@@ -1096,10 +1096,10 @@ namespace KoPlayer.Forms
             }
             while (taken);
 
-            IPlayList newPlayList = new PlayList(library, name);
-            playLists.Add(newPlayList);
-            SetPlayListGridView();
-            songGridView.DataSource = newPlayList.GetSongs();
+            IPlaylist newPlaylist = new Playlist(library, name);
+            playlists.Add(newPlaylist);
+            SetPlaylistGridView();
+            songGridView.DataSource = newPlaylist.GetSongs();
         }
         #endregion
 
@@ -1114,7 +1114,7 @@ namespace KoPlayer.Forms
 
         private void songGridView_DragEnter(object sender, DragEventArgs e)
         {
-            if (showingPlayList != library)
+            if (showingPlaylist != library)
                 e.Effect = DragDropEffects.Move;
         }
 
@@ -1129,7 +1129,7 @@ namespace KoPlayer.Forms
                     DataGridViewSelectedRowCollection rows;
                     rows = (DataGridViewSelectedRowCollection)e.Data.GetData(typeof(DataGridViewSelectedRowCollection));
 
-                    IPlayList pl = showingPlayList;
+                    IPlaylist pl = showingPlaylist;
                     if (pl != library)
                     {
                         List<int> indexes = GetSortedRowIndexes(rows);
@@ -1138,11 +1138,11 @@ namespace KoPlayer.Forms
                         foreach (DataGridViewRow row in rows)
                         {
                             Song s = (Song)row.DataBoundItem;
-                            PlayList playList = pl as PlayList;
-                            playList.Insert(info.RowIndex, s);
+                            Playlist playlist = pl as Playlist;
+                            playlist.Insert(info.RowIndex, s);
                         }
 
-                        if (showingPlayList == partyMix)
+                        if (showingPlaylist == partyMix)
                             PopulatePartyMix();
                         else
                             songGridView.DataSource = pl.GetSongs();
@@ -1151,23 +1151,23 @@ namespace KoPlayer.Forms
             }
         }
 
-        private void playListGridView_DragEnter(object sender, DragEventArgs e)
+        private void playlistGridView_DragEnter(object sender, DragEventArgs e)
         {
             e.Effect = DragDropEffects.Copy;
         }
 
-        private void playListGridView_DragDrop(object sender, DragEventArgs e)
+        private void playlistGridView_DragDrop(object sender, DragEventArgs e)
         {
             if (e.Data.GetDataPresent(typeof(DataGridViewSelectedRowCollection)))
             {
-                Point p = playListGridView.PointToClient(new Point(e.X, e.Y));
-                DataGridView.HitTestInfo info = playListGridView.HitTest(p.X, p.Y);
+                Point p = playlistGridView.PointToClient(new Point(e.X, e.Y));
+                DataGridView.HitTestInfo info = playlistGridView.HitTest(p.X, p.Y);
                 if (info.RowIndex >= 0)
                 {
                     DataGridViewSelectedRowCollection rows;
                     rows = (DataGridViewSelectedRowCollection)e.Data.GetData(typeof(DataGridViewSelectedRowCollection));
 
-                    IPlayList pl = GetPlayList(playListGridView.Rows[info.RowIndex].Cells[0].Value.ToString());
+                    IPlaylist pl = GetPlaylist(playlistGridView.Rows[info.RowIndex].Cells[0].Value.ToString());
                     if (pl != library)
                     {
                         foreach (DataGridViewRow row in rows)
@@ -1175,8 +1175,8 @@ namespace KoPlayer.Forms
                             Song s = (Song)row.DataBoundItem;
                             pl.Add(s.Path);
                         }
-                        if (pl == showingPlayList)
-                            UpdateShowingPlayList(true);
+                        if (pl == showingPlaylist)
+                            UpdateShowingPlaylist(true);
                     }
                 }
             }
@@ -1193,7 +1193,7 @@ namespace KoPlayer.Forms
             this.playpauseButton.Update();
             this.previousButton.Update();
             this.songInfoLabel.Update();
-            this.playListGridView.Update();
+            this.playlistGridView.Update();
         }
 
         private void MainForm_Resize(object sender, EventArgs e)
@@ -1218,7 +1218,7 @@ namespace KoPlayer.Forms
         {
             if (searchBox.Text.Length == 0)
             {
-                UpdateShowingPlayList(true);
+                UpdateShowingPlaylist(true);
                 ResetSearchBox();
             }
         }
@@ -1271,14 +1271,14 @@ namespace KoPlayer.Forms
 
         private void DoSearch()
         {
-            ChangeToPlayList(library);
+            ChangeToPlaylist(library);
             if (searchBox.Text.Length > 0)
             {
                 songGridView.DataSource = library.Search(searchBox.Text);
-                UpdateShowingPlayList(false);
+                UpdateShowingPlaylist(false);
             }
             else if (searchBox.Text.Length == 0)
-                UpdateShowingPlayList(true);
+                UpdateShowingPlaylist(true);
             SetSortGlyph();
             
         }
@@ -1291,7 +1291,7 @@ namespace KoPlayer.Forms
                 if (e.KeyCode == Keys.Escape)
                 {
                     ResetSearchBox();
-                    UpdateShowingPlayList(true);
+                    UpdateShowingPlaylist(true);
                 }
                 SetSortGlyph();
             }
@@ -1307,39 +1307,39 @@ namespace KoPlayer.Forms
         }
 
         #region Playlist gridview right click menu
-        private void playListGridView_MouseDown(object sender, MouseEventArgs e)
+        private void playlistGridView_MouseDown(object sender, MouseEventArgs e)
         {
             if (e.Button == System.Windows.Forms.MouseButtons.Right)
             {
                 ContextMenu cm = new ContextMenu();
                 cm.MenuItems.Add(CreateMenuItem("Create new playlist", newPlaylistToolStripMenuItem_Click));
 
-                int rowIndex = playListGridView.HitTest(e.X, e.Y).RowIndex;
+                int rowIndex = playlistGridView.HitTest(e.X, e.Y).RowIndex;
 
                 if (rowIndex >= 0)
                 {
-                    playListGridView.ClearSelection();
-                    playListGridView.Rows[rowIndex].Selected = true;
-                    playListGridView.Rows[rowIndex].Cells[0].Selected = true;
+                    playlistGridView.ClearSelection();
+                    playlistGridView.Rows[rowIndex].Selected = true;
+                    playlistGridView.Rows[rowIndex].Cells[0].Selected = true;
 
                     if (rowIndex > 1)
                     {
-                        cm.MenuItems.Add(CreateMenuItem("Delete playlist", playListGridViewRightClickMenuDelete));
-                        cm.MenuItems.Add(CreateMenuItem("Rename playlist", playListGridViewRightClickRename));
+                        cm.MenuItems.Add(CreateMenuItem("Delete playlist", playlistGridViewRightClickMenuDelete));
+                        cm.MenuItems.Add(CreateMenuItem("Rename playlist", playlistGridViewRightClickRename));
                     }
                 }
-                cm.Show(playListGridView, new Point(e.X, e.Y));
+                cm.Show(playlistGridView, new Point(e.X, e.Y));
             }
         }
 
-        private void playListGridViewRightClickMenuDelete(object sender, EventArgs e)
+        private void playlistGridViewRightClickMenuDelete(object sender, EventArgs e)
         {
-            DeletePlayList(playListGridView.SelectedCells[0]);
+            DeletePlaylist(playlistGridView.SelectedCells[0]);
         }
 
-        private void playListGridViewRightClickRename(object sender, EventArgs e)
+        private void playlistGridViewRightClickRename(object sender, EventArgs e)
         {
-            RenamePlayList();
+            RenamePlaylist();
         }
         #endregion
 
@@ -1430,7 +1430,7 @@ namespace KoPlayer.Forms
 
         private void songGridViewRightClickPlay(object sender, EventArgs e)
         {
-            PlaySong((Song)songGridView.Rows[clickedIndex].DataBoundItem, showingPlayList);
+            PlaySong((Song)songGridView.Rows[clickedIndex].DataBoundItem, showingPlaylist);
         }
 
         private void songGridViewRightClickPause(object sender, EventArgs e)
@@ -1452,8 +1452,8 @@ namespace KoPlayer.Forms
                 songs.Add((Song)row.DataBoundItem);
             partyMix.Insert(partyMix.CurrentIndex + 1, songs);
 
-            if (showingPlayList == partyMix)
-                UpdateShowingPlayList(true);
+            if (showingPlaylist == partyMix)
+                UpdateShowingPlaylist(true);
         }
 
         private void songGridViewRightClickAddToPartyMixBottom(object sender, EventArgs e)
@@ -1461,8 +1461,8 @@ namespace KoPlayer.Forms
             foreach (DataGridViewRow row in songGridView.SelectedRows)
                 partyMix.Add((Song)row.DataBoundItem);
 
-            if (showingPlayList == partyMix)
-                UpdateShowingPlayList(true);
+            if (showingPlaylist == partyMix)
+                UpdateShowingPlaylist(true);
         }
 
         private void songGridViewRightClickShowExplorer(object sender, EventArgs e)
@@ -1492,7 +1492,7 @@ namespace KoPlayer.Forms
             }
             if (exists)
             {
-                SongInfoPopup popUp = new SongInfoPopup(this, clickedSong, this.clickedIndex, this.showingPlayList);
+                SongInfoPopup popUp = new SongInfoPopup(this, clickedSong, this.clickedIndex, this.showingPlaylist);
                 popUp.SavePlayingSong += popUp_SavePlayingSong;
                 popUp.StartPosition = FormStartPosition.CenterParent;
                 popUp.ShowDialog();

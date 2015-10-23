@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace KoPlayer.PlayLists
+namespace KoPlayer.Playlists
 {
     public static class Searching
     {

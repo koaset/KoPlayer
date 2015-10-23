@@ -46,7 +46,7 @@
             this.albumArtBox = new System.Windows.Forms.PictureBox();
             this.volumeTrackBar = new System.Windows.Forms.TrackBar();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
-            this.playListGridView = new System.Windows.Forms.DataGridView();
+            this.playlistGridView = new System.Windows.Forms.DataGridView();
             this.Column1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.songsBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.previousButton = new System.Windows.Forms.Button();
@@ -59,15 +59,15 @@
             this.trayIcon = new System.Windows.Forms.NotifyIcon(this.components);
             this.searchBox = new System.Windows.Forms.TextBox();
             this.songGridView = new KoPlayer.Forms.DataGridViewPlus();
-            this.playListBindingSource = new System.Windows.Forms.BindingSource(this.components);
+            this.playlistBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.albumArtBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.volumeTrackBar)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.playListGridView)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.playlistGridView)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.songsBindingSource)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.searchBar)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.songGridView)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.playListBindingSource)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.playlistBindingSource)).BeginInit();
             this.SuspendLayout();
             // 
             // menuStrip1
@@ -209,36 +209,36 @@
             this.statusStrip1.TabIndex = 6;
             this.statusStrip1.Text = "statusStrip1";
             // 
-            // playListGridView
+            // playlistGridView
             // 
-            this.playListGridView.AllowDrop = true;
-            this.playListGridView.AllowUserToAddRows = false;
-            this.playListGridView.AllowUserToDeleteRows = false;
-            this.playListGridView.AllowUserToResizeColumns = false;
-            this.playListGridView.AllowUserToResizeRows = false;
-            this.playListGridView.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.playlistGridView.AllowDrop = true;
+            this.playlistGridView.AllowUserToAddRows = false;
+            this.playlistGridView.AllowUserToDeleteRows = false;
+            this.playlistGridView.AllowUserToResizeColumns = false;
+            this.playlistGridView.AllowUserToResizeRows = false;
+            this.playlistGridView.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
-            this.playListGridView.BackgroundColor = System.Drawing.SystemColors.ButtonHighlight;
-            this.playListGridView.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.None;
-            this.playListGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.playListGridView.ColumnHeadersVisible = false;
-            this.playListGridView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.playlistGridView.BackgroundColor = System.Drawing.SystemColors.ButtonHighlight;
+            this.playlistGridView.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.None;
+            this.playlistGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.playlistGridView.ColumnHeadersVisible = false;
+            this.playlistGridView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.Column1});
-            this.playListGridView.EditMode = System.Windows.Forms.DataGridViewEditMode.EditProgrammatically;
-            this.playListGridView.GridColor = System.Drawing.Color.Black;
-            this.playListGridView.Location = new System.Drawing.Point(12, 95);
-            this.playListGridView.MultiSelect = false;
-            this.playListGridView.Name = "playListGridView";
-            this.playListGridView.RowHeadersVisible = false;
-            this.playListGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
-            this.playListGridView.Size = new System.Drawing.Size(175, 345);
-            this.playListGridView.TabIndex = 7;
-            this.playListGridView.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.playListGridView_CellClick);
-            this.playListGridView.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.playListGridView_CellEndEdit);
-            this.playListGridView.DragDrop += new System.Windows.Forms.DragEventHandler(this.playListGridView_DragDrop);
-            this.playListGridView.DragEnter += new System.Windows.Forms.DragEventHandler(this.playListGridView_DragEnter);
-            this.playListGridView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.playListGridView_KeyDown);
-            this.playListGridView.MouseDown += new System.Windows.Forms.MouseEventHandler(this.playListGridView_MouseDown);
+            this.playlistGridView.EditMode = System.Windows.Forms.DataGridViewEditMode.EditProgrammatically;
+            this.playlistGridView.GridColor = System.Drawing.Color.Black;
+            this.playlistGridView.Location = new System.Drawing.Point(12, 95);
+            this.playlistGridView.MultiSelect = false;
+            this.playlistGridView.Name = "playlistGridView";
+            this.playlistGridView.RowHeadersVisible = false;
+            this.playlistGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
+            this.playlistGridView.Size = new System.Drawing.Size(175, 345);
+            this.playlistGridView.TabIndex = 7;
+            this.playlistGridView.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.playlistGridView_CellClick);
+            this.playlistGridView.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.playlistGridView_CellEndEdit);
+            this.playlistGridView.DragDrop += new System.Windows.Forms.DragEventHandler(this.playlistGridView_DragDrop);
+            this.playlistGridView.DragEnter += new System.Windows.Forms.DragEventHandler(this.playlistGridView_DragEnter);
+            this.playlistGridView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.playlistGridView_KeyDown);
+            this.playlistGridView.MouseDown += new System.Windows.Forms.MouseEventHandler(this.playlistGridView_MouseDown);
             // 
             // Column1
             // 
@@ -371,9 +371,9 @@
             this.songGridView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.songGridView_KeyDown);
             this.songGridView.MouseDown += new System.Windows.Forms.MouseEventHandler(this.songGridView_MouseDown);
             // 
-            // playListBindingSource
+            // playlistBindingSource
             // 
-            this.playListBindingSource.DataSource = typeof(KoPlayer.PlayLists.PlayList);
+            this.playlistBindingSource.DataSource = typeof(KoPlayer.Playlists.Playlist);
             // 
             // MainForm
             // 
@@ -389,7 +389,7 @@
             this.Controls.Add(this.nextButton);
             this.Controls.Add(this.playpauseButton);
             this.Controls.Add(this.previousButton);
-            this.Controls.Add(this.playListGridView);
+            this.Controls.Add(this.playlistGridView);
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.volumeTrackBar);
             this.Controls.Add(this.albumArtBox);
@@ -406,11 +406,11 @@
             this.menuStrip1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.albumArtBox)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.volumeTrackBar)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.playListGridView)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.playlistGridView)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.songsBindingSource)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.searchBar)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.songGridView)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.playListBindingSource)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.playlistBindingSource)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -429,9 +429,9 @@
         private System.Windows.Forms.PictureBox albumArtBox;
         private System.Windows.Forms.TrackBar volumeTrackBar;
         private System.Windows.Forms.StatusStrip statusStrip1;
-        private System.Windows.Forms.DataGridView playListGridView;
+        private System.Windows.Forms.DataGridView playlistGridView;
         private System.Windows.Forms.DataGridViewTextBoxColumn Column1;
-        private System.Windows.Forms.BindingSource playListBindingSource;
+        private System.Windows.Forms.BindingSource playlistBindingSource;
         private System.Windows.Forms.BindingSource songsBindingSource;
         private System.Windows.Forms.Button previousButton;
         private System.Windows.Forms.Button playpauseButton;

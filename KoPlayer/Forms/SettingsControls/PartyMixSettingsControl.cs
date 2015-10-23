@@ -7,36 +7,36 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using KoPlayer.PlayLists;
+using KoPlayer.Playlists;
 
 namespace KoPlayer.Forms.SettingsControls
 {
     public partial class PartyMixSettingsControl : UserControl
     {
         Settings settings;
-        List<string> playListNames;
+        List<string> playlistNames;
 
-        public PartyMixSettingsControl(Settings settings, List<IPlayList> playLists)
+        public PartyMixSettingsControl(Settings settings, List<IPlaylist> playlists)
         {
             this.settings = settings;
-            this.playListNames = new List<string>();
-            foreach (IPlayList pl in playLists)
+            this.playlistNames = new List<string>();
+            foreach (IPlaylist pl in playlists)
                 if (pl.Name != "Party Mix")
-                    this.playListNames.Add(pl.Name);
+                    this.playlistNames.Add(pl.Name);
 
             InitializeComponent();
 
             this.recent_box.Value = settings.Partymix_NumPrevious;
             this.upcoming_box.Value = settings.Partymix_NumNext;
 
-            foreach (string name in this.playListNames)
+            foreach (string name in this.playlistNames)
                 this.playlist_box.Items.Add(name);
-            this.playlist_box.SelectedIndex = this.playListNames.IndexOf(settings.Partymix_SourcePlayListName);
+            this.playlist_box.SelectedIndex = this.playlistNames.IndexOf(settings.Partymix_SourcePlaylistName);
         }
 
         private void playlist_box_SelectedIndexChanged(object sender, EventArgs e)
         {
-            this.settings.Partymix_SourcePlayListName = this.playlist_box.Text;
+            this.settings.Partymix_SourcePlaylistName = this.playlist_box.Text;
         }
 
         private void recent_box_ValueChanged(object sender, EventArgs e)

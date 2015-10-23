@@ -6,10 +6,10 @@ using System.Linq;
 using System.Windows.Forms;
 using System.Xml.Serialization;
 
-namespace KoPlayer.PlayLists
+namespace KoPlayer.Playlists
 {
 
-    public class PlayList : IPlayList
+    public class Playlist : IPlaylist
     {
         public static Random r = new Random();
 
@@ -34,15 +34,15 @@ namespace KoPlayer.PlayLists
 
         private List<Dictionary<string, List<Song>>> sortDictionaries;
 
-        protected PlayList() { }
+        protected Playlist() { }
 
-        public PlayList(Library library)
-            : this(library, "PlayListName") { }
+        public Playlist(Library library)
+            : this(library, "PlaylistName") { }
 
-        public PlayList(Library library, string name)
+        public Playlist(Library library, string name)
             : this(library, name, new List<string>()) { }
 
-        public PlayList(Library library, string name, List<string> songPaths)
+        public Playlist(Library library, string name, List<string> songPaths)
         {
             this.libraryDictionary = library.Dictionary;
             library.LibraryChanged += library_LibraryChanged;
@@ -245,7 +245,7 @@ namespace KoPlayer.PlayLists
 
         public Song GetRandom()
         {
-            return libraryDictionary[songPaths[PlayList.r.Next(0, songPaths.Count)]];
+            return libraryDictionary[songPaths[Playlist.r.Next(0, songPaths.Count)]];
         }
 
         public void Save()
@@ -253,7 +253,7 @@ namespace KoPlayer.PlayLists
             try
             {
                 Stream stream = File.Create(this.Path);
-                XmlSerializer serializer = new XmlSerializer(typeof(PlayList));
+                XmlSerializer serializer = new XmlSerializer(typeof(Playlist));
                 serializer.Serialize(stream, this);
                 stream.Close();
             }
@@ -269,15 +269,15 @@ namespace KoPlayer.PlayLists
         /// <param name="path"></param>
         /// <param name="library"></param>
         /// <returns></returns>
-        public static PlayList Load(String path, Library library)
+        public static Playlist Load(String path, Library library)
         {
             Stream stream = null;
-            PlayList loadedPlayList = null;
+            Playlist loadedPlaylist = null;
             try
             {
                 stream = File.OpenRead(path);
-                XmlSerializer serializer = new XmlSerializer(typeof(PlayList));
-                loadedPlayList = (PlayList)serializer.Deserialize(stream);
+                XmlSerializer serializer = new XmlSerializer(typeof(Playlist));
+                loadedPlaylist = (Playlist)serializer.Deserialize(stream);
             }
             catch
             {
@@ -287,7 +287,7 @@ namespace KoPlayer.PlayLists
             {
                 if (stream != null) stream.Close();
             }
-            PlayList pl = new PlayList(library, loadedPlayList.Name, loadedPlayList.songPaths);
+            Playlist pl = new Playlist(library, loadedPlaylist.Name, loadedPlaylist.songPaths);
             library.LibraryChanged += pl.library_LibraryChanged;
 
             List<string> toBeRemoved = new List<string>();
