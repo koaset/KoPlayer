@@ -289,6 +289,7 @@ namespace KoPlayer.Playlists
             }
             Playlist pl = new Playlist(library, loadedPlaylist.Name, loadedPlaylist.songPaths);
             library.LibraryChanged += pl.library_LibraryChanged;
+            pl.CurrentIndex = loadedPlaylist.CurrentIndex;
 
             List<string> toBeRemoved = new List<string>();
             foreach (string filePath in pl.songPaths)

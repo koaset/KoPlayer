@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml.Serialization;
+using System.IO;
 
 namespace KoPlayer.Playlists
 {
@@ -229,6 +230,17 @@ namespace KoPlayer.Playlists
                 if (i < rating)
                     ret += "★";
             return ret;
+        }
+
+        public static System.Drawing.Image GetImage(Song song)
+        {
+            TagLib.File tagFile = TagLib.File.Create(song.Path);
+            if (tagFile.Tag.Pictures.Length > 0)
+            {
+                MemoryStream ms = new MemoryStream(tagFile.Tag.Pictures[0].Data.Data);
+                return System.Drawing.Image.FromStream(ms);
+            }
+            return null;
         }
     }
 }

@@ -56,6 +56,7 @@ namespace KoPlayer.Forms
         private KeyboardHook hook;
         private TimeSpan oldPosition;
         private TimeSpan currentSongTimePlayed;
+        private int songInfoPopupTime = 3000;
         #endregion
 
         #region Constructor & Load event
@@ -391,14 +392,7 @@ namespace KoPlayer.Forms
 
         private void UpdateSongImage()
         {
-            TagLib.File tagFile = TagLib.File.Create(currentlyPlaying.Path);
-            if (tagFile.Tag.Pictures.Length > 0)
-            {
-                MemoryStream ms = new MemoryStream(tagFile.Tag.Pictures[0].Data.Data);
-                albumArtBox.Image = System.Drawing.Image.FromStream(ms);
-            }
-            else
-                albumArtBox.Image = null;
+            albumArtBox.Image = Song.GetImage(currentlyPlaying);
         }
 
         private void UpdateSongInfoLabel()
@@ -690,7 +684,6 @@ namespace KoPlayer.Forms
                 hook.Dispose();
                 hook = new KeyboardHook();
                 hook.KeyPressed += hook_KeyPressed;
-                MessageBox.Show("Unable to set global hotkeys.\nTry closing other applications that use them and restart.");
             }
         }
 
@@ -734,9 +727,9 @@ namespace KoPlayer.Forms
 
         private void ShowCurrentSongPopup()
         {
-            //Do popup stuff
+            if (currentlyPlaying != null)
+                SongInfoPopup.ShowPopup(currentlyPlaying, songInfoPopupTime);
         }
-
         #endregion
 
         #region Playlist manipulatiom methods
@@ -1558,7 +1551,7 @@ namespace KoPlayer.Forms
             }
             if (exists)
             {
-                SongInfoPopup popUp = new SongInfoPopup(this, clickedSong, this.clickedSongIndex, this.showingPlaylist);
+                SongPropertiesWindow popUp = new SongPropertiesWindow(this, clickedSong, this.clickedSongIndex, this.showingPlaylist);
                 popUp.SavePlayingSong += popUp_SavePlayingSong;
                 popUp.StartPosition = FormStartPosition.CenterParent;
                 popUp.ShowDialog();

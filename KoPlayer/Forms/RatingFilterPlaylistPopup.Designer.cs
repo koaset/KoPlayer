@@ -83,7 +83,7 @@
             this.includehigher_checkbox.Text = "Include songs of higher rating";
             this.includehigher_checkbox.UseVisualStyleBackColor = true;
             // 
-            // CreateRatingFilterPlaylistPopup
+            // RatingFilterPlaylistPopup
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -94,7 +94,8 @@
             this.Controls.Add(this.cancel_button);
             this.Controls.Add(this.create_button);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
-            this.Name = "CreateRatingFilterPlaylistPopup";
+            this.Name = "RatingFilterPlaylistPopup";
+            this.ShowInTaskbar = false;
             this.Text = "Rating Filter Playlist";
             ((System.ComponentModel.ISupportInitialize)(this.ratingBox1)).EndInit();
             this.ResumeLayout(false);

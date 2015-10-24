@@ -107,6 +107,12 @@
     <Compile Include="Forms\SongInfoPopup.Designer.cs">
       <DependentUpon>SongInfoPopup.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\SongPropertiesWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\SongPropertiesWindow.Designer.cs">
+      <DependentUpon>SongPropertiesWindow.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\SettingsControls\SongListSettingsControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -162,6 +168,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\SongInfoPopup.resx">
       <DependentUpon>SongInfoPopup.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\SongPropertiesWindow.resx">
+      <DependentUpon>SongPropertiesWindow.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\SettingsControls\SongListSettingsControl.resx">
       <DependentUpon>SongListSettingsControl.cs</DependentUpon>
