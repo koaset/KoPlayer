@@ -1,6 +1,6 @@
 ﻿namespace KoPlayer.Forms.SettingsControls
 {
-    partial class PartyMixSettingsControl
+    partial class ShuffleQueueSettingsControl
     {
         /// <summary> 
         /// Required designer variable.
@@ -46,7 +46,7 @@
             this.title_label.Name = "title_label";
             this.title_label.Size = new System.Drawing.Size(91, 13);
             this.title_label.TabIndex = 13;
-            this.title_label.Text = "Party Mix Settings";
+            this.title_label.Text = "Shuffle Queue Settings";
             // 
             // nextsongs_label
             // 
@@ -121,7 +121,7 @@
             this.playlist_box.TabIndex = 16;
             this.playlist_box.SelectedIndexChanged += new System.EventHandler(this.playlist_box_SelectedIndexChanged);
             // 
-            // PartyMixSettingsControl
+            // ShuffleQueueSettingsControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -132,7 +132,7 @@
             this.Controls.Add(this.upcoming_box);
             this.Controls.Add(this.prevsongs_label);
             this.Controls.Add(this.recent_box);
-            this.Name = "PartyMixSettingsControl";
+            this.Name = "ShuffleQueueSettingsControl";
             this.Size = new System.Drawing.Size(205, 186);
             ((System.ComponentModel.ISupportInitialize)(this.upcoming_box)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.recent_box)).EndInit();

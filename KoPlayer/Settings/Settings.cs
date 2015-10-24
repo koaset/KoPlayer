@@ -53,9 +53,9 @@ namespace KoPlayer
 
         public string StartupPlaylist = "Library";
 
-        public string Partymix_SourcePlaylistName = "Library";
-        public int Partymix_NumPrevious = 5;
-        public int Partymix_NumNext = 15;
+        public string Shufflequeue_SourcePlaylistName = "Library";
+        public int Shufflequeue_NumPrevious = 5;
+        public int Shufflequeue_NumNext = 15;
 
         public Keys[] RatingHotkeys = { (Keys)220, Keys.D1, Keys.D2, Keys.D3, Keys.D4, Keys.D5 };
 

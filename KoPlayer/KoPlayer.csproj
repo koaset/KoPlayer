@@ -95,11 +95,11 @@
     <Compile Include="Forms\SettingsControls\HotkeySettingsControl.Designer.cs">
       <DependentUpon>HotkeySettingsControl.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\SettingsControls\PartyMixSettingsControl.cs">
+    <Compile Include="Forms\SettingsControls\ShuffleQueueSettingsControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Forms\SettingsControls\PartyMixSettingsControl.Designer.cs">
-      <DependentUpon>PartyMixSettingsControl.cs</DependentUpon>
+    <Compile Include="Forms\SettingsControls\ShuffleQueueSettingsControl.Designer.cs">
+      <DependentUpon>ShuffleQueueSettingsControl.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\SongInfoPopup.cs">
       <SubType>Form</SubType>
@@ -160,8 +160,8 @@
     <EmbeddedResource Include="Forms\SettingsControls\HotkeySettingsControl.resx">
       <DependentUpon>HotkeySettingsControl.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\SettingsControls\PartyMixSettingsControl.resx">
-      <DependentUpon>PartyMixSettingsControl.cs</DependentUpon>
+    <EmbeddedResource Include="Forms\SettingsControls\ShuffleQueueSettingsControl.resx">
+      <DependentUpon>ShuffleQueueSettingsControl.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\SettingsWindow.resx">
       <DependentUpon>SettingsWindow.cs</DependentUpon>
@@ -198,12 +198,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Settings\column_settings.xml" />
-    <Content Include="Settings\settings.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
