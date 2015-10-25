@@ -592,16 +592,36 @@ namespace KoPlayer.Forms
             }
         }
 
+        private void MainForm_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (musicPlayer.PlaybackState == PlaybackState.Playing)
+                if (e.Control)
+                    if (settings.RatingHotkeys.Contains(e.KeyCode))
+                    {
+                        RateSong(currentlyPlaying, Array.IndexOf(settings.RatingHotkeys, e.KeyCode));
+                        
+                        songGridView.Refresh();
+                    }
+        }
+
         private void RateSongs(DataGridViewSelectedRowCollection rows, int rating)
         {
             foreach (DataGridViewRow row in rows)
             {
                 Song s = row.DataBoundItem as Song;
                 s.Rating = rating;
+                library.UpdateSongInfo(s);
             }
             songGridView.Refresh();
             showingPlaylist.Save();
-            library.UpdateSortDictionaries();
+        }
+
+        private void RateSong(Song s, int rating)
+        {
+            s.Rating = rating;
+            library.UpdateSongInfo(currentlyPlaying);
+            songGridView.Refresh();
+            playingPlaylist.Save();
         }
 
         private void DeleteSongs(DataGridViewSelectedRowCollection rows)
@@ -1543,19 +1563,6 @@ namespace KoPlayer.Forms
             songToSave = e.savingSong;
         }
         #endregion
-
-        private void MainForm_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (musicPlayer.PlaybackState == PlaybackState.Playing)
-                if (e.Control)
-                    if (settings.RatingHotkeys.Contains(e.KeyCode))
-                    {
-                        currentlyPlaying.Rating = Array.IndexOf(settings.RatingHotkeys, e.KeyCode);
-                        if (playingPlaylist == showingPlaylist)
-                            songGridView.Refresh();
-                    }
-        }
-
         #endregion
         #endregion
     }

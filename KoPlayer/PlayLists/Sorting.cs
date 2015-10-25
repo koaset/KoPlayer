@@ -121,7 +121,7 @@ namespace KoPlayer.Playlists
         /// <param name="sourceList"></param>
         /// <param name="field"></param>
         /// <returns></returns>
-        private static Dictionary<string, List<Song>> CreateFieldDictionary(BindingList<Song> sourceList, string field)
+        public static Dictionary<string, List<Song>> CreateFieldDictionary(BindingList<Song> sourceList, string field)
         {
             Dictionary<string, List<Song>> fieldDictionary = new Dictionary<string, List<Song>>();
             foreach (Song s in sourceList)

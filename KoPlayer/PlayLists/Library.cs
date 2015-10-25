@@ -20,6 +20,7 @@ namespace KoPlayer.Playlists
         public string Path { get { return PATH; } }
         public int SortColumnIndex { get; set; }
         public Dictionary<string, Song> PathDictionary { get { return pathDictionary; } }
+        public SortOrder SortOrder { get { return sortOrder; } }
 
         private const string PATH = "Library.xml";
         private const string EXTENSION = ".mp3";
@@ -29,8 +30,7 @@ namespace KoPlayer.Playlists
         private List<Dictionary<string, List<Song>>> sortDictionaries;
         private List<Song> newSongs;
 
-        public SortOrder SortOrder { get { return sortOrder; } }
-        private SortOrder sortOrder;
+        private SortOrder sortOrder = SortOrder.None;
         private string sortField = "";
         private bool raiseLibraryChangedEvent = true;
 
@@ -96,9 +96,15 @@ namespace KoPlayer.Playlists
             return ret;
         }
 
-        public void UpdateSortDictionaries()
+        public void UpdateSongInfo(Song song)
         {
-            Sorting.CreateSortDictionaries(this.outputSongs, this.sortDictionaries);
+            //Remove from all dictionaries
+            foreach (Dictionary<string, List<Song>> dictionary in this.sortDictionaries)
+                foreach (List<Song> list in dictionary.Values)
+                    if (list.Contains(song))
+                        list.Remove(song);
+
+            Sorting.AddSongToSortDictionaries(song, this.sortDictionaries);
         }
 
         public BindingList<Song> GetSongs()
@@ -221,7 +227,7 @@ namespace KoPlayer.Playlists
 
         public Song GetRandom()
         {
-            return outputSongs[Playlist.r.Next(0, outputSongs.Count)];
+            return pathDictionary.Values.ToList()[Playlist.r.Next(0, pathDictionary.Count)];
         }
 
 

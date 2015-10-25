@@ -42,9 +42,9 @@
             // title_label
             // 
             this.title_label.AutoSize = true;
-            this.title_label.Location = new System.Drawing.Point(13, 12);
+            this.title_label.Location = new System.Drawing.Point(14, 2);
             this.title_label.Name = "title_label";
-            this.title_label.Size = new System.Drawing.Size(91, 13);
+            this.title_label.Size = new System.Drawing.Size(116, 13);
             this.title_label.TabIndex = 13;
             this.title_label.Text = "Shuffle Queue Settings";
             // 

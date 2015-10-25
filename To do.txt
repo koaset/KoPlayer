@@ -1,4 +1,2 @@
-separate library search results from output
-make rating filter playlist update properly
 Password storing
 last.fm scrobbling
