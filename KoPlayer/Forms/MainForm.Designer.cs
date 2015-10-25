@@ -237,7 +237,7 @@
             this.playlistGridView.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.playlistGridView_CellClick);
             this.playlistGridView.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.playlistGridView_CellEndEdit);
             this.playlistGridView.DragDrop += new System.Windows.Forms.DragEventHandler(this.playlistGridView_DragDrop);
-            this.playlistGridView.DragEnter += new System.Windows.Forms.DragEventHandler(this.playlistGridView_DragEnter);
+            this.playlistGridView.DragOver += new System.Windows.Forms.DragEventHandler(this.playlistGridView_DragOver);
             this.playlistGridView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.playlistGridView_KeyDown);
             this.playlistGridView.MouseDown += new System.Windows.Forms.MouseEventHandler(this.playlistGridView_MouseDown);
             // 

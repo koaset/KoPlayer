@@ -60,6 +60,7 @@ namespace KoPlayer.Playlists
                 this.outputSongs = new BindingList<Song>(songs);
             else
                 this.outputSongs = new BindingList<Song>();
+
             this.pathDictionary = SongListToPathDictionary();
             this.CurrentIndex = 0;
             ResetSortVariables();
@@ -117,7 +118,6 @@ namespace KoPlayer.Playlists
         {
             ResetSortVariables();
             this.outputSongs = new BindingList<Song>(pathDictionary.Values.ToList());
-            Sorting.CreateSortDictionaries(this.outputSongs, this.sortDictionaries);
             return GetSongs();
         }
 
@@ -130,6 +130,11 @@ namespace KoPlayer.Playlists
         public void Add(string path)
         {
             Add(new Song(path));
+        }
+
+        public void ResetSearchDictionaries()
+        {
+            Sorting.CreateSortDictionaries(this.outputSongs, this.sortDictionaries);
         }
 
         public void Add(Song song)
