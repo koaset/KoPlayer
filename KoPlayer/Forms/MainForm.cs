@@ -396,20 +396,17 @@ namespace KoPlayer.Forms
         private void UpdateSongInfoLabel()
         {
             if (songInfoLabel.InvokeRequired)
-                songInfoLabel.Invoke(new MethodInvoker(delegate { SetSongInfoLabelText(); }));
+                songInfoLabel.Invoke(new MethodInvoker(delegate { UpdateSongInfoLabel(); }));
             else
-                SetSongInfoLabelText();
-        }
-
-        private void SetSongInfoLabelText()
-        {
-            if (musicPlayer.PlaybackState != PlaybackState.Stopped)
-                songInfoLabel.Text =
-                      currentlyPlaying.Title + "\n"
-                    + currentlyPlaying.Artist + "\n"
-                    + currentlyPlaying.Album;
-            else
-                songInfoLabel.Text = "";
+            {
+                if (musicPlayer.PlaybackState != PlaybackState.Stopped)
+                    songInfoLabel.Text =
+                          currentlyPlaying.Title + "\n"
+                        + currentlyPlaying.Artist + "\n"
+                        + currentlyPlaying.Album;
+                else
+                    songInfoLabel.Text = "";
+            }
         }
         #endregion
 
@@ -424,32 +421,15 @@ namespace KoPlayer.Forms
 
                 //SCROBBLE HERE IF ENABLED
 
-                if (songGridView.InvokeRequired)
-                    songGridView.Invoke(new Action(delegate { songGridView.Refresh(); }));
-                else
-                    songGridView.Refresh();
+                RefreshSongGridView();
             }
 
-            bool play = true;
-            try
-            {
-                song.Reload();
-            }
-            catch (SongReloadException ex)
-            {
-                play = false;
-                MessageBox.Show(ex.ToString() + "\nSong will be removed from the library.");
-                library.Remove(song);
-            }
-
-            if (play)
+            if (ReloadSong(song))
             {
                 if (inPlaylist == shuffleQueue)
                     PopulateShuffleQueue();
 
                 ResetSearchBarTimer();
-
-                musicPlayer.Volume = 0;
                 searchBarTimer.Stop();
 
                 try
@@ -470,6 +450,7 @@ namespace KoPlayer.Forms
                 UpdateSongLengthLabel();
                 UpdateSongInfoLabel();
 
+                //Saves changed from tag editing when song is not playing any more
                 if (songToSave != null)
                     if (songToSave.Path != currentlyPlaying.Path)
                     {
@@ -479,14 +460,42 @@ namespace KoPlayer.Forms
             }
         }
 
+        private void RefreshSongGridView()
+        {
+            if (songGridView.InvokeRequired)
+                songGridView.Invoke(new Action(delegate { songGridView.Refresh(); }));
+            else
+                songGridView.Refresh();
+        }
+
+        /// <summary>
+        /// True if reaload was successful
+        /// </summary>
+        /// <param name="song"></param>
+        /// <returns></returns>
+        private bool ReloadSong(Song song)
+        {
+            try
+            {
+                song.Reload();
+            }
+            catch (SongReloadException ex)
+            {
+                MessageBox.Show(ex.ToString() + "\nSong will be removed from the library.");
+                library.Remove(song);
+                return false;
+            }
+            return true;
+        }
+
         private void PlayMusic()
         {
-            musicPlayer.Play();
-
             if (volumeTrackBar.InvokeRequired)
                 volumeTrackBar.Invoke(new Action(delegate { musicPlayer.Volume = volumeTrackBar.Value; }));
             else
                 musicPlayer.Volume = volumeTrackBar.Value;
+
+            musicPlayer.Play();
 
             UpdateSearchBar(musicPlayer.Length, musicPlayer.Position);
             searchBarTimer.Start();
@@ -501,13 +510,10 @@ namespace KoPlayer.Forms
 
         private void StopPlaying()
         {
-            musicPlayer.Volume = 0;
-            musicPlayer.Stop();
             searchBarTimer.Stop();
-            if (songInfoLabel.InvokeRequired)
-                songInfoLabel.Invoke(new MethodInvoker(delegate { SetSongInfoLabelText(); }));
-            else
-                SetSongInfoLabelText();
+            musicPlayer.Stop();
+            musicPlayer.Volume = 0;
+            UpdateSongInfoLabel();
         }
 
         private void PlayNextSong()
@@ -842,16 +848,19 @@ namespace KoPlayer.Forms
             TimeSpan position = musicPlayer.Position;
 
             UpdateSearchBar(length, position);
-            UpdateCurrentTimeLabel(length, position);
+            UpdateCurrentTimeLabel();
 
             if (Math.Abs(position.Seconds - oldPosition.Seconds) < 5)
                 currentSongTimePlayed += position - oldPosition;
 
             this.oldPosition = position;
 
-            if ((searchBarTimer.Enabled && musicPlayer.PlaybackState == PlaybackState.Stopped)
-                || searchBarTimer.Enabled && position > length)
+            if ((searchBarTimer.Enabled && musicPlayer.PlaybackState == PlaybackState.Stopped) ||
+                (searchBarTimer.Enabled && position > length))
+            {
+                StopPlaying();
                 PlayNextSong();
+            }
         }
         #endregion
 
@@ -868,22 +877,15 @@ namespace KoPlayer.Forms
             }
         }
 
-        private void UpdateCurrentTimeLabel(TimeSpan length, TimeSpan position)
+        private void UpdateCurrentTimeLabel()
         {
-            if (position > length)
-                position = length;
-
-            if (!currentTime_Label.IsDisposed)
-                if (currentTime_Label.InvokeRequired)
-                    currentTime_Label.Invoke(new Action(
-                        delegate 
-                        {
-                            if (!currentTime_Label.IsDisposed)
-                                currentTime_Label.Text = Song.DurationFromTimeSpanToString(musicPlayer.Position);
-                        }));
+            if (currentTime_Label.InvokeRequired)
+                currentTime_Label.Invoke(new MethodInvoker(delegate { UpdateCurrentTimeLabel(); }));
             else
+            {
                 if (!currentTime_Label.IsDisposed)
                     currentTime_Label.Text = Song.DurationFromTimeSpanToString(musicPlayer.Position);
+            }
         }
 
         private void UpdateSongLengthLabel()
@@ -1240,11 +1242,7 @@ namespace KoPlayer.Forms
         private void ResetSearchBox()
         {
             if (searchBox.InvokeRequired)
-                searchBox.Invoke(new Action(delegate
-                    {
-                        searchBox.Text = searchBoxDefault;
-                        searchBox.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
-                    }));
+                searchBox.Invoke(new MethodInvoker(delegate { ResetSearchBox(); }));
             else
             {
                 searchBox.Text = searchBoxDefault;
