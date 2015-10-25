@@ -20,14 +20,16 @@ namespace KoPlayer.Forms
         private Song song;
         private int currentIndex;
         private IPlaylist currentPlaylist;
+        private Library library;
         private MainForm mainForm;
 
-        public SongPropertiesWindow(MainForm mainForm, Song song, int clickedIndex, IPlaylist currentPlaylist)
+        public SongPropertiesWindow(MainForm mainForm, Song song, int clickedIndex, IPlaylist currentPlaylist, Library library)
         {
             this.mainForm = mainForm;
             this.song = song;
             this.currentIndex = clickedIndex;
             this.currentPlaylist = currentPlaylist;
+            this.library = library;
 
             InitializeComponent();
         }
@@ -96,10 +98,12 @@ namespace KoPlayer.Forms
                 this.song.DiscNumber = Convert.ToInt32(this.discnr_box.Text);
                 this.song.Genre = this.genre_box.Text;
                 this.song.Rating = (int)this.rating_numupdownstring.Value;
-                song.SaveTags();
+                this.song.SaveTags();
             }
             else
                 OnSavePlayingSong(this.song);
+
+            this.library.UpdateSongInfo(this.song);
             
         }
 

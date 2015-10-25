@@ -510,6 +510,7 @@ namespace KoPlayer.Forms
 
         private void StopPlaying()
         {
+            albumArtBox.Image = null;
             searchBarTimer.Stop();
             musicPlayer.Stop();
             musicPlayer.Volume = 0;
@@ -627,6 +628,8 @@ namespace KoPlayer.Forms
         private void DeleteSongs(DataGridViewSelectedRowCollection rows)
         {
             bool shouldDelete = true;
+            if (showingPlaylist.GetType() == typeof(RatingFilterPlaylist))
+                shouldDelete = false;
             if (rows.Count > 25)
             {
                 string queryMessage = "You are about to delete " + rows.Count + " songs from the ";
@@ -654,17 +657,13 @@ namespace KoPlayer.Forms
                             if (showingPlaylist == library)
                             {
                                 if (currentlyPlaying == (Song)songGridView.Rows[i].DataBoundItem)
-                                {
                                     StopPlaying();
-                                    albumArtBox.Image = null;
-                                }
                             }
                             else
+                            {
                                 if (playingPlaylist.CurrentIndex == i)
-                                {
                                     StopPlaying();
-                                    albumArtBox.Image = null;
-                                }
+                            }
                         }
                     }
                     showingPlaylist.Remove(indexList);
@@ -1447,7 +1446,8 @@ namespace KoPlayer.Forms
             #endregion
             cm.MenuItems.Add(ratingMenu);
             cm.MenuItems.Add(CreateMenuItem("Show file in explorer", songGridViewRightClickShowExplorer));
-            cm.MenuItems.Add(CreateMenuItem("Delete", songGridViewRightClickDelete));
+            if (showingPlaylist.GetType() != typeof(RatingFilterPlaylist))
+                cm.MenuItems.Add(CreateMenuItem("Delete", songGridViewRightClickDelete));
             cm.MenuItems.Add(CreateMenuItem("Properties", songGridViewRightClickProperties));
             return cm;
         }
@@ -1526,7 +1526,7 @@ namespace KoPlayer.Forms
         private void songGridViewRightClickShowExplorer(object sender, EventArgs e)
         {
             Song clickedSong = songGridView.Rows[clickedSongIndex].DataBoundItem as Song;
-            Process.Start("explorer.exe", @"/select, " + clickedSong.Path);
+            Process.Start("explorer.exe", @"/select, " + "\"" + clickedSong.Path + "\"");
         }
 
         private void songGridViewRightClickDelete(object sender, EventArgs e)
@@ -1550,7 +1550,8 @@ namespace KoPlayer.Forms
             }
             if (exists)
             {
-                SongPropertiesWindow popUp = new SongPropertiesWindow(this, clickedSong, this.clickedSongIndex, this.showingPlaylist);
+                SongPropertiesWindow popUp = new SongPropertiesWindow(this, clickedSong,
+                    this.clickedSongIndex, this.showingPlaylist, this.library);
                 popUp.SavePlayingSong += popUp_SavePlayingSong;
                 popUp.StartPosition = FormStartPosition.CenterParent;
                 popUp.ShowDialog();

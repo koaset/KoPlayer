@@ -79,6 +79,7 @@ namespace KoPlayer.Playlists
             }
             else
                 this.sortOrder = SortOrder.Ascending;
+
             this.SortColumnIndex = columnIndex;
             this.sortField = field;
             Sorting.Sort(field, this.sortOrder, this.sortDictionaries, ref this.outputSongs);
@@ -173,7 +174,6 @@ namespace KoPlayer.Playlists
 
         public void Remove(List<Song> songs)
         {
-            this.outputSongs.RaiseListChangedEvents = false;
             this.outputSongs.RaiseListChangedEvents = false;
             foreach (Song s in songs)
                 Remove(s.Path);
