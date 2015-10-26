@@ -556,10 +556,10 @@ namespace KoPlayer.Forms
                 musicPlayer.Volume = volumeTrackBar.Value;
 
             musicPlayer.Play();
-
             UpdateSearchBar(musicPlayer.Length, musicPlayer.Position);
             searchBarTimer.Start();
             UpdateStatusStip();
+            UpdatePlayPauseButtonImage();
         }
 
         private void PauseMusic()
@@ -568,6 +568,7 @@ namespace KoPlayer.Forms
             musicPlayer.Pause();
             searchBarTimer.Stop();
             UpdateStatusStip();
+            UpdatePlayPauseButtonImage();
         }
 
         private void StopPlaying()
@@ -578,6 +579,7 @@ namespace KoPlayer.Forms
             musicPlayer.Volume = 0;
             UpdateSongInfoLabel();
             UpdateStatusStip();
+            UpdatePlayPauseButtonImage();
         }
 
         private void PlayNextSong()
@@ -1083,7 +1085,7 @@ namespace KoPlayer.Forms
 
         private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("KoPlayer 0.9\n(C) Karl-Oskar Smed, 2015\nhttps://github.com/koaset/KoPlayer");
+            MessageBox.Show("KoPlayer 0.9\n(C) Karl-Oskar Smed, 2015\nhttps://github.com/koaset/KoPlayer\n Icons from: https://icons8.com/");
         }
         #endregion
 
@@ -1674,6 +1676,91 @@ namespace KoPlayer.Forms
                 SetTrayIconContextMenu();
         }
 
+        #endregion
+
+        #endregion
+
+        #region Button Image selection
+        #region PlayPauseButton
+
+        private void UpdatePlayPauseButtonImage()
+        {
+            if (musicPlayer.PlaybackState == PlaybackState.Playing)
+            {
+                //playpauseButton.Location = new Point(playpauseButton.Location.X - 5, playpauseButton.Location.Y);
+                playpauseButton.ImageList = pauseButton_imageList;
+            }
+            else
+            {
+                //playpauseButton.Location = new Point(playpauseButton.Location.X + 5, playpauseButton.Location.Y);
+                playpauseButton.ImageList = playButton_imageList;
+            }
+        }
+
+        private void playpauseButton_MouseEnter(object sender, EventArgs e)
+        {
+            playpauseButton.ImageIndex = 1;
+        }
+
+        private void playpauseButton_MouseLeave(object sender, EventArgs e)
+        {
+            playpauseButton.ImageIndex = 0;
+        }
+
+        private void playpauseButton_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (e.Button == System.Windows.Forms.MouseButtons.Left)
+                playpauseButton.ImageIndex = 2;
+        }
+
+        private void playpauseButton_MouseUp(object sender, MouseEventArgs e)
+        {
+            playpauseButton.ImageIndex = 1;
+        }
+        #endregion
+
+        #region Next Button
+        private void nextButton_MouseEnter(object sender, EventArgs e)
+        {
+            nextButton.ImageIndex = 1;
+        }
+
+        private void nextButton_MouseLeave(object sender, EventArgs e)
+        {
+            nextButton.ImageIndex = 0;
+        }
+
+        private void nextButton_MouseDown(object sender, MouseEventArgs e)
+        {
+            nextButton.ImageIndex = 2;
+        }
+
+        private void nextButton_MouseUp(object sender, MouseEventArgs e)
+        {
+            nextButton.ImageIndex = 1;
+        }
+        #endregion
+
+        #region Previous Button
+        private void previousButton_MouseEnter(object sender, EventArgs e)
+        {
+            previousButton.ImageIndex = 1;
+        }
+
+        private void previousButton_MouseLeave(object sender, EventArgs e)
+        {
+            previousButton.ImageIndex = 0;
+        }
+
+        private void previousButton_MouseDown(object sender, MouseEventArgs e)
+        {
+            previousButton.ImageIndex = 2;
+        }
+
+        private void previousButton_MouseUp(object sender, MouseEventArgs e)
+        {
+            previousButton.ImageIndex = 1;
+        }
         #endregion
         #endregion
     }

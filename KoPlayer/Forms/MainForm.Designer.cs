@@ -30,6 +30,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -44,29 +45,33 @@
             this.playPreviousToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.albumArtBox = new System.Windows.Forms.PictureBox();
             this.volumeTrackBar = new System.Windows.Forms.TrackBar();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.playlistGridView = new System.Windows.Forms.DataGridView();
             this.Column1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.songsBindingSource = new System.Windows.Forms.BindingSource(this.components);
-            this.previousButton = new System.Windows.Forms.Button();
-            this.playpauseButton = new System.Windows.Forms.Button();
-            this.nextButton = new System.Windows.Forms.Button();
+            this.previousButton_imageList = new System.Windows.Forms.ImageList(this.components);
+            this.nextButton_imageList = new System.Windows.Forms.ImageList(this.components);
             this.searchBar = new System.Windows.Forms.TrackBar();
             this.songInfoLabel = new System.Windows.Forms.Label();
             this.currentTime_Label = new System.Windows.Forms.Label();
             this.songLength_Label = new System.Windows.Forms.Label();
             this.trayIcon = new System.Windows.Forms.NotifyIcon(this.components);
             this.searchBox = new System.Windows.Forms.TextBox();
+            this.playButton_imageList = new System.Windows.Forms.ImageList(this.components);
+            this.pauseButton_imageList = new System.Windows.Forms.ImageList(this.components);
+            this.nextButton = new System.Windows.Forms.Button();
+            this.playpauseButton = new System.Windows.Forms.Button();
+            this.previousButton = new System.Windows.Forms.Button();
+            this.albumArtBox = new System.Windows.Forms.PictureBox();
+            this.songsBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.songGridView = new KoPlayer.Forms.DataGridViewPlus();
             this.playlistBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.menuStrip1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.albumArtBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.volumeTrackBar)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.playlistGridView)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.songsBindingSource)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.searchBar)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.albumArtBox)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.songsBindingSource)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.songGridView)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.playlistBindingSource)).BeginInit();
             this.SuspendLayout();
@@ -176,18 +181,6 @@
             this.aboutToolStripMenuItem.Text = "About";
             this.aboutToolStripMenuItem.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
             // 
-            // albumArtBox
-            // 
-            this.albumArtBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.albumArtBox.BackColor = System.Drawing.SystemColors.ControlLight;
-            this.albumArtBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.albumArtBox.Location = new System.Drawing.Point(12, 446);
-            this.albumArtBox.Name = "albumArtBox";
-            this.albumArtBox.Size = new System.Drawing.Size(175, 175);
-            this.albumArtBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.albumArtBox.TabIndex = 3;
-            this.albumArtBox.TabStop = false;
-            // 
             // volumeTrackBar
             // 
             this.volumeTrackBar.AutoSize = false;
@@ -247,35 +240,21 @@
             this.Column1.HeaderText = "Column1";
             this.Column1.Name = "Column1";
             // 
-            // previousButton
+            // previousButton_imageList
             // 
-            this.previousButton.Location = new System.Drawing.Point(12, 54);
-            this.previousButton.Name = "previousButton";
-            this.previousButton.Size = new System.Drawing.Size(48, 23);
-            this.previousButton.TabIndex = 8;
-            this.previousButton.Text = "prev";
-            this.previousButton.UseVisualStyleBackColor = true;
-            this.previousButton.Click += new System.EventHandler(this.previousButton_Click);
+            this.previousButton_imageList.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("previousButton_imageList.ImageStream")));
+            this.previousButton_imageList.TransparentColor = System.Drawing.Color.Transparent;
+            this.previousButton_imageList.Images.SetKeyName(0, "Media-Controls-Rewind-icon.png");
+            this.previousButton_imageList.Images.SetKeyName(1, "Media-Controls-Rewind-icon-click.png");
+            this.previousButton_imageList.Images.SetKeyName(2, "Media-Controls-Rewind-icon-hover.png");
             // 
-            // playpauseButton
+            // nextButton_imageList
             // 
-            this.playpauseButton.Location = new System.Drawing.Point(66, 54);
-            this.playpauseButton.Name = "playpauseButton";
-            this.playpauseButton.Size = new System.Drawing.Size(48, 23);
-            this.playpauseButton.TabIndex = 9;
-            this.playpauseButton.Text = "play/pause";
-            this.playpauseButton.UseVisualStyleBackColor = true;
-            this.playpauseButton.Click += new System.EventHandler(this.playpauseButton_Click);
-            // 
-            // nextButton
-            // 
-            this.nextButton.Location = new System.Drawing.Point(120, 54);
-            this.nextButton.Name = "nextButton";
-            this.nextButton.Size = new System.Drawing.Size(48, 23);
-            this.nextButton.TabIndex = 10;
-            this.nextButton.Text = "next";
-            this.nextButton.UseVisualStyleBackColor = true;
-            this.nextButton.Click += new System.EventHandler(this.nextButton_Click);
+            this.nextButton_imageList.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("nextButton_imageList.ImageStream")));
+            this.nextButton_imageList.TransparentColor = System.Drawing.Color.Transparent;
+            this.nextButton_imageList.Images.SetKeyName(0, "Media-Controls-Fast-Forward-icon.png");
+            this.nextButton_imageList.Images.SetKeyName(1, "Media-Controls-Fast-Forward-icon-click.png");
+            this.nextButton_imageList.Images.SetKeyName(2, "Media-Controls-Fast-Forward-icon-hover.png");
             // 
             // searchBar
             // 
@@ -340,6 +319,91 @@
             this.searchBox.Enter += new System.EventHandler(this.searchBox_Enter);
             this.searchBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.searchBox_KeyDown);
             this.searchBox.Leave += new System.EventHandler(this.searchBox_Leave);
+            // 
+            // playButton_imageList
+            // 
+            this.playButton_imageList.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("playButton_imageList.ImageStream")));
+            this.playButton_imageList.TransparentColor = System.Drawing.Color.Transparent;
+            this.playButton_imageList.Images.SetKeyName(0, "Media-Controls-Play-icon.png");
+            this.playButton_imageList.Images.SetKeyName(1, "Media-Controls-Play-icon-click.png");
+            this.playButton_imageList.Images.SetKeyName(2, "Media-Controls-Play-icon-hover.png");
+            // 
+            // pauseButton_imageList
+            // 
+            this.pauseButton_imageList.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("pauseButton_imageList.ImageStream")));
+            this.pauseButton_imageList.TransparentColor = System.Drawing.Color.Transparent;
+            this.pauseButton_imageList.Images.SetKeyName(0, "Media-Controls-Pause-icon.png");
+            this.pauseButton_imageList.Images.SetKeyName(1, "Media-Controls-Pause-icon-click.png");
+            this.pauseButton_imageList.Images.SetKeyName(2, "Media-Controls-Pause-icon-hover.png");
+            // 
+            // nextButton
+            // 
+            this.nextButton.FlatAppearance.BorderSize = 0;
+            this.nextButton.FlatAppearance.MouseDownBackColor = System.Drawing.SystemColors.Control;
+            this.nextButton.FlatAppearance.MouseOverBackColor = System.Drawing.SystemColors.Control;
+            this.nextButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.nextButton.ImageIndex = 0;
+            this.nextButton.ImageList = this.nextButton_imageList;
+            this.nextButton.Location = new System.Drawing.Point(122, 49);
+            this.nextButton.Name = "nextButton";
+            this.nextButton.Size = new System.Drawing.Size(45, 35);
+            this.nextButton.TabIndex = 10;
+            this.nextButton.UseVisualStyleBackColor = true;
+            this.nextButton.Click += new System.EventHandler(this.nextButton_Click);
+            this.nextButton.MouseDown += new System.Windows.Forms.MouseEventHandler(this.nextButton_MouseDown);
+            this.nextButton.MouseEnter += new System.EventHandler(this.nextButton_MouseEnter);
+            this.nextButton.MouseLeave += new System.EventHandler(this.nextButton_MouseLeave);
+            this.nextButton.MouseUp += new System.Windows.Forms.MouseEventHandler(this.nextButton_MouseUp);
+            // 
+            // playpauseButton
+            // 
+            this.playpauseButton.FlatAppearance.BorderSize = 0;
+            this.playpauseButton.FlatAppearance.MouseDownBackColor = System.Drawing.SystemColors.Control;
+            this.playpauseButton.FlatAppearance.MouseOverBackColor = System.Drawing.SystemColors.Control;
+            this.playpauseButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.playpauseButton.ImageIndex = 0;
+            this.playpauseButton.ImageList = this.playButton_imageList;
+            this.playpauseButton.Location = new System.Drawing.Point(71, 49);
+            this.playpauseButton.Name = "playpauseButton";
+            this.playpauseButton.Size = new System.Drawing.Size(35, 35);
+            this.playpauseButton.TabIndex = 9;
+            this.playpauseButton.UseVisualStyleBackColor = true;
+            this.playpauseButton.Click += new System.EventHandler(this.playpauseButton_Click);
+            this.playpauseButton.MouseDown += new System.Windows.Forms.MouseEventHandler(this.playpauseButton_MouseDown);
+            this.playpauseButton.MouseEnter += new System.EventHandler(this.playpauseButton_MouseEnter);
+            this.playpauseButton.MouseLeave += new System.EventHandler(this.playpauseButton_MouseLeave);
+            this.playpauseButton.MouseUp += new System.Windows.Forms.MouseEventHandler(this.playpauseButton_MouseUp);
+            // 
+            // previousButton
+            // 
+            this.previousButton.FlatAppearance.BorderSize = 0;
+            this.previousButton.FlatAppearance.MouseDownBackColor = System.Drawing.SystemColors.Control;
+            this.previousButton.FlatAppearance.MouseOverBackColor = System.Drawing.SystemColors.Control;
+            this.previousButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.previousButton.ImageIndex = 0;
+            this.previousButton.ImageList = this.previousButton_imageList;
+            this.previousButton.Location = new System.Drawing.Point(12, 49);
+            this.previousButton.Name = "previousButton";
+            this.previousButton.Size = new System.Drawing.Size(45, 35);
+            this.previousButton.TabIndex = 8;
+            this.previousButton.UseVisualStyleBackColor = true;
+            this.previousButton.Click += new System.EventHandler(this.previousButton_Click);
+            this.previousButton.MouseDown += new System.Windows.Forms.MouseEventHandler(this.previousButton_MouseDown);
+            this.previousButton.MouseEnter += new System.EventHandler(this.previousButton_MouseEnter);
+            this.previousButton.MouseLeave += new System.EventHandler(this.previousButton_MouseLeave);
+            this.previousButton.MouseUp += new System.Windows.Forms.MouseEventHandler(this.previousButton_MouseUp);
+            // 
+            // albumArtBox
+            // 
+            this.albumArtBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.albumArtBox.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.albumArtBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.albumArtBox.Location = new System.Drawing.Point(12, 446);
+            this.albumArtBox.Name = "albumArtBox";
+            this.albumArtBox.Size = new System.Drawing.Size(175, 175);
+            this.albumArtBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.albumArtBox.TabIndex = 3;
+            this.albumArtBox.TabStop = false;
             // 
             // songGridView
             // 
@@ -408,11 +472,11 @@
             this.Resize += new System.EventHandler(this.MainForm_Resize);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.albumArtBox)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.volumeTrackBar)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.playlistGridView)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.songsBindingSource)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.searchBar)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.albumArtBox)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.songsBindingSource)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.songGridView)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.playlistBindingSource)).EndInit();
             this.ResumeLayout(false);
@@ -452,5 +516,9 @@
         private System.Windows.Forms.ToolStripMenuItem playNextToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem playPreviousToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem aboutToolStripMenuItem;
+        private System.Windows.Forms.ImageList playButton_imageList;
+        private System.Windows.Forms.ImageList previousButton_imageList;
+        private System.Windows.Forms.ImageList nextButton_imageList;
+        private System.Windows.Forms.ImageList pauseButton_imageList;
     }
 }
