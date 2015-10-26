@@ -58,6 +58,8 @@ namespace KoPlayer.Forms
         private Playlist tempPlaylist;
         private int clickedSongIndex;
         private int clickedPlaylistIndex;
+
+        ToolStripProgressBar progressBar;
         #endregion
 
         #region Constructor & Load event
@@ -69,6 +71,7 @@ namespace KoPlayer.Forms
                 library = new Library();
                 library.Save();
             }
+            library.LibraryChanged += library_LibraryChanged;
 
             settings = Settings.Load(SETTINGSPATH);
             if (settings == null)
@@ -121,12 +124,44 @@ namespace KoPlayer.Forms
             PopulateShuffleQueue();
             UpdateTrayIconText();
             SetTrayIconContextMenu();
+            SetStatusStrip();
         }
 
         private void SetSongGridViewStyle()
         {
             songGridView.RowTemplate.Height = settings.RowHeight;
             songGridView.DefaultCellStyle.Font = new Font(settings.FontName, settings.FontSize, GraphicsUnit.Point);
+            songGridView.ShowCellToolTips = false;
+        }
+
+        private void SetStatusStrip()
+        {
+            ToolStripLabel item = new ToolStripLabel();
+            item.Name = "playlist_info";
+            item.Text = showingPlaylist.ToString();
+            statusStrip1.Items.Add(item);
+            ToolStripSeparator separator = new ToolStripSeparator();
+            separator.Name = "playlist_info_separator";
+            separator.Visible = false;
+            statusStrip1.Items.Add(separator);
+
+            item = new ToolStripLabel();
+            item.Name = "playback_status";
+            statusStrip1.Items.Add(item);
+        }
+
+        private void UpdateStatusStip()
+        {
+            statusStrip1.Items["playlist_info"].Text = showingPlaylist.ToString();
+
+            string itemText = "";
+            if (musicPlayer.PlaybackState == PlaybackState.Playing)
+                itemText = "Playing";
+            else if (musicPlayer.PlaybackState == PlaybackState.Paused)
+                itemText = "Paused";
+            statusStrip1.Items["playback_status"].Text = itemText;
+
+            statusStrip1.Items["playlist_info_separator"].Visible = !(itemText.Length == 0);
         }
         #endregion
 
@@ -330,13 +365,15 @@ namespace KoPlayer.Forms
             if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
                 library.AddFolder(dialog.SelectedPath);
+
+                statusStrip1.Items.Add(new ToolStripSeparator());
                 statusStrip1.Items.Add("Adding files...");
-                ToolStripProgressBar progressBar = new ToolStripProgressBar("add_progress");
+                progressBar = new ToolStripProgressBar("add_progress");
                 progressBar.Minimum = 0;
                 progressBar.Maximum = 100;
                 statusStrip1.Items.Add(progressBar);
+                UpdateStatusStip();
                 library.ReportProgress += library_ReportProgress;
-                library.LibraryChanged += library_LibraryChanged;
             }
         }
 
@@ -345,18 +382,20 @@ namespace KoPlayer.Forms
             if (showingPlaylist == library)
                 UpdateShowingPlaylist(true);
             PopulateShuffleQueue();
+            UpdateStatusStip();
         }
 
         private void library_ReportProgress(object sender, ReportProgressEventArgs e)
         {
             if (e.ProgressPercentage < 100)
             {
-                ToolStripProgressBar progressBar = (ToolStripProgressBar)statusStrip1.Items["add_progress"];
-                progressBar.Value = (int)(e.ProgressPercentage);
+                this.progressBar.Value = (int)(e.ProgressPercentage);
             }
             else if (e.ProgressPercentage == 100)
             {
                 statusStrip1.Items.Clear();
+                progressBar = null;
+                SetStatusStrip();
                 library.ReportProgress -= library_ReportProgress;
             }
         }
@@ -520,6 +559,7 @@ namespace KoPlayer.Forms
 
             UpdateSearchBar(musicPlayer.Length, musicPlayer.Position);
             searchBarTimer.Start();
+            UpdateStatusStip();
         }
 
         private void PauseMusic()
@@ -527,6 +567,7 @@ namespace KoPlayer.Forms
             musicPlayer.Volume = 0;
             musicPlayer.Pause();
             searchBarTimer.Stop();
+            UpdateStatusStip();
         }
 
         private void StopPlaying()
@@ -536,6 +577,7 @@ namespace KoPlayer.Forms
             musicPlayer.Stop();
             musicPlayer.Volume = 0;
             UpdateSongInfoLabel();
+            UpdateStatusStip();
         }
 
         private void PlayNextSong()
@@ -671,8 +713,12 @@ namespace KoPlayer.Forms
             }
             if (shouldDelete)
             {
-                if (songGridView.AreAllCellsSelected(false))
+                if (songGridView.SelectedRows.Count == showingPlaylist.NumSongs)
+                {
                     showingPlaylist.RemoveAll();
+                    if (musicPlayer.PlaybackState != PlaybackState.Stopped)
+                        StopPlaying();
+                }
                 else
                 {
                     List<int> indexList = GetSortedRowIndexes(rows);
@@ -870,6 +916,7 @@ namespace KoPlayer.Forms
                 UpdateShowingPlaylist(true);
                 songGridView.ClearSelection();
                 SetPlaylistGridView();
+                UpdateStatusStip();
             }
         }
         #endregion

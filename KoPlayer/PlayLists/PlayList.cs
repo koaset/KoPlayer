@@ -60,9 +60,18 @@ namespace KoPlayer.Playlists
             BindingList<Song> ret = new BindingList<Song>();
             if (songPaths.Count == 0)
                 return ret;
+            List<string> pathsToBeRemoved = new List<string>();
             foreach (string songPath in songPaths)
+            {
                 if (libraryDictionary.ContainsKey(songPath))
                     ret.Add(libraryDictionary[songPath]);
+                else
+                    pathsToBeRemoved.Add(songPath);
+            }
+
+            foreach (string path in pathsToBeRemoved)
+                songPaths.Remove(path);
+
             return ret;
         }
 
@@ -127,9 +136,11 @@ namespace KoPlayer.Playlists
             if (CurrentIndex > index)
                 CurrentIndex--;
             songPaths.RemoveAt(index);
+
             Song s = outputSongs[index];
             Sorting.RemoveSongFromSortDictionaries(this.outputSongs[index], this.sortDictionaries);
-            outputSongs.Remove(this.outputSongs[index]);
+            if (outputSongs.Contains(s))
+                outputSongs.Remove(s);
         }
 
         public void Remove(string path)
@@ -299,6 +310,11 @@ namespace KoPlayer.Playlists
                 pl.Remove(filePath);
 
             return pl;
+        }
+
+        public override string ToString()
+        {
+            return "Playlist: " + this.Name + ", " + this.NumSongs + " songs.";
         }
     }
 }

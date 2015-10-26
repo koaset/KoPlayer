@@ -195,6 +195,7 @@ namespace KoPlayer.Playlists
             Sorting.RemoveSongFromSortDictionaries(toBeRemoved, sortDictionaries);
             outputSongs.Remove(toBeRemoved);
             this.pathDictionary.Remove(toBeRemoved.Path);
+            this.OnLibraryChanged(new LibraryChangedEventArgs());
         }
 
         public void RemoveAll()
@@ -202,6 +203,7 @@ namespace KoPlayer.Playlists
             this.outputSongs = new BindingList<Song>();
             this.pathDictionary.Clear();
             Sorting.CreateSortDictionaries(this.outputSongs, this.sortDictionaries);
+            this.OnLibraryChanged(new LibraryChangedEventArgs());
         }
 
         public Song GetNext()
@@ -397,6 +399,11 @@ namespace KoPlayer.Playlists
         private Dictionary<string, Song> SongListToPathDictionary()
         {
             return outputSongs.ToDictionary(x => x.Path, x => x);
+        }
+
+        public override string ToString()
+        {
+            return this.Name + ", " + this.NumSongs + " songs.";
         }
     }
 
