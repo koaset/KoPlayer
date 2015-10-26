@@ -48,6 +48,7 @@ namespace KoPlayer.Forms
         {
             VerticalScrollBar.VisibleChanged += VerticalScrollBar_VisibleChanged;
             InitializeComponent();
+            VerticalScrollBar.Visible = true;
         }
 
         #endregion
@@ -138,8 +139,17 @@ namespace KoPlayer.Forms
                 RowDrag(this, e);
         }
 
-        void VerticalScrollBar_VisibleChanged(object sender, EventArgs e)
+        private void VerticalScrollBar_VisibleChanged(object sender, EventArgs e)
         {
+            if (!VerticalScrollBar.Visible)
+            {
+                int width = VerticalScrollBar.Width;
+                VerticalScrollBar.Location = new Point(ClientRectangle.Width - width - 1, 1);
+                VerticalScrollBar.Size = new Size(width, ClientRectangle.Height - 1 - this.HorizontalScrollBar.Height);
+                if (!HorizontalScrollBar.Visible)
+                    VerticalScrollBar.Size = new Size(width, ClientRectangle.Height - 1 
+                        - this.HorizontalScrollBar.Height + this.HorizontalScrollBar.Height - 1);
+            }
             VerticalScrollBar.Visible = true;
         }
 

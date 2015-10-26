@@ -860,7 +860,7 @@ namespace KoPlayer.Forms
         private void ChangeToPlaylist(IPlaylist playlist)
         {
             if (showingPlaylist != playlist)
-            { 
+            {
                 if (playlist != library)
                     ResetSearchBox();
                 showingPlaylist = playlist;
