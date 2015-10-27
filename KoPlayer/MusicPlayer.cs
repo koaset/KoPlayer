@@ -4,25 +4,37 @@ using CSCore;
 using CSCore.Codecs;
 using CSCore.CoreAudioAPI;
 using CSCore.SoundOut;
+using CSCore.Streams;
 
 namespace KoPlayer
 {
-    public class MusicPlayer : Component
+    public class MusicPlayer : IDisposable
     {
-        private ISoundOut _soundOut;
-        private IWaveSource _waveSource;
+        private ISoundOut soundOut;
+        private IWaveSource waveSource;
+        private Equalizer equalizer;
+
+        public event EventHandler OpenCompleted;
 
         public event EventHandler<PlaybackStoppedEventArgs> PlaybackStopped
         {
             add
             {
-                if (_soundOut != null)
-                    _soundOut.Stopped += value;
+                if (soundOut != null)
+                    soundOut.Stopped += value;
             }
             remove
             {
-                if (_soundOut != null)
-                    _soundOut.Stopped -= value;
+                if (soundOut != null)
+                    soundOut.Stopped -= value;
+            }
+        }
+
+        public Equalizer Equalizer
+        {
+            get
+            {
+                return equalizer;
             }
         }
 
@@ -30,8 +42,8 @@ namespace KoPlayer
         {
             get
             {
-                if (_soundOut != null)
-                    return _soundOut.PlaybackState;
+                if (soundOut != null)
+                    return soundOut.PlaybackState;
                 return PlaybackState.Stopped;
             }
         }
@@ -40,14 +52,14 @@ namespace KoPlayer
         {
             get
             {
-                if (_waveSource != null)
-                    return _waveSource.GetPosition();
+                if (waveSource != null)
+                    return waveSource.GetPosition();
                 return TimeSpan.Zero;
             }
             set
             {
-                if (_waveSource != null)
-                    _waveSource.SetPosition(value);
+                if (waveSource != null)
+                    waveSource.SetPosition(value);
             }
         }
 
@@ -55,8 +67,8 @@ namespace KoPlayer
         {
             get
             {
-                if (_waveSource != null)
-                    return _waveSource.GetLength();
+                if (waveSource != null)
+                    return waveSource.GetLength();
                 return TimeSpan.Zero;
             }
         }
@@ -65,15 +77,15 @@ namespace KoPlayer
         {
             get
             {
-                if (_soundOut != null)
-                    return Math.Min(100, Math.Max((int)(_soundOut.Volume * 100), 0));
+                if (soundOut != null)
+                    return Math.Min(100, Math.Max((int)(soundOut.Volume * 100), 0));
                 return 100;
             }
             set
             {
-                if (_soundOut != null)
+                if (soundOut != null)
                 {
-                    _soundOut.Volume = Math.Min(1.0f, Math.Max(value / 100f, 0f));
+                    soundOut.Volume = Math.Min(1.0f, Math.Max(value / 100f, 0f));
                 }
             }
         }
@@ -82,51 +94,59 @@ namespace KoPlayer
         {
             CleanupPlayback();
 
-            _waveSource =
+            var source = CodecFactory.Instance.GetCodec(filename);
+
+            waveSource =
                 CodecFactory.Instance.GetCodec(filename)
+                    .ToStereo()
+                    .ChangeSampleRate(44100)
                     .ToSampleSource()
-                    .ToMono()
-                    .ToWaveSource();
-            _soundOut = new WasapiOut() {Latency = 100, Device = device};
-            _soundOut.Initialize(_waveSource);
+                    .AppendSource(Equalizer.Create10BandEqualizer, out equalizer)
+                    .ToWaveSource(16);
+
+            soundOut = new WasapiOut() {Latency = 100, Device = device};
+            soundOut.Initialize(waveSource);
+            if (this.OpenCompleted != null)
+                this.OpenCompleted(this, new EventArgs());
         }
 
         public void Play()
         {
-            if (_soundOut != null)
-                _soundOut.Play();
+            if (soundOut != null)
+                soundOut.Play();
         }
 
         public void Pause()
         {
-            if (_soundOut != null)
-                _soundOut.Pause();
+            if (soundOut != null)
+                soundOut.Pause();
         }
 
         public void Stop()
         {
-            if (_soundOut != null)
-                _soundOut.Stop();
+            if (soundOut != null)
+                soundOut.Stop();
         }
 
         private void CleanupPlayback()
         {
-            if (_soundOut != null)
+            if (soundOut != null)
             {
-                _soundOut.Dispose();
-                _soundOut = null;
+                soundOut.Dispose();
+                soundOut = null;
             }
-            if (_waveSource != null)
+            if (waveSource != null)
             {
-                _waveSource.Dispose();
-                _waveSource = null;
+                waveSource.Dispose();
+                waveSource = null;
             }
         }
 
-        protected override void Dispose(bool disposing)
+        public void Dispose()
         {
-            base.Dispose(disposing);
             CleanupPlayback();
+            if (equalizer != null)
+                equalizer.Dispose();
         }
     }
 }

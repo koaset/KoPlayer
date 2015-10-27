@@ -66,6 +66,7 @@
             this.songsBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.songGridView = new KoPlayer.Forms.DataGridViewPlus();
             this.playlistBindingSource = new System.Windows.Forms.BindingSource(this.components);
+            this.equalizerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.volumeTrackBar)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.playlistGridView)).BeginInit();
@@ -140,7 +141,8 @@
             this.playbackToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.playPauseToolStripMenuItem,
             this.playNextToolStripMenuItem,
-            this.playPreviousToolStripMenuItem});
+            this.playPreviousToolStripMenuItem,
+            this.equalizerToolStripMenuItem});
             this.playbackToolStripMenuItem.Name = "playbackToolStripMenuItem";
             this.playbackToolStripMenuItem.Size = new System.Drawing.Size(66, 20);
             this.playbackToolStripMenuItem.Text = "Playback";
@@ -148,21 +150,21 @@
             // playPauseToolStripMenuItem
             // 
             this.playPauseToolStripMenuItem.Name = "playPauseToolStripMenuItem";
-            this.playPauseToolStripMenuItem.Size = new System.Drawing.Size(144, 22);
+            this.playPauseToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.playPauseToolStripMenuItem.Text = "Play / Pause";
             this.playPauseToolStripMenuItem.Click += new System.EventHandler(this.playPauseToolStripMenuItem_Click);
             // 
             // playNextToolStripMenuItem
             // 
             this.playNextToolStripMenuItem.Name = "playNextToolStripMenuItem";
-            this.playNextToolStripMenuItem.Size = new System.Drawing.Size(144, 22);
+            this.playNextToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.playNextToolStripMenuItem.Text = "Play Next";
             this.playNextToolStripMenuItem.Click += new System.EventHandler(this.playNextToolStripMenuItem_Click);
             // 
             // playPreviousToolStripMenuItem
             // 
             this.playPreviousToolStripMenuItem.Name = "playPreviousToolStripMenuItem";
-            this.playPreviousToolStripMenuItem.Size = new System.Drawing.Size(144, 22);
+            this.playPreviousToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.playPreviousToolStripMenuItem.Text = "Play Previous";
             this.playPreviousToolStripMenuItem.Click += new System.EventHandler(this.playPreviousToolStripMenuItem_Click);
             // 
@@ -441,6 +443,13 @@
             // 
             this.playlistBindingSource.DataSource = typeof(KoPlayer.Playlists.Playlist);
             // 
+            // equalizerToolStripMenuItem
+            // 
+            this.equalizerToolStripMenuItem.Name = "equalizerToolStripMenuItem";
+            this.equalizerToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.equalizerToolStripMenuItem.Text = "Equalizer";
+            this.equalizerToolStripMenuItem.Click += new System.EventHandler(this.equalizerToolStripMenuItem_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -520,5 +529,6 @@
         private System.Windows.Forms.ImageList previousButton_imageList;
         private System.Windows.Forms.ImageList nextButton_imageList;
         private System.Windows.Forms.ImageList pauseButton_imageList;
+        private System.Windows.Forms.ToolStripMenuItem equalizerToolStripMenuItem;
     }
 }

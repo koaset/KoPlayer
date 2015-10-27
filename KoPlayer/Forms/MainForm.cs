@@ -1,5 +1,6 @@
 ﻿using CSCore.CoreAudioAPI;
 using CSCore.SoundOut;
+using CSCore.Streams;
 using KoPlayer.Playlists;
 using KoPlayer.Forms;
 using System;
@@ -42,6 +43,7 @@ namespace KoPlayer.Forms
 
         private readonly MusicPlayer musicPlayer = new MusicPlayer();
         private MMDevice defaultAudioDevice;
+        private EqualizerSettings equalizerSettings;
 
         private Song currentlyPlaying;
         private System.Timers.Timer searchBarTimer;
@@ -77,8 +79,11 @@ namespace KoPlayer.Forms
             if (settings == null)
                 settings = new Settings();
 
-            var enumerator = new MMDeviceEnumerator();
+            MMDeviceEnumerator enumerator = new MMDeviceEnumerator();
             defaultAudioDevice = enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Console);
+            this.musicPlayer.OpenCompleted += musicPlayer_OpenCompleted;
+            this.equalizerSettings = new EqualizerSettings();
+            this.equalizerSettings.ValueChanged += equalizerSettings_ValueChanged;
 
             SetUpGlobalHotkeys();
 
@@ -152,16 +157,21 @@ namespace KoPlayer.Forms
 
         private void UpdateStatusStip()
         {
-            statusStrip1.Items["playlist_info"].Text = showingPlaylist.ToString();
+            if (statusStrip1.InvokeRequired)
+                statusStrip1.Invoke(new MethodInvoker(delegate { UpdateStatusStip(); }));
+            else
+            {
+                statusStrip1.Items["playlist_info"].Text = showingPlaylist.ToString();
 
-            string itemText = "";
-            if (musicPlayer.PlaybackState == PlaybackState.Playing)
-                itemText = "Playing";
-            else if (musicPlayer.PlaybackState == PlaybackState.Paused)
-                itemText = "Paused";
-            statusStrip1.Items["playback_status"].Text = itemText;
+                string itemText = "";
+                if (musicPlayer.PlaybackState == PlaybackState.Playing)
+                    itemText = "Playing";
+                else if (musicPlayer.PlaybackState == PlaybackState.Paused)
+                    itemText = "Paused";
+                statusStrip1.Items["playback_status"].Text = itemText;
 
-            statusStrip1.Items["playlist_info_separator"].Visible = !(itemText.Length == 0);
+                statusStrip1.Items["playlist_info_separator"].Visible = !(itemText.Length == 0);
+            }
         }
         #endregion
 
@@ -337,8 +347,8 @@ namespace KoPlayer.Forms
                 searchLibraryTimer.Stop();
                 searchLibraryTimer.Dispose();
             }
-            musicPlayer.Dispose();
             trayIcon.Dispose();
+            musicPlayer.Dispose();
         }
         #endregion
 
@@ -475,9 +485,9 @@ namespace KoPlayer.Forms
         {
             if (currentSongTimePlayed.Ticks > 0.95 * musicPlayer.Length.Ticks)
             {
-                currentSongTimePlayed = TimeSpan.Zero;
-                currentlyPlaying.LastPlayed = DateTime.Now;
-                currentlyPlaying.PlayCount++;
+                this.currentSongTimePlayed = TimeSpan.Zero;
+                this.currentlyPlaying.LastPlayed = DateTime.Now;
+                this.currentlyPlaying.PlayCount++;
 
                 //SCROBBLE HERE IF ENABLED
 
@@ -491,7 +501,7 @@ namespace KoPlayer.Forms
 
                 try
                 {
-                    musicPlayer.Open(song.Path, defaultAudioDevice);
+                    this.musicPlayer.Open(song.Path, defaultAudioDevice);
                     PlayMusic();
                 }
                 catch (Exception ex)
@@ -499,8 +509,8 @@ namespace KoPlayer.Forms
                     MessageBox.Show("Play music exception: " + ex.ToString());
                 }
 
-                currentlyPlaying = song;
-                playingPlaylist = inPlaylist;
+                this.currentlyPlaying = song;
+                this.playingPlaylist = inPlaylist;
 
                 UpdateTrayIconText();
                 UpdateSongImage();
@@ -1762,6 +1772,24 @@ namespace KoPlayer.Forms
             previousButton.ImageIndex = 1;
         }
         #endregion
+
+        private void equalizerToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            EqualizerWindow eqWindow = new EqualizerWindow(equalizerSettings);
+            eqWindow.Show();
+        }
+
+        void musicPlayer_OpenCompleted(object sender, EventArgs e)
+        {
+            //set musicPlayer.Equalizer according to settings
+            
+            equalizerSettings.SetEqualizer(musicPlayer.Equalizer);
+        }
+
+        void equalizerSettings_ValueChanged(object sender, EventArgs e)
+        {
+            equalizerSettings.SetEqualizer(musicPlayer.Equalizer);
+        }
         #endregion
     }
 }
