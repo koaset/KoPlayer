@@ -199,6 +199,9 @@ namespace KoPlayer.Forms
             playlists = new List<IPlaylist>();
             playlists.Add(library);
 
+            if (!Directory.Exists(PLAYLISTDIRECTORYPATH))
+                Directory.CreateDirectory(PLAYLISTDIRECTORYPATH);
+
             shuffleQueue = Playlist.Load(SHUFFLEQUEUEFILEPATH, library);
             if (shuffleQueue == null)
             {
