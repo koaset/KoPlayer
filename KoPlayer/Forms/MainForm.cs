@@ -21,6 +21,7 @@ namespace KoPlayer.Forms
         public const string SHUFFLEQUEUEFILEPATH = @"Playlists\Shuffle Queue.pl";
         private const string COLUMNSETTINGSPATH = @"Settings\column_settings.xml";
         private const string DEFAULTCOLUMNSETTINGSPATH = @"Settings\default_column_settings.xml";
+        private const string EQUALIZERPATH = @"Default.eq";
         #endregion
 
         #region Properties
@@ -81,9 +82,15 @@ namespace KoPlayer.Forms
 
             MMDeviceEnumerator enumerator = new MMDeviceEnumerator();
             defaultAudioDevice = enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Console);
-            this.musicPlayer.OpenCompleted += musicPlayer_OpenCompleted;
-            this.equalizerSettings = new EqualizerSettings();
-            this.equalizerSettings.ValueChanged += equalizerSettings_ValueChanged;
+            this.musicPlayer.OpenCompleted += equalizerSettings_ShouldSet;
+
+            this.equalizerSettings = EqualizerSettings.Load(EQUALIZERPATH);
+            if (this.equalizerSettings == null)
+            {
+                this.equalizerSettings = new EqualizerSettings();
+                this.equalizerSettings.Save(EQUALIZERPATH);
+            }
+            this.equalizerSettings.ValueChanged += equalizerSettings_ShouldSet;
 
             SetUpGlobalHotkeys();
 
@@ -1203,6 +1210,11 @@ namespace KoPlayer.Forms
 
         private void newRatingFilterPlaylistToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            ShowCreateNewRatingFilterPlaylistPopup();
+        }
+
+        private void ShowCreateNewRatingFilterPlaylistPopup()
+        {
             RatingFilterPlaylistPopup popup = new RatingFilterPlaylistPopup();
             popup.SetStartPosition();
 
@@ -1782,14 +1794,7 @@ namespace KoPlayer.Forms
             eqWindow.Show();
         }
 
-        void musicPlayer_OpenCompleted(object sender, EventArgs e)
-        {
-            //set musicPlayer.Equalizer according to settings
-            
-            equalizerSettings.SetEqualizer(musicPlayer.Equalizer);
-        }
-
-        void equalizerSettings_ValueChanged(object sender, EventArgs e)
+        void equalizerSettings_ShouldSet(object sender, EventArgs e)
         {
             equalizerSettings.SetEqualizer(musicPlayer.Equalizer);
         }

@@ -72,5 +72,10 @@ namespace KoPlayer.Forms
                 equalizerSettings[index] = SliderToEqualizer(tb.Value);
             }
         }
+
+        private void EqualizerWindow_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            this.equalizerSettings.Save("default.eq");
+        }
     }
 }

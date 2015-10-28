@@ -43,6 +43,7 @@
             this.playPauseToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.playNextToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.playPreviousToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.equalizerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.volumeTrackBar = new System.Windows.Forms.TrackBar();
@@ -66,7 +67,7 @@
             this.songsBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.songGridView = new KoPlayer.Forms.DataGridViewPlus();
             this.playlistBindingSource = new System.Windows.Forms.BindingSource(this.components);
-            this.equalizerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.newRatingFilterPlaylistToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.volumeTrackBar)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.playlistGridView)).BeginInit();
@@ -95,6 +96,7 @@
             this.openToolStripMenuItem,
             this.setLibraryPathToolStripMenuItem,
             this.newPlaylistToolStripMenuItem,
+            this.newRatingFilterPlaylistToolStripMenuItem,
             this.preferencesToolStripMenuItem,
             this.exitToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
@@ -104,35 +106,35 @@
             // openToolStripMenuItem
             // 
             this.openToolStripMenuItem.Name = "openToolStripMenuItem";
-            this.openToolStripMenuItem.Size = new System.Drawing.Size(183, 22);
+            this.openToolStripMenuItem.Size = new System.Drawing.Size(204, 22);
             this.openToolStripMenuItem.Text = "Open";
             this.openToolStripMenuItem.Click += new System.EventHandler(this.openToolStripMenuItem_Click);
             // 
             // setLibraryPathToolStripMenuItem
             // 
             this.setLibraryPathToolStripMenuItem.Name = "setLibraryPathToolStripMenuItem";
-            this.setLibraryPathToolStripMenuItem.Size = new System.Drawing.Size(183, 22);
+            this.setLibraryPathToolStripMenuItem.Size = new System.Drawing.Size(204, 22);
             this.setLibraryPathToolStripMenuItem.Text = "Add folder to Library";
             this.setLibraryPathToolStripMenuItem.Click += new System.EventHandler(this.addFolderToLibraryToolStripMenuItem_Click);
             // 
             // newPlaylistToolStripMenuItem
             // 
             this.newPlaylistToolStripMenuItem.Name = "newPlaylistToolStripMenuItem";
-            this.newPlaylistToolStripMenuItem.Size = new System.Drawing.Size(183, 22);
+            this.newPlaylistToolStripMenuItem.Size = new System.Drawing.Size(204, 22);
             this.newPlaylistToolStripMenuItem.Text = "New Playlist";
             this.newPlaylistToolStripMenuItem.Click += new System.EventHandler(this.newPlaylistToolStripMenuItem_Click);
             // 
             // preferencesToolStripMenuItem
             // 
             this.preferencesToolStripMenuItem.Name = "preferencesToolStripMenuItem";
-            this.preferencesToolStripMenuItem.Size = new System.Drawing.Size(183, 22);
+            this.preferencesToolStripMenuItem.Size = new System.Drawing.Size(204, 22);
             this.preferencesToolStripMenuItem.Text = "Settings";
             this.preferencesToolStripMenuItem.Click += new System.EventHandler(this.preferencesToolStripMenuItem_Click);
             // 
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(183, 22);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(204, 22);
             this.exitToolStripMenuItem.Text = "Exit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.OnExitButton_Click);
             // 
@@ -167,6 +169,13 @@
             this.playPreviousToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.playPreviousToolStripMenuItem.Text = "Play Previous";
             this.playPreviousToolStripMenuItem.Click += new System.EventHandler(this.playPreviousToolStripMenuItem_Click);
+            // 
+            // equalizerToolStripMenuItem
+            // 
+            this.equalizerToolStripMenuItem.Name = "equalizerToolStripMenuItem";
+            this.equalizerToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.equalizerToolStripMenuItem.Text = "Equalizer";
+            this.equalizerToolStripMenuItem.Click += new System.EventHandler(this.equalizerToolStripMenuItem_Click);
             // 
             // helpToolStripMenuItem
             // 
@@ -443,12 +452,12 @@
             // 
             this.playlistBindingSource.DataSource = typeof(KoPlayer.Playlists.Playlist);
             // 
-            // equalizerToolStripMenuItem
+            // newRatingFilterPlaylistToolStripMenuItem
             // 
-            this.equalizerToolStripMenuItem.Name = "equalizerToolStripMenuItem";
-            this.equalizerToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-            this.equalizerToolStripMenuItem.Text = "Equalizer";
-            this.equalizerToolStripMenuItem.Click += new System.EventHandler(this.equalizerToolStripMenuItem_Click);
+            this.newRatingFilterPlaylistToolStripMenuItem.Name = "newRatingFilterPlaylistToolStripMenuItem";
+            this.newRatingFilterPlaylistToolStripMenuItem.Size = new System.Drawing.Size(204, 22);
+            this.newRatingFilterPlaylistToolStripMenuItem.Text = "New Rating Filter Playlist";
+            this.newRatingFilterPlaylistToolStripMenuItem.Click += new System.EventHandler(this.newRatingFilterPlaylistToolStripMenuItem_Click);
             // 
             // MainForm
             // 
@@ -530,5 +539,6 @@
         private System.Windows.Forms.ImageList nextButton_imageList;
         private System.Windows.Forms.ImageList pauseButton_imageList;
         private System.Windows.Forms.ToolStripMenuItem equalizerToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem newRatingFilterPlaylistToolStripMenuItem;
     }
 }

@@ -242,6 +242,7 @@
             this.Name = "EqualizerWindow";
             this.ShowInTaskbar = false;
             this.Text = "Equalizer";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.EqualizerWindow_FormClosing);
             ((System.ComponentModel.ISupportInitialize)(this.trackBar1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.trackBar2)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.trackBar4)).EndInit();
