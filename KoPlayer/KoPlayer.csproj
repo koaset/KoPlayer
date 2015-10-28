@@ -60,7 +60,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Forms\EqualizerSettings.cs" />
+    <Compile Include="Settings\EqualizerSettings.cs" />
     <Compile Include="Forms\EqualizerWindow.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -73,15 +73,15 @@
     <Compile Include="Forms\RatingFilterPlaylistPopup.Designer.cs">
       <DependentUpon>RatingFilterPlaylistPopup.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\DataGridViewPlus.cs">
+    <Compile Include="Forms\Controls\DataGridViewPlus.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Forms\DataGridViewPlus.Designer.cs">
+    <Compile Include="Forms\Controls\DataGridViewPlus.Designer.cs">
       <DependentUpon>DataGridViewPlus.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\Fixes.cs" />
-    <Compile Include="Forms\KeyboardHook.cs" />
-    <Compile Include="Forms\RatingBox.cs">
+    <Compile Include="Fixes.cs" />
+    <Compile Include="KeyboardHook.cs" />
+    <Compile Include="Forms\Controls\RatingBox.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Forms\SettingsControls\LastFMSettingsControl.cs">
