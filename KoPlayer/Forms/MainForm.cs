@@ -162,24 +162,6 @@ namespace KoPlayer.Forms
             statusStrip1.Items.Add(item);
         }
 
-        private void UpdateStatusStip()
-        {
-            if (statusStrip1.InvokeRequired)
-                statusStrip1.Invoke(new MethodInvoker(delegate { UpdateStatusStip(); }));
-            else
-            {
-                statusStrip1.Items["playlist_info"].Text = showingPlaylist.ToString();
-
-                string itemText = "";
-                if (musicPlayer.PlaybackState == PlaybackState.Playing)
-                    itemText = "Playing";
-                else if (musicPlayer.PlaybackState == PlaybackState.Paused)
-                    itemText = "Paused";
-                statusStrip1.Items["playback_status"].Text = itemText;
-
-                statusStrip1.Items["playlist_info_separator"].Visible = !(itemText.Length == 0);
-            }
-        }
         #endregion
 
         #region Playlist methods
@@ -199,6 +181,13 @@ namespace KoPlayer.Forms
                         SetShuffleQueueColors();
                 }
             }
+        }
+
+        private void UpdateFilterPlaylistSongPaths()
+        {
+            foreach (IPlaylist pl in playlists)
+                if (pl.GetType() == typeof(RatingFilterPlaylist))
+                    pl.GetAllSongs();
         }
 
         private void LoadPlaylists()
@@ -293,6 +282,102 @@ namespace KoPlayer.Forms
                     row.DefaultCellStyle.BackColor = Color.White;
                 else
                     row.DefaultCellStyle.BackColor = System.Drawing.SystemColors.Control;
+            }
+        }
+        #endregion
+
+        #region Playlist manipulatiom methods
+        private void DeletePlaylist(DataGridViewCell cell)
+        {
+            bool deleted = false;
+            IPlaylist pl = playlists[cell.RowIndex];
+            if (pl != library && pl != shuffleQueue)
+            {
+                if (pl == showingPlaylist)
+                    ChangeToPlaylist(library);
+                if (pl == playingPlaylist)
+                {
+                    StopPlaying();
+                    playingPlaylist = library;
+                }
+                playlists.Remove(pl);
+                try
+                {
+                    File.Delete(pl.Path);
+                }
+                catch { }
+                deleted = true;
+            }
+
+            if (deleted)
+                SetPlaylistGridView();
+        }
+
+        private void playlistGridView_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (playlistGridView.Focused)
+                if (e.KeyCode == Keys.Delete)
+                {
+                    DeletePlaylist(playlistGridView.SelectedCells[0]);
+                }
+        }
+
+        private void RenamePlaylist()
+        {
+            this.tempPlaylist = GetPlaylist(playlistGridView.CurrentCell.Value.ToString()) as Playlist;
+            playlistGridView.BeginEdit(true);
+        }
+
+        private void playlistGridView_CellEndEdit(object sender, DataGridViewCellEventArgs e)
+        {
+            string currentName = playlistGridView.CurrentCell.Value.ToString();
+            string oldName = this.tempPlaylist.Name;
+            string oldPath = this.tempPlaylist.Path;
+            bool acceptable = true;
+            foreach (IPlaylist pl in playlists)
+            {
+                if (currentName.ToLower() == pl.Name.ToLower())
+                    if (currentName.ToLower() != oldName.ToLower())
+                        acceptable = false;
+            }
+            if (acceptable)
+            {
+                if (currentName.ToLower() != oldName.ToLower())
+                {
+                    tempPlaylist.Name = currentName;
+                    try
+                    {
+                        System.IO.File.Move(oldPath, tempPlaylist.Path);
+                    }
+                    catch { }
+                }
+            }
+            else
+                playlistGridView.BeginEdit(true);
+        }
+        
+        #endregion
+
+        #region Playlist selection
+        private void playlistGridView_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            ChangeToPlaylist(playlists[e.RowIndex]);
+        }
+
+        private void ChangeToPlaylist(IPlaylist playlist)
+        {
+            if (showingPlaylist != playlist)
+            {
+                if (playlist != library)
+                    ResetSearchBox();
+                showingPlaylist = playlist;
+                SetSortGlyph();
+                if (showingPlaylist == shuffleQueue)
+                    PopulateShuffleQueue();
+                UpdateShowingPlaylist(true);
+                songGridView.ClearSelection();
+                SetPlaylistGridView();
+                UpdateStatusStip();
             }
         }
         #endregion
@@ -422,6 +507,34 @@ namespace KoPlayer.Forms
         #endregion
 
         #region Control updates
+
+        private void RefreshSongGridView()
+        {
+            if (songGridView.InvokeRequired)
+                songGridView.Invoke(new MethodInvoker(delegate { RefreshSongGridView(); }));
+            else
+                songGridView.Refresh();
+        }
+
+        private void UpdateStatusStip()
+        {
+            if (statusStrip1.InvokeRequired)
+                statusStrip1.Invoke(new MethodInvoker(delegate { UpdateStatusStip(); }));
+            else
+            {
+                statusStrip1.Items["playlist_info"].Text = showingPlaylist.ToString();
+
+                string itemText = "";
+                if (musicPlayer.PlaybackState == PlaybackState.Playing)
+                    itemText = "Playing";
+                else if (musicPlayer.PlaybackState == PlaybackState.Paused)
+                    itemText = "Paused";
+                statusStrip1.Items["playback_status"].Text = itemText;
+
+                statusStrip1.Items["playlist_info_separator"].Visible = !(itemText.Length == 0);
+            }
+        }
+
         private void UpdateTrayIconText()
         {
             string text = "";
@@ -447,17 +560,12 @@ namespace KoPlayer.Forms
                     itemText = "Pause";
                 cm.MenuItems.Add(CreateMenuItem(itemText, playpauseButton_Click));
 
-                cm.MenuItems.Add(CreateMenuItem("Play next", playNextToolStripMenuItem_Click));
-                cm.MenuItems.Add(CreateMenuItem("Play previous", playPreviousToolStripMenuItem_Click));
+                cm.MenuItems.Add(CreateMenuItem("Play next", playNextButton_Click));
+                cm.MenuItems.Add(CreateMenuItem("Play previous", playPreviousButton_Click));
             }
-            cm.MenuItems.Add(CreateMenuItem("Show KoPlayer", ShowKoPlayerMenuItem_Click));
+            cm.MenuItems.Add(CreateMenuItem("Show KoPlayer", showKoPlayer_Event));
             cm.MenuItems.Add(CreateMenuItem("Close", OnExitButton_Click));
             trayIcon.ContextMenu = cm;
-        }
-
-        private void ShowKoPlayerMenuItem_Click(object sender, EventArgs e)
-        {
-            ShowKoPlayer();
         }
 
         private string ShortenString(string s, int limit)
@@ -490,7 +598,7 @@ namespace KoPlayer.Forms
         }
         #endregion
 
-        #region Playback control methods
+        #region Playback control
         private void PlaySong(Song song, IPlaylist inPlaylist)
         {
             if (currentSongTimePlayed.Ticks > 0.95 * musicPlayer.Length.Ticks)
@@ -538,14 +646,6 @@ namespace KoPlayer.Forms
                         songToSave = null;
                     }
             }
-        }
-
-        private void RefreshSongGridView()
-        {
-            if (songGridView.InvokeRequired)
-                songGridView.Invoke(new MethodInvoker(delegate { RefreshSongGridView(); }));
-            else
-                songGridView.Refresh();
         }
 
         /// <summary>
@@ -649,17 +749,13 @@ namespace KoPlayer.Forms
         }
 
         #region Menu items
-        private void playPauseToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            PlayOrPause();
-        }
 
-        private void playNextToolStripMenuItem_Click(object sender, EventArgs e)
+        private void playNextButton_Click(object sender, EventArgs e)
         {
             PlayNextSong();
         }
 
-        private void playPreviousToolStripMenuItem_Click(object sender, EventArgs e)
+        private void playPreviousButton_Click(object sender, EventArgs e)
         {
             PlayPreviousSong();
         }
@@ -667,6 +763,41 @@ namespace KoPlayer.Forms
 
         #endregion
 
+        #region Playback timer
+        private void ResetSearchBarTimer()
+        {
+            if (searchBarTimer != null)
+                searchBarTimer.Dispose();
+            searchBarTimer = new System.Timers.Timer(searchBarTimerInterval);
+            searchBarTimer.Elapsed += searchBarTimer_Elapsed;
+            SetSearchBarValue(0);
+            this.currentSongTimePlayed = TimeSpan.Zero;
+            this.oldPosition = TimeSpan.Zero;
+        }
+
+        private void searchBarTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        {
+            TimeSpan length = musicPlayer.Length;
+            TimeSpan position = musicPlayer.Position;
+
+            UpdateSearchBar(length, position);
+            UpdateCurrentTimeLabel();
+
+            if (Math.Abs(position.Seconds - oldPosition.Seconds) < 5)
+                currentSongTimePlayed += position - oldPosition;
+
+            this.oldPosition = position;
+
+            if ((searchBarTimer.Enabled && musicPlayer.PlaybackState == PlaybackState.Stopped) ||
+                (searchBarTimer.Enabled && position > length))
+            {
+                StopPlaying();
+                PlayNextSong();
+            }
+        }
+        #endregion
+
+        #region Hotkeys
         #region Local Hotkeys
         private void songGridView_KeyDown(object sender, KeyEventArgs e)
         {
@@ -701,6 +832,7 @@ namespace KoPlayer.Forms
                 Song s = row.DataBoundItem as Song;
                 s.Rating = rating;
                 library.UpdateSongInfo(s);
+                UpdateSongForRatingFilterPlaylist(s);
             }
             UpdateFilterPlaylistSongPaths();
             RefreshSongGridView();
@@ -713,11 +845,18 @@ namespace KoPlayer.Forms
         {
             s.Rating = rating;
             library.UpdateSongInfo(currentlyPlaying);
+            UpdateSongForRatingFilterPlaylist(s);
             UpdateFilterPlaylistSongPaths();
             RefreshSongGridView();
             playingPlaylist.Save();
             if (showingPlaylist.GetType() == typeof(RatingFilterPlaylist))
                 UpdateShowingPlaylist(true);
+        }
+
+        private void UpdateSongForRatingFilterPlaylist(Song song)
+        {
+            foreach (IPlaylist pl in playlists)
+                pl.UpdateSongInfo(song);
         }
 
         private void DeleteSongs(DataGridViewSelectedRowCollection rows)
@@ -852,137 +991,9 @@ namespace KoPlayer.Forms
                 SongInfoPopup.ShowPopup(currentlyPlaying, songInfoPopupTime);
         }
         #endregion
-
-        #region Playlist manipulatiom methods
-        private void playlistGridView_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (playlistGridView.Focused)
-                if (e.KeyCode == Keys.Delete)
-                {
-                    DeletePlaylist(playlistGridView.SelectedCells[0]);
-                }
-        }
-
-        private void DeletePlaylist(DataGridViewCell cell)
-        {
-            bool deleted = false;
-            IPlaylist pl = playlists[cell.RowIndex];
-            if (pl != library && pl != shuffleQueue)
-            {
-                if (pl == showingPlaylist)
-                    ChangeToPlaylist(library);
-                if (pl == playingPlaylist)
-                {
-                    StopPlaying();
-                    playingPlaylist = library;
-                }
-                playlists.Remove(pl);
-                try
-                {
-                    File.Delete(pl.Path);
-                }
-                catch { }
-                deleted = true;
-            }
-            
-            if (deleted)
-                SetPlaylistGridView();
-        }
-
-        private void RenamePlaylist()
-        {
-            this.tempPlaylist = GetPlaylist(playlistGridView.CurrentCell.Value.ToString()) as Playlist;
-            playlistGridView.BeginEdit(true);
-        }
-
-        private void playlistGridView_CellEndEdit(object sender, DataGridViewCellEventArgs e)
-        {
-            string currentName = playlistGridView.CurrentCell.Value.ToString();
-            string oldName = this.tempPlaylist.Name;
-            string oldPath = this.tempPlaylist.Path;
-            bool acceptable = true;
-            foreach (IPlaylist pl in playlists)
-            {
-                if (currentName.ToLower() == pl.Name.ToLower())
-                    if (currentName.ToLower() != oldName.ToLower())
-                        acceptable = false;
-            }
-            if (acceptable)
-            {
-                if (currentName.ToLower() != oldName.ToLower())
-                {
-                    tempPlaylist.Name = currentName;
-                    try
-                    {
-                        System.IO.File.Move(oldPath, tempPlaylist.Path);
-                    }
-                    catch { }
-                }
-            }
-            else
-                playlistGridView.BeginEdit(true);
-        }
         #endregion
 
-        #region Playlist selection
-        private void playlistGridView_CellClick(object sender, DataGridViewCellEventArgs e)
-        {
-            ChangeToPlaylist(playlists[e.RowIndex]);
-        }
-
-        private void ChangeToPlaylist(IPlaylist playlist)
-        {
-            if (showingPlaylist != playlist)
-            {
-                if (playlist != library)
-                    ResetSearchBox();
-                showingPlaylist = playlist;
-                SetSortGlyph();
-                if (showingPlaylist == shuffleQueue)
-                    PopulateShuffleQueue();
-                UpdateShowingPlaylist(true);
-                songGridView.ClearSelection();
-                SetPlaylistGridView();
-                UpdateStatusStip();
-            }
-        }
-        #endregion
-
-        #region Playback timer methods
-        private void ResetSearchBarTimer()
-        {
-            if (searchBarTimer != null)
-                searchBarTimer.Dispose();
-            searchBarTimer = new System.Timers.Timer(searchBarTimerInterval);
-            searchBarTimer.Elapsed += searchBarTimer_Elapsed;
-            SetSearchBarValue(0);
-            this.currentSongTimePlayed = TimeSpan.Zero;
-            this.oldPosition = TimeSpan.Zero;
-        }
-
-        private void searchBarTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
-        {
-            TimeSpan length = musicPlayer.Length;
-            TimeSpan position = musicPlayer.Position;
-
-            UpdateSearchBar(length, position);
-            UpdateCurrentTimeLabel();
-
-            if (Math.Abs(position.Seconds - oldPosition.Seconds) < 5)
-                currentSongTimePlayed += position - oldPosition;
-
-            this.oldPosition = position;
-
-            if ((searchBarTimer.Enabled && musicPlayer.PlaybackState == PlaybackState.Stopped) ||
-                (searchBarTimer.Enabled && position > length))
-            {
-                StopPlaying();
-                PlayNextSong();
-            }
-        }
-        #endregion
-
-        #region Updates for controls that change during playback
+        #region Playback dependant method updates
         private void UpdateSearchBar(TimeSpan length, TimeSpan position)
         {
             if (position > length)
@@ -1041,7 +1052,6 @@ namespace KoPlayer.Forms
             }
         }
         #endregion
-        #endregion
 
         #region Searchbar events
         private void searchBar_ValueChanged(object sender, EventArgs e)
@@ -1091,6 +1101,7 @@ namespace KoPlayer.Forms
             ee.Handled = true;
         }
         #endregion
+        #endregion
 
         #region Button events
         private void nextButton_Click(object sender, EventArgs e)
@@ -1114,7 +1125,7 @@ namespace KoPlayer.Forms
         }
         #endregion
 
-        #region Column header events
+        #region Sorting
         private void songGridView_ColumnHeaderMouseClick(object sender, DataGridViewCellMouseEventArgs e)
         {
             if (e.Button == System.Windows.Forms.MouseButtons.Left)
@@ -1154,6 +1165,97 @@ namespace KoPlayer.Forms
             MenuItem senderItem = sender as MenuItem;
             songGridView.Columns[senderItem.Name].Visible = !songGridView.Columns[senderItem.Name].Visible;
             columnSettings = new ColumnSettings(songGridView.Columns);
+        }
+        #endregion
+
+        #region Search
+        private void searchBox_Enter(object sender, EventArgs e)
+        {
+            if (searchBox.Text == searchBoxDefault)
+                searchBox.Clear();
+            searchBox.ForeColor = Color.Black;
+        }
+
+        private void searchBox_Leave(object sender, EventArgs e)
+        {
+            if (searchBox.Text.Length == 0)
+            {
+                UpdateShowingPlaylist(true);
+                ResetSearchBox();
+            }
+        }
+
+        private void ResetSearchBox()
+        {
+            if (searchBox.InvokeRequired)
+                searchBox.Invoke(new MethodInvoker(delegate { ResetSearchBox(); }));
+            else
+            {
+                searchBox.Text = searchBoxDefault;
+                searchBox.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
+            }
+        }
+
+
+        private void searchBox_TextChanged(object sender, EventArgs e)
+        {
+            if (searchBox.Text != searchBoxDefault)
+            {
+                if (searchLibraryTimer != null)
+                {
+                    searchLibraryTimer.Stop();
+                    searchLibraryTimer.Dispose();
+                }
+                searchLibraryTimer = new System.Timers.Timer(searchLibraryTimerInterval);
+                searchLibraryTimer.AutoReset = false;
+                searchLibraryTimer.Elapsed += searchLibraryTimer_Elapsed;
+                searchLibraryTimer.Start();
+            }
+        }
+
+        void searchLibraryTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        {
+            searchLibraryTimer.Stop();
+
+            if (searchBox.Text != searchBoxDefault)
+                if (searchBox.Text.Length > 0 || searchBox.Text.Length == 0)
+                {
+                    if (songGridView.InvokeRequired)
+                        songGridView.Invoke(new MethodInvoker(delegate { DoSearch(); }));
+                    else
+                        DoSearch();
+                }
+        }
+
+        private void DoSearch()
+        {
+            ChangeToPlaylist(library);
+            if (searchBox.Text.Length > 0)
+            {
+                songGridView.DataSource = library.Search(searchBox.Text);
+                UpdateShowingPlaylist(false);
+            }
+            else if (searchBox.Text.Length == 0)
+            {
+                UpdateShowingPlaylist(true);
+                library.ResetSearchDictionaries();
+            }
+            SetSortGlyph();
+
+        }
+
+        private void searchBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter || e.KeyCode == Keys.Escape)
+            {
+                songGridView.Focus();
+                if (e.KeyCode == Keys.Escape)
+                {
+                    ResetSearchBox();
+                    UpdateShowingPlaylist(true);
+                }
+                SetSortGlyph();
+            }
         }
         #endregion
 
@@ -1334,7 +1436,8 @@ namespace KoPlayer.Forms
         #endregion
 
         #region Minimize to tray
-        private void notifyIcon1_DoubleClick(object sender, EventArgs e)
+
+        private void showKoPlayer_Event(object sender, EventArgs e)
         {
             ShowKoPlayer();
         }
@@ -1364,96 +1467,11 @@ namespace KoPlayer.Forms
                 this.Hide();
             }
         }
-        #endregion
 
-        #region Search
-        private void searchBox_Enter(object sender, EventArgs e)
+        private void trayIcon_MouseDown(object sender, MouseEventArgs e)
         {
-            if (searchBox.Text == searchBoxDefault)
-                searchBox.Clear();
-            searchBox.ForeColor = Color.Black;
-        }
-
-        private void searchBox_Leave(object sender, EventArgs e)
-        {
-            if (searchBox.Text.Length == 0)
-            {
-                UpdateShowingPlaylist(true);
-                ResetSearchBox();
-            }
-        }
-
-        private void ResetSearchBox()
-        {
-            if (searchBox.InvokeRequired)
-                searchBox.Invoke(new MethodInvoker(delegate { ResetSearchBox(); }));
-            else
-            {
-                searchBox.Text = searchBoxDefault;
-                searchBox.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
-            }
-        }
-
-
-        private void searchBox_TextChanged(object sender, EventArgs e)
-        {
-            if (searchBox.Text != searchBoxDefault)
-            {
-                if (searchLibraryTimer != null)
-                {
-                    searchLibraryTimer.Stop();
-                    searchLibraryTimer.Dispose();
-                }
-                searchLibraryTimer = new System.Timers.Timer(searchLibraryTimerInterval);
-                searchLibraryTimer.AutoReset = false;
-                searchLibraryTimer.Elapsed += searchLibraryTimer_Elapsed;
-                searchLibraryTimer.Start();
-            }
-        }
-
-        void searchLibraryTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
-        {
-            searchLibraryTimer.Stop();
-
-            if (searchBox.Text != searchBoxDefault)
-                if (searchBox.Text.Length > 0 || searchBox.Text.Length == 0)
-                {
-                    if (songGridView.InvokeRequired)
-                        songGridView.Invoke(new MethodInvoker(delegate { DoSearch(); }));
-                    else
-                        DoSearch();
-                }
-        }
-
-        private void DoSearch()
-        {
-            ChangeToPlaylist(library);
-            if (searchBox.Text.Length > 0)
-            {
-                songGridView.DataSource = library.Search(searchBox.Text);
-                UpdateShowingPlaylist(false);
-            }
-            else if (searchBox.Text.Length == 0)
-            {
-                UpdateShowingPlaylist(true);
-                library.ResetSearchDictionaries();
-            }
-            SetSortGlyph();
-            
-        }
-
-        private void searchBox_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.KeyCode == Keys.Enter || e.KeyCode == Keys.Escape)
-            {
-                songGridView.Focus();
-                if (e.KeyCode == Keys.Escape)
-                {
-                    ResetSearchBox();
-                    UpdateShowingPlaylist(true);
-                }
-                SetSortGlyph();
-            }
+            if (e.Button == System.Windows.Forms.MouseButtons.Right)
+                SetTrayIconContextMenu();
         }
         #endregion
 
@@ -1552,9 +1570,9 @@ namespace KoPlayer.Forms
             ContextMenu cm = new ContextMenu();
             cm.MenuItems.Add(CreateMenuItem("Play Song", songGridViewRightClickPlay));
             if (musicPlayer.PlaybackState == PlaybackState.Playing)
-                cm.MenuItems.Add(CreateMenuItem("Pause", songGridViewRightClickPause));
+                cm.MenuItems.Add(CreateMenuItem("Pause", playpauseButton_Click));
             if (musicPlayer.PlaybackState == PlaybackState.Paused)
-                cm.MenuItems.Add(CreateMenuItem("Resume", songGridViewRightClickResume));
+                cm.MenuItems.Add(CreateMenuItem("Resume", playpauseButton_Click));
             cm.MenuItems.Add(CreateMenuItem("Queue next in shuffle queue", songGridViewRightClickAddToShuffleQueueNext));
             cm.MenuItems.Add(CreateMenuItem("Add songs to shuffle queue", songGridViewRightClickAddToShuffleQueueBottom));
             MenuItem ratingMenu = new MenuItem("Set Rating");
@@ -1619,18 +1637,6 @@ namespace KoPlayer.Forms
             PlaySong((Song)songGridView.Rows[clickedSongIndex].DataBoundItem, showingPlaylist);
         }
 
-        private void songGridViewRightClickPause(object sender, EventArgs e)
-        {
-            if (musicPlayer.PlaybackState == PlaybackState.Playing)
-                PauseMusic();
-        }
-
-        private void songGridViewRightClickResume(object sender, EventArgs e)
-        {
-            if (musicPlayer.PlaybackState == PlaybackState.Paused)
-                PlayMusic();
-        }
-
         private void songGridViewRightClickAddToShuffleQueueNext(object sender, EventArgs e)
         {
             List<Song> songs = new List<Song>();
@@ -1660,13 +1666,6 @@ namespace KoPlayer.Forms
         private void songGridViewRightClickDelete(object sender, EventArgs e)
         {
             DeleteSongs(songGridView.SelectedRows);
-        }
-
-        private void UpdateFilterPlaylistSongPaths()
-        {
-            foreach (IPlaylist pl in playlists)
-                if (pl.GetType() == typeof(RatingFilterPlaylist))
-                    pl.GetAllSongs();
         }
 
         private void songGridViewRightClickProperties(object sender, EventArgs e)
@@ -1735,17 +1734,12 @@ namespace KoPlayer.Forms
         }
         #endregion
 
-        private void trayIcon_MouseDown(object sender, MouseEventArgs e)
-        {
-            if (e.Button == System.Windows.Forms.MouseButtons.Right)
-                SetTrayIconContextMenu();
-        }
-
         #endregion
 
         #endregion
 
         #region Button Image selection
+
         #region PlayPauseButton
 
         private void UpdatePlayPauseButtonImage()
@@ -1828,6 +1822,10 @@ namespace KoPlayer.Forms
         }
         #endregion
 
+        #endregion
+
+        #region Equalizer
+
         private void equalizerToolStripMenuItem_Click(object sender, EventArgs e)
         {
             EqualizerWindow eqWindow = new EqualizerWindow(equalizerSettings);
@@ -1838,6 +1836,7 @@ namespace KoPlayer.Forms
         {
             equalizerSettings.SetEqualizer(musicPlayer.Equalizer);
         }
+
         #endregion
     }
 }

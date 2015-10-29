@@ -20,6 +20,7 @@ namespace KoPlayer.Playlists
         public string Path { get { return PATH; } }
         public int SortColumnIndex { get; set; }
         public Dictionary<string, Song> PathDictionary { get { return pathDictionary; } }
+        public List<Dictionary<string, List<Song>>> SortDictionaries { get { return this.sortDictionaries; } }
         public SortOrder SortOrder { get { return sortOrder; } }
 
         private const string PATH = "Library.xml";

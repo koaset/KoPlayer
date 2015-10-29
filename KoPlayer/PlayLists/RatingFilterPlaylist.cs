@@ -41,12 +41,17 @@ namespace KoPlayer.Playlists
             this.library = library;
             this.allowedRating = ratingCutoff;
             this.IncludeHigher = includeHigher;
+            UpdateSongPaths();
+            base.outputSongs = base.GetAllSongs();
+            Sorting.CreateSortDictionaries(outputSongs, this.sortDictionaries);
         }
 
         public override BindingList<Song> GetAllSongs()
         {
             UpdateSongPaths();
-            return base.GetAllSongs();
+            base.outputSongs = base.GetAllSongs();
+            //Sorting.CreateSortDictionaries(outputSongs, this.sortDictionaries);
+            return base.outputSongs;
         }
 
         /// <summary>
@@ -58,7 +63,7 @@ namespace KoPlayer.Playlists
             Dictionary<string, List<Song>> ratingDictionary = library.GetSortDictionary("rating");
             foreach (string key in ratingDictionary.Keys)
             {
-                if (key.ToString().Length == AllowedRating)
+                if (key.ToString().Length == allowedRating)
                     songList.AddRange(ratingDictionary[key]);
                 else if (IncludeHigher)
                     if (key.ToString().Length > allowedRating)
@@ -66,6 +71,18 @@ namespace KoPlayer.Playlists
             }
 
             base.songPaths = songList.Select(x => x.Path).ToList();
+        }
+
+        public override void UpdateSongInfo(Song song)
+        {
+            //Remove from all dictionaries
+            foreach (Dictionary<string, List<Song>> dictionary in this.sortDictionaries)
+                foreach (List<Song> list in dictionary.Values)
+                    if (list.Contains(song))
+                        list.Remove(song);
+
+            if ((song.Rating == allowedRating) || (IncludeHigher && (song.Rating > allowedRating)))
+                Sorting.AddSongToSortDictionaries(song, this.sortDictionaries);
         }
 
         public override Song GetRandom()

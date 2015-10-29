@@ -154,21 +154,21 @@
             this.playPauseToolStripMenuItem.Name = "playPauseToolStripMenuItem";
             this.playPauseToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.playPauseToolStripMenuItem.Text = "Play / Pause";
-            this.playPauseToolStripMenuItem.Click += new System.EventHandler(this.playPauseToolStripMenuItem_Click);
+            this.playPauseToolStripMenuItem.Click += new System.EventHandler(this.playpauseButton_Click);
             // 
             // playNextToolStripMenuItem
             // 
             this.playNextToolStripMenuItem.Name = "playNextToolStripMenuItem";
             this.playNextToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.playNextToolStripMenuItem.Text = "Play Next";
-            this.playNextToolStripMenuItem.Click += new System.EventHandler(this.playNextToolStripMenuItem_Click);
+            this.playNextToolStripMenuItem.Click += new System.EventHandler(this.playNextButton_Click);
             // 
             // playPreviousToolStripMenuItem
             // 
             this.playPreviousToolStripMenuItem.Name = "playPreviousToolStripMenuItem";
             this.playPreviousToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.playPreviousToolStripMenuItem.Text = "Play Previous";
-            this.playPreviousToolStripMenuItem.Click += new System.EventHandler(this.playPreviousToolStripMenuItem_Click);
+            this.playPreviousToolStripMenuItem.Click += new System.EventHandler(this.playPreviousButton_Click);
             // 
             // equalizerToolStripMenuItem
             // 
@@ -314,7 +314,7 @@
             // 
             this.trayIcon.Text = "KoPlayer";
             this.trayIcon.Visible = true;
-            this.trayIcon.DoubleClick += new System.EventHandler(this.notifyIcon1_DoubleClick);
+            this.trayIcon.DoubleClick += new System.EventHandler(this.showKoPlayer_Event);
             this.trayIcon.MouseDown += new System.Windows.Forms.MouseEventHandler(this.trayIcon_MouseDown);
             // 
             // searchBox

@@ -145,7 +145,7 @@ namespace KoPlayer.Playlists
             songPaths.RemoveAt(index);
 
             Sorting.RemoveSongFromSortDictionaries(this.outputSongs[index], this.sortDictionaries);
-            if (outputSongs.Count < index)
+            if (index < outputSongs.Count)
                 outputSongs.RemoveAt(index);
         }
 
@@ -211,6 +211,17 @@ namespace KoPlayer.Playlists
             }
         }
 
+        public virtual void UpdateSongInfo(Song song)
+        {
+            //Remove from all dictionaries
+            foreach (Dictionary<string, List<Song>> dictionary in this.sortDictionaries)
+                foreach (List<Song> list in dictionary.Values)
+                    if (list.Contains(song))
+                        list.Remove(song);
+
+            Sorting.AddSongToSortDictionaries(song, this.sortDictionaries);
+        }
+
         public void AddFolder(string path)
         {
             try
@@ -256,7 +267,6 @@ namespace KoPlayer.Playlists
         {
             ResetSortVariables();
             BindingList<Song> outputSongs = GetSongsFromLibrary();
-            Sorting.CreateSortDictionaries(outputSongs, this.sortDictionaries);
             return outputSongs;
         }
 
