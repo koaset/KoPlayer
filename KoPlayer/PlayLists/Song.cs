@@ -89,6 +89,10 @@ namespace KoPlayer.Playlists
                         return DateAdded.ToShortTimeString();
                     case "last played":
                         return LastPlayed.ToShortDateString();
+                    case "track number":
+                        return TrackNumber.ToString();
+                    case "disc number":
+                        return DiscNumber.ToString();
                     default:
                         return null;
                 }
@@ -190,13 +194,13 @@ namespace KoPlayer.Playlists
         {
             using (TagLib.File track = TagLib.File.Create(Path))
             {
-                if (this.Title != null && this.Title != "")
+                if (this.Title != null)
                     track.Tag.Title = this.Title;
-                if (this.Artist != null && this.Artist != "")
+                if (this.Artist != null)
                 track.Tag.Performers[0] = this.Artist;
-                if (this.Album != null && this.Album != "")
+                if (this.Album != null)
                     track.Tag.Album = this.Album;
-                if (this.Genre != null  && this.Genre != "")
+                if (this.Genre != null)
                     track.Tag.Genres[0] = this.Genre;
                 if (this.TrackNumber > 0)
                     track.Tag.Track = (uint)this.TrackNumber;

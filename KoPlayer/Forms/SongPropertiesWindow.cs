@@ -89,17 +89,16 @@ namespace KoPlayer.Forms
         {
             this.song.Rating = (int)this.rating_numupdownstring.Value;
 
+            this.song.Title = this.title_box.Text;
+            this.song.Artist = this.artist_box.Text;
+            this.song.Album = this.album_box.Text;
+            this.song.TrackNumber = Convert.ToInt32(this.tracknr_box.Text);
+            this.song.DiscNumber = Convert.ToInt32(this.discnr_box.Text);
+            this.song.Genre = this.genre_box.Text;
+            this.song.Rating = (int)this.rating_numupdownstring.Value;
+            
             if (this.song != this.mainForm.CurrentlyPlaying)
-            {
-                this.song.Title = this.title_box.Text;
-                this.song.Artist = this.artist_box.Text;
-                this.song.Album = this.album_box.Text;
-                this.song.TrackNumber = Convert.ToInt32(this.tracknr_box.Text);
-                this.song.DiscNumber = Convert.ToInt32(this.discnr_box.Text);
-                this.song.Genre = this.genre_box.Text;
-                this.song.Rating = (int)this.rating_numupdownstring.Value;
                 this.song.SaveTags();
-            }
             else
                 OnSavePlayingSong(this.song);
 
@@ -130,22 +129,10 @@ namespace KoPlayer.Forms
             currentPlaylist.CurrentIndex = oldIndex;
         }
 
-        private void tracknr_box_KeyPress(object sender, KeyPressEventArgs e)
-        {
-            CheckIfNumber(e);
-        }
-
-        private void discnr_box_KeyPress(object sender, KeyPressEventArgs e)
-        {
-            CheckIfNumber(e);
-        }
-
-        private void CheckIfNumber(KeyPressEventArgs e)
+        private void nr_box_KeyPress(object sender, KeyPressEventArgs e)
         {
             if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
-            {
                 e.Handled = true;
-            }
         }
     }
 

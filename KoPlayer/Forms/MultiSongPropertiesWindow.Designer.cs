@@ -1,6 +1,6 @@
 ﻿namespace KoPlayer.Forms
 {
-    partial class SongPropertiesWindow
+    partial class MultiSongPropertiesWindow
     {
         /// <summary>
         /// Required designer variable.
@@ -53,8 +53,8 @@
             this.lastplayed_box = new System.Windows.Forms.TextBox();
             this.ok_button = new System.Windows.Forms.Button();
             this.cancel_button = new System.Windows.Forms.Button();
-            this.previous_button = new System.Windows.Forms.Button();
-            this.next_button = new System.Windows.Forms.Button();
+            this.save_ComboBox = new System.Windows.Forms.ComboBox();
+            this.save_CheckBox = new System.Windows.Forms.CheckBox();
             this.rating_numupdownstring = new KoPlayer.Forms.RatingBox();
             ((System.ComponentModel.ISupportInitialize)(this.rating_numupdownstring)).BeginInit();
             this.SuspendLayout();
@@ -65,6 +65,8 @@
             this.title_box.Name = "title_box";
             this.title_box.Size = new System.Drawing.Size(369, 20);
             this.title_box.TabIndex = 0;
+            this.title_box.Tag = "Title";
+            this.title_box.TextChanged += new System.EventHandler(this.box_TextChanged);
             // 
             // artist_box
             // 
@@ -72,6 +74,8 @@
             this.artist_box.Name = "artist_box";
             this.artist_box.Size = new System.Drawing.Size(369, 20);
             this.artist_box.TabIndex = 1;
+            this.artist_box.Tag = "Artist";
+            this.artist_box.TextChanged += new System.EventHandler(this.box_TextChanged);
             // 
             // album_box
             // 
@@ -79,6 +83,8 @@
             this.album_box.Name = "album_box";
             this.album_box.Size = new System.Drawing.Size(369, 20);
             this.album_box.TabIndex = 2;
+            this.album_box.Tag = "Album";
+            this.album_box.TextChanged += new System.EventHandler(this.box_TextChanged);
             // 
             // genre_box
             // 
@@ -86,6 +92,8 @@
             this.genre_box.Name = "genre_box";
             this.genre_box.Size = new System.Drawing.Size(178, 20);
             this.genre_box.TabIndex = 5;
+            this.genre_box.Tag = "Genre";
+            this.genre_box.TextChanged += new System.EventHandler(this.box_TextChanged);
             // 
             // path_box
             // 
@@ -95,6 +103,7 @@
             this.path_box.Size = new System.Drawing.Size(369, 20);
             this.path_box.TabIndex = 5;
             this.path_box.TabStop = false;
+            this.path_box.Tag = "Path";
             // 
             // tracknr_box
             // 
@@ -103,6 +112,8 @@
             this.tracknr_box.Name = "tracknr_box";
             this.tracknr_box.Size = new System.Drawing.Size(30, 20);
             this.tracknr_box.TabIndex = 3;
+            this.tracknr_box.Tag = "Track Number";
+            this.tracknr_box.TextChanged += new System.EventHandler(this.box_TextChanged);
             this.tracknr_box.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.nr_box_KeyPress);
             // 
             // discnr_box
@@ -112,6 +123,8 @@
             this.discnr_box.Name = "discnr_box";
             this.discnr_box.Size = new System.Drawing.Size(30, 20);
             this.discnr_box.TabIndex = 4;
+            this.discnr_box.Tag = "Disc Number";
+            this.discnr_box.TextChanged += new System.EventHandler(this.box_TextChanged);
             this.discnr_box.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.nr_box_KeyPress);
             // 
             // title_label
@@ -202,6 +215,7 @@
             this.length_box.Size = new System.Drawing.Size(72, 20);
             this.length_box.TabIndex = 17;
             this.length_box.TabStop = false;
+            this.length_box.Tag = "Length";
             // 
             // rating_label
             // 
@@ -231,6 +245,7 @@
             this.playcount_box.Size = new System.Drawing.Size(64, 20);
             this.playcount_box.TabIndex = 21;
             this.playcount_box.TabStop = false;
+            this.playcount_box.Tag = "Play Count";
             // 
             // dateadded_label
             // 
@@ -250,6 +265,7 @@
             this.dateadded_box.Size = new System.Drawing.Size(173, 20);
             this.dateadded_box.TabIndex = 23;
             this.dateadded_box.TabStop = false;
+            this.dateadded_box.Tag = "Date Added";
             // 
             // lastplayed_label
             // 
@@ -269,6 +285,7 @@
             this.lastplayed_box.Size = new System.Drawing.Size(178, 20);
             this.lastplayed_box.TabIndex = 25;
             this.lastplayed_box.TabStop = false;
+            this.lastplayed_box.Tag = "Last Played";
             // 
             // ok_button
             // 
@@ -290,25 +307,37 @@
             this.cancel_button.UseVisualStyleBackColor = true;
             this.cancel_button.Click += new System.EventHandler(this.cancel_button_Click);
             // 
-            // previous_button
+            // save_ComboBox
             // 
-            this.previous_button.Location = new System.Drawing.Point(12, 327);
-            this.previous_button.Name = "previous_button";
-            this.previous_button.Size = new System.Drawing.Size(75, 23);
-            this.previous_button.TabIndex = 29;
-            this.previous_button.Text = "Previous";
-            this.previous_button.UseVisualStyleBackColor = true;
-            this.previous_button.Click += new System.EventHandler(this.previous_button_Click);
+            this.save_ComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.save_ComboBox.FormattingEnabled = true;
+            this.save_ComboBox.Items.AddRange(new object[] {
+            "Select Property",
+            "All",
+            "Title",
+            "Artist",
+            "Album",
+            "Track Number",
+            "Disc Number",
+            "Genre",
+            "Rating"});
+            this.save_ComboBox.Location = new System.Drawing.Point(12, 327);
+            this.save_ComboBox.Name = "save_ComboBox";
+            this.save_ComboBox.Size = new System.Drawing.Size(121, 21);
+            this.save_ComboBox.TabIndex = 32;
+            this.save_ComboBox.SelectionChangeCommitted += new System.EventHandler(this.save_ComboBox_SelectionChangeCommitted);
             // 
-            // next_button
+            // save_CheckBox
             // 
-            this.next_button.Location = new System.Drawing.Point(93, 327);
-            this.next_button.Name = "next_button";
-            this.next_button.Size = new System.Drawing.Size(75, 23);
-            this.next_button.TabIndex = 30;
-            this.next_button.Text = "Next";
-            this.next_button.UseVisualStyleBackColor = true;
-            this.next_button.Click += new System.EventHandler(this.next_button_Click);
+            this.save_CheckBox.AutoSize = true;
+            this.save_CheckBox.Enabled = false;
+            this.save_CheckBox.Location = new System.Drawing.Point(155, 331);
+            this.save_CheckBox.Name = "save_CheckBox";
+            this.save_CheckBox.Size = new System.Drawing.Size(51, 17);
+            this.save_CheckBox.TabIndex = 33;
+            this.save_CheckBox.Text = "Save";
+            this.save_CheckBox.UseVisualStyleBackColor = true;
+            this.save_CheckBox.CheckedChanged += new System.EventHandler(this.save_CheckBox_CheckedChanged);
             // 
             // rating_numupdownstring
             // 
@@ -324,15 +353,17 @@
             this.rating_numupdownstring.Size = new System.Drawing.Size(120, 20);
             this.rating_numupdownstring.TabIndex = 31;
             this.rating_numupdownstring.TabStop = false;
+            this.rating_numupdownstring.Tag = "Rating";
+            this.rating_numupdownstring.ValueChanged += new System.EventHandler(this.box_TextChanged);
             // 
-            // SongInfoPopup
+            // MultiSongPropertiesWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(395, 375);
+            this.Controls.Add(this.save_CheckBox);
+            this.Controls.Add(this.save_ComboBox);
             this.Controls.Add(this.rating_numupdownstring);
-            this.Controls.Add(this.next_button);
-            this.Controls.Add(this.previous_button);
             this.Controls.Add(this.cancel_button);
             this.Controls.Add(this.ok_button);
             this.Controls.Add(this.lastplayed_label);
@@ -359,7 +390,7 @@
             this.Controls.Add(this.artist_box);
             this.Controls.Add(this.title_box);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
-            this.Name = "SongInfoPopup";
+            this.Name = "MultiSongPropertiesWindow";
             this.ShowInTaskbar = false;
             this.Text = "Song Properties";
             this.Load += new System.EventHandler(this.SongInfoPopup_Load);
@@ -396,8 +427,8 @@
         private System.Windows.Forms.TextBox lastplayed_box;
         private System.Windows.Forms.Button ok_button;
         private System.Windows.Forms.Button cancel_button;
-        private System.Windows.Forms.Button previous_button;
-        private System.Windows.Forms.Button next_button;
         private RatingBox rating_numupdownstring;
+        private System.Windows.Forms.ComboBox save_ComboBox;
+        private System.Windows.Forms.CheckBox save_CheckBox;
     }
 }

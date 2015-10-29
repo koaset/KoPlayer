@@ -561,11 +561,16 @@ namespace KoPlayer.Forms
             }
             catch (SongReloadException ex)
             {
-                MessageBox.Show(ex.ToString() + "\nSong will be removed from the library.");
-                library.Remove(song);
+                OnSongReloadException(ex, song);
                 return false;
             }
             return true;
+        }
+
+        private void OnSongReloadException(SongReloadException ex, Song song)
+        {
+            MessageBox.Show(ex.ToString() + "\nSong will be removed from the library.");
+            library.Remove(song);
         }
 
         private void PlayMusic()
@@ -1666,30 +1671,65 @@ namespace KoPlayer.Forms
 
         private void songGridViewRightClickProperties(object sender, EventArgs e)
         {
-            Song clickedSong = songGridView.Rows[clickedSongIndex].DataBoundItem as Song;
-            bool exists = true;
-            try
+            List<Song> songs = new List<Song>();
+            
+            if (songGridView.SelectedRows.Count > 1)
             {
-                clickedSong.Reload();
+                foreach (DataGridViewRow row in songGridView.SelectedRows)
+                    songs.Add((Song)row.DataBoundItem);
             }
-            catch (SongReloadException ex)
+            else if (songGridView.SelectedRows.Count == 1)
             {
-                exists = false;
-                MessageBox.Show(ex.ToString() + "\nSong will be removed from the library.");
-                library.Remove(clickedSong);
+                Song clickedSong = songGridView.Rows[clickedSongIndex].DataBoundItem as Song;
+                songs.Add(clickedSong);
             }
-            if (exists)
-            {
-                SongPropertiesWindow popUp = new SongPropertiesWindow(this, clickedSong,
-                    this.clickedSongIndex, this.showingPlaylist, this.library);
-                popUp.SavePlayingSong += popUp_SavePlayingSong;
-                popUp.StartPosition = FormStartPosition.CenterParent;
-                popUp.ShowDialog();
-            }
+
+            ShowSongListProperties(songs);
             RefreshSongGridView();
         }
 
-        private void popUp_SavePlayingSong(object sender, SavePlayingSongEventArgs e)
+        private void ShowSongListProperties(List<Song> songs)
+        {
+            bool exists = true;
+            foreach (Song s in songs)
+            {
+                try
+                {
+                    s.Reload();
+                }
+                catch (SongReloadException ex)
+                {
+                    OnSongReloadException(ex, s);
+                    exists = false;
+                }
+            }
+            if (exists && songs.Count > 0)
+            {
+                Form popup;
+
+                if (songs.Count > 1)
+                {
+                    MultiSongPropertiesWindow multiSongWindow = new MultiSongPropertiesWindow(this, songs,
+                        this.showingPlaylist, this.library);
+                    multiSongWindow.SavePlayingSong += popup_SavePlayingSong;
+                    popup = multiSongWindow;
+                }
+                else
+                {
+                    SongPropertiesWindow singleSongWindow = new SongPropertiesWindow(this, songs[0],
+                        this.clickedSongIndex, this.showingPlaylist, this.library);
+                    singleSongWindow.SavePlayingSong += popup_SavePlayingSong;
+                    popup = singleSongWindow;
+                }
+
+                popup.StartPosition = FormStartPosition.CenterParent;
+                popup.ShowDialog();
+            }
+            else
+                throw new Exception("Songs don't exist or are 0");
+        }
+
+        private void popup_SavePlayingSong(object sender, SavePlayingSongEventArgs e)
         {
             songToSave = e.savingSong;
         }
