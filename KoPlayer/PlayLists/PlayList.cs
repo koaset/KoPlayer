@@ -114,7 +114,14 @@ namespace KoPlayer.Playlists
         public void Insert(int index, string song)
         {
             if (index < songPaths.Count)
-                songPaths.Insert(index, song);
+            {
+                if (index < CurrentIndex)
+                    CurrentIndex++;
+                if (index == CurrentIndex)
+                    songPaths.Insert(index + 1, song);
+                else
+                    songPaths.Insert(index, song);
+            }
             else
                 songPaths.Add(song);
         }
@@ -137,10 +144,9 @@ namespace KoPlayer.Playlists
                 CurrentIndex--;
             songPaths.RemoveAt(index);
 
-            Song s = outputSongs[index];
             Sorting.RemoveSongFromSortDictionaries(this.outputSongs[index], this.sortDictionaries);
-            if (outputSongs.Contains(s))
-                outputSongs.Remove(s);
+            if (outputSongs.Count < index)
+                outputSongs.RemoveAt(index);
         }
 
         public void Remove(string path)

@@ -1279,7 +1279,7 @@ namespace KoPlayer.Forms
                         if (showingPlaylist == shuffleQueue)
                             PopulateShuffleQueue();
                         else
-                            songGridView.DataSource = pl.GetSongs();
+                            UpdateShowingPlaylist(true);
                     }
                 }
             }
