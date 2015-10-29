@@ -197,11 +197,25 @@ namespace KoPlayer.Playlists
                 if (this.Title != null)
                     track.Tag.Title = this.Title;
                 if (this.Artist != null)
-                track.Tag.Performers[0] = this.Artist;
+                {
+                    if (track.Tag.Performers.Length == 0)
+                        track.Tag.Performers = new string[1] { this.Artist };
+                    else
+                        track.Tag.Performers[0] = this.Artist;
+                    if (this.Artist == "")
+                        track.Tag.Performers = new string[0];
+                }
                 if (this.Album != null)
                     track.Tag.Album = this.Album;
                 if (this.Genre != null)
-                    track.Tag.Genres[0] = this.Genre;
+                {
+                    if (track.Tag.Genres.Length == 0)
+                        track.Tag.Genres = new string[1] { this.Genre };
+                    else
+                        track.Tag.Genres[0] = this.Genre;
+                    if (this.Genre == "")
+                        track.Tag.Genres = new string[0];
+                }
                 if (this.TrackNumber > 0)
                     track.Tag.Track = (uint)this.TrackNumber;
                 if (this.DiscNumber > 0)

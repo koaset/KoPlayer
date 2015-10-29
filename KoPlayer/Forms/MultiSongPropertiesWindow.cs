@@ -38,6 +38,7 @@ namespace KoPlayer.Forms
 
         private void SongInfoPopup_Load(object sender, EventArgs e)
         {
+            // If a certain property has the same value for all songs, set that textbox text to the value
             foreach (Control c in this.Controls)
             {
                 if (c.Tag != null)
