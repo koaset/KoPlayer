@@ -120,8 +120,13 @@ namespace KoPlayer.Playlists
         public BindingList<Song> GetAllSongs()
         {
             ResetSortVariables();
-            this.outputSongs = new BindingList<Song>(pathDictionary.Values.ToList());
+            this.outputSongs = GetSongsFromPathDictionary();
             return GetSongs();
+        }
+
+        private BindingList<Song> GetSongsFromPathDictionary()
+        {
+            return new BindingList<Song>(pathDictionary.Values.ToList());
         }
 
         private void ResetSortVariables()
@@ -138,6 +143,13 @@ namespace KoPlayer.Playlists
         public void ResetSearchDictionaries()
         {
             Sorting.CreateSortDictionaries(this.outputSongs, this.sortDictionaries);
+        }
+
+        public void ResetRatingDictionary()
+        {
+            int index = Array.IndexOf(Sorting.SortColumns, "rating");
+            this.outputSongs = GetSongsFromPathDictionary();
+            this.sortDictionaries[index] = Sorting.CreateFieldDictionary(this.outputSongs, "rating");
         }
 
         public void Add(Song song)

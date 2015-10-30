@@ -31,7 +31,7 @@ namespace KoPlayer.Forms
             title_label.Text = song.Title;
             artist_label.Text = song.Artist;
             album_label.Text = song.Album;
-            length_label.Text = Song.DurationFromTimeSpanToString(song.Length);
+            length_label.Text = song.LengthString;
             rating_label.Text = song.RatingString;
             pictureBox1.Image = Song.GetImage(song);
 

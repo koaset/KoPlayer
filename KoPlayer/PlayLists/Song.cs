@@ -11,6 +11,8 @@ namespace KoPlayer.Playlists
 {
     public class Song : IComparable
     {
+        public const string LengthFormat = "%m\\:ss";
+
         #region Properties
         [System.ComponentModel.Browsable(false)]
         public string Path { get; set; }
@@ -48,10 +50,14 @@ namespace KoPlayer.Playlists
         public TimeSpan Length { get; set; }
 
         [System.ComponentModel.Browsable(false)]
-        public string LengthString {
-            get { return DurationFromTimeSpanToString(this.Length); }
-            set { this.Length = DurationFromStringToTimespan(value); }
+        public int LengthMS {
+            get { return (int)this.Length.TotalMilliseconds; }
+            set { this.Length = new TimeSpan(0, 0, 0, 0, value); }
         }
+
+        [XmlIgnore]
+        [System.ComponentModel.Browsable(false)]
+        public string LengthString { get { return this.Length.ToString(LengthFormat); } }
 
         [System.ComponentModel.DisplayName("Date Added")]
         public DateTime DateAdded { get; set; }
@@ -103,7 +109,7 @@ namespace KoPlayer.Playlists
                     case "rating":
                         return RatingString;
                     case "length":
-                        return DurationFromTimeSpanToString(Length);
+                        return LengthString;
                     case "play count":
                         return PlayCount.ToString();
                     case "date added":
@@ -118,61 +124,6 @@ namespace KoPlayer.Playlists
                         return null;
                 }
             }
-        }
-
-        public void Reload()
-        {
-            TagLib.File track = null;
-            try
-            {
-                track = TagLib.File.Create(this.Path);
-            }
-            catch
-            {
-                throw new SongReloadException();
-            }
-
-            Title = track.Tag.Title;
-            if (Title == null)
-                Title = "";
-
-            if (Artist != null && track.Tag.Performers.Length > 0)
-                Artist = track.Tag.Performers[0];
-            else
-                Artist = "";
-
-            Album = track.Tag.Album;
-            if (Album == null)
-                Album = "";
-
-            Genre = track.Tag.FirstGenre;
-            if (Genre == null)
-                Genre = "";
-
-            TrackNumber = (int)track.Tag.Track;
-            DiscNumber = (int)track.Tag.Disc;
-
-            Length = track.Properties.Duration;
-        }
-
-        public int CompareTo(object obj)
-        {
-            if (obj == null) return 1;
-
-            Song otherSong = obj as Song;
-            if (otherSong != null)
-            {
-                if (this.Album.CompareTo(otherSong.Album) == 0)
-                {
-                    if (this.DiscNumber.CompareTo(otherSong.DiscNumber) != 0)
-                        return this.DiscNumber.CompareTo(otherSong.DiscNumber);
-                    else
-                        return this.TrackNumber.CompareTo(otherSong.TrackNumber);
-                }
-                return this.Album.CompareTo(otherSong.Album);
-            }
-            else
-                throw new ArgumentException("Object is not a Song");
         }
 
         private void Read(string path)
@@ -241,11 +192,73 @@ namespace KoPlayer.Playlists
                     track.Tag.Track = (uint)this.TrackNumber;
                 if (this.DiscNumber > 0)
                     track.Tag.Disc = (uint)this.DiscNumber;
-                track.Save();
+                try
+                {
+                    track.Save();
+                }
+                catch
+                {
+                    MessageBox.Show("Could not save tags: File being used by another process.");
+                }
             }
         }
 
-        public static string DurationFromTimeSpanToString(TimeSpan duration)
+        public void Reload()
+        {
+            TagLib.File track = null;
+            try
+            {
+                track = TagLib.File.Create(this.Path);
+            }
+            catch
+            {
+                throw new SongReloadException();
+            }
+
+            Title = track.Tag.Title;
+            if (Title == null)
+                Title = "";
+
+            if (Artist != null && track.Tag.Performers.Length > 0)
+                Artist = track.Tag.Performers[0];
+            else
+                Artist = "";
+
+            Album = track.Tag.Album;
+            if (Album == null)
+                Album = "";
+
+            Genre = track.Tag.FirstGenre;
+            if (Genre == null)
+                Genre = "";
+
+            TrackNumber = (int)track.Tag.Track;
+            DiscNumber = (int)track.Tag.Disc;
+
+            Length = track.Properties.Duration;
+        }
+
+        public int CompareTo(object obj)
+        {
+            if (obj == null) return 1;
+
+            Song otherSong = obj as Song;
+            if (otherSong != null)
+            {
+                if (this.Album.CompareTo(otherSong.Album) == 0)
+                {
+                    if (this.DiscNumber.CompareTo(otherSong.DiscNumber) != 0)
+                        return this.DiscNumber.CompareTo(otherSong.DiscNumber);
+                    else
+                        return this.TrackNumber.CompareTo(otherSong.TrackNumber);
+                }
+                return this.Album.CompareTo(otherSong.Album);
+            }
+            else
+                throw new ArgumentException("Object is not a Song");
+        }
+
+        /*public static string LengthFromTimeSpanToString(TimeSpan duration)
         {
             string ret = "";
             if (duration.Hours > 0)
@@ -254,11 +267,10 @@ namespace KoPlayer.Playlists
             if (duration.Seconds < 10)
                 ret += "0";
             ret += duration.Seconds;
-            TimeSpan test = DurationFromStringToTimespan(ret);
             return ret;
         }
 
-        public static TimeSpan DurationFromStringToTimespan(string duration)
+        public static TimeSpan LengthFromStringToTimespan(string duration)
         {
             int hours = 0, minutes, seconds, i = 0;
 
@@ -270,7 +282,7 @@ namespace KoPlayer.Playlists
             seconds = Convert.ToInt32(splitDuration[i++]);
 
             return new TimeSpan(hours, minutes, seconds);
-        }
+        }*/
 
         public static int RatingStringToInt(string rating)
         {

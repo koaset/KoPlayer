@@ -115,7 +115,7 @@ namespace KoPlayer.Forms
 
             UpdateShowingPlaylist(true);
             songGridView.AutoGenerateColumns = false;
-            songGridView.Columns["Length"].DefaultCellStyle.Format = "%m\\:ss";
+            songGridView.Columns["Length"].DefaultCellStyle.Format = Song.LengthFormat;
 
             columnSettings = ColumnSettings.Load(COLUMNSETTINGSPATH);
             if (columnSettings == null)
@@ -485,8 +485,7 @@ namespace KoPlayer.Forms
 
         private void library_LibraryChanged(object sender, LibraryChangedEventArgs e)
         {
-            if (showingPlaylist == library)
-                UpdateShowingPlaylist(true);
+            UpdateShowingPlaylist(true);
             PopulateShuffleQueue();
             UpdateStatusStip();
         }
@@ -778,7 +777,7 @@ namespace KoPlayer.Forms
 
         private void searchBarTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
-            TimeSpan length = musicPlayer.Length;
+            TimeSpan length = currentlyPlaying.Length;
             TimeSpan position = musicPlayer.Position;
 
             UpdateSearchBar(length, position);
@@ -789,12 +788,12 @@ namespace KoPlayer.Forms
 
             this.oldPosition = position;
 
-            if ((searchBarTimer.Enabled && musicPlayer.PlaybackState == PlaybackState.Stopped) ||
-                (searchBarTimer.Enabled && position > length))
-            {
-                StopPlaying();
-                PlayNextSong();
-            }
+            if (searchBarTimer.Enabled)
+                if (musicPlayer.PlaybackState == PlaybackState.Stopped || position > length)
+                {
+                    StopPlaying();
+                    PlayNextSong();
+                }
         }
         #endregion
 
@@ -832,9 +831,10 @@ namespace KoPlayer.Forms
             {
                 Song s = row.DataBoundItem as Song;
                 s.Rating = rating;
-                library.UpdateSongInfo(s);
-                UpdateSongForRatingFilterPlaylist(s);
             }
+
+            library.ResetSearchDictionaries();
+
             UpdateFilterPlaylistSongPaths();
             RefreshSongGridView();
             showingPlaylist.Save();
@@ -1014,7 +1014,7 @@ namespace KoPlayer.Forms
             else
             {
                 if (!currentTime_Label.IsDisposed)
-                    currentTime_Label.Text = Song.DurationFromTimeSpanToString(musicPlayer.Position);
+                    currentTime_Label.Text = musicPlayer.Position.ToString(Song.LengthFormat);
             }
         }
 
@@ -1023,10 +1023,10 @@ namespace KoPlayer.Forms
             if (songInfoLabel.InvokeRequired)
                 songInfoLabel.Invoke(new Action(delegate
                     {
-                        songLength_Label.Text = Song.DurationFromTimeSpanToString(musicPlayer.Length);
+                        songLength_Label.Text = currentlyPlaying.LengthString;
                     }));
             else
-                songLength_Label.Text = Song.DurationFromTimeSpanToString(musicPlayer.Length);
+                songLength_Label.Text = currentlyPlaying.LengthString;
         }
 
         #region Set control value methods

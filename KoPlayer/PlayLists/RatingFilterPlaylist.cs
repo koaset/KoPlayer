@@ -60,6 +60,7 @@ namespace KoPlayer.Playlists
         private void UpdateSongPaths()
         {
             List<Song> songList = new List<Song>();
+            library.ResetRatingDictionary();
             Dictionary<string, List<Song>> ratingDictionary = library.GetSortDictionary("rating");
             foreach (string key in ratingDictionary.Keys)
             {

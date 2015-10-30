@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <Settings xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  <FormWidth>1058</FormWidth>
+  <FormWidth>1060</FormWidth>
   <FormHeight>600</FormHeight>
-  <StartupPlaylist>Library</StartupPlaylist>
+  <StartupPlaylist>Shuffle Queue</StartupPlaylist>
   <Shufflequeue_SourcePlaylistName>Library</Shufflequeue_SourcePlaylistName>
   <Shufflequeue_NumPrevious>5</Shufflequeue_NumPrevious>
   <Shufflequeue_NumNext>15</Shufflequeue_NumNext>
