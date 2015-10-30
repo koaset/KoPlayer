@@ -4,7 +4,7 @@
     <ColumnSetting>
       <DisplayIndex>0</DisplayIndex>
       <Name>Title</Name>
-      <Width>237</Width>
+      <Width>242</Width>
       <Visible>true</Visible>
     </ColumnSetting>
     <ColumnSetting>
@@ -40,7 +40,7 @@
     <ColumnSetting>
       <DisplayIndex>1</DisplayIndex>
       <Name>Length</Name>
-      <Width>69</Width>
+      <Width>66</Width>
       <Visible>true</Visible>
     </ColumnSetting>
     <ColumnSetting>

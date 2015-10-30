@@ -11,33 +11,54 @@ namespace KoPlayer.Playlists
 {
     public class Song : IComparable
     {
+        #region Properties
         [System.ComponentModel.Browsable(false)]
         public string Path { get; set; }
+
         [System.ComponentModel.DisplayName("Title")]
         public string Title { get; set; }
+
         [System.ComponentModel.DisplayName("Artist")]
         public string Artist { get; set; }
+
         [System.ComponentModel.DisplayName("Album")]
         public string Album { get; set; }
+
         [System.ComponentModel.DisplayName("Genre")]
         public string Genre { get; set; }
+
         [System.ComponentModel.Browsable(false)]
         public int TrackNumber { get; set; }
+
         [System.ComponentModel.Browsable(false)]
         public int DiscNumber { get; set; }
+
         [System.ComponentModel.DisplayName("Rating")]
         [XmlIgnore]
         public string RatingString { get { return RatingIntToString(Rating); } }
+
         [System.ComponentModel.Browsable(false)]
         public int Rating { get; set; }
+
         [System.ComponentModel.DisplayName("Play Count")]
         public int PlayCount { get; set; }
+
+        [XmlIgnore]
         [System.ComponentModel.DisplayName("Length")]
-        public string Length { get; set; }
+        public TimeSpan Length { get; set; }
+
+        [System.ComponentModel.Browsable(false)]
+        public string LengthString {
+            get { return DurationFromTimeSpanToString(this.Length); }
+            set { this.Length = DurationFromStringToTimespan(value); }
+        }
+
         [System.ComponentModel.DisplayName("Date Added")]
         public DateTime DateAdded { get; set; }
+
         [System.ComponentModel.DisplayName("Last Played")]
         public DateTime LastPlayed { get; set; }
+        #endregion
 
         public Song()
         {
@@ -50,7 +71,7 @@ namespace KoPlayer.Playlists
             DiscNumber = -1;
             Rating = -1;
             PlayCount = -1;
-            Length = "0:0";
+            Length = TimeSpan.MinValue;
             DateAdded = DateTime.Now;
         }
 
@@ -82,7 +103,7 @@ namespace KoPlayer.Playlists
                     case "rating":
                         return RatingString;
                     case "length":
-                        return Length;
+                        return DurationFromTimeSpanToString(Length);
                     case "play count":
                         return PlayCount.ToString();
                     case "date added":
@@ -131,7 +152,7 @@ namespace KoPlayer.Playlists
             TrackNumber = (int)track.Tag.Track;
             DiscNumber = (int)track.Tag.Disc;
 
-            Length = DurationFromTimeSpanToString(track.Properties.Duration);
+            Length = track.Properties.Duration;
         }
 
         public int CompareTo(object obj)
@@ -181,7 +202,7 @@ namespace KoPlayer.Playlists
                 DiscNumber = (int)track.Tag.Disc;
                 Rating = 0;
                 PlayCount = 0;
-                Length = DurationFromTimeSpanToString(track.Properties.Duration);
+                Length = track.Properties.Duration;
                 DateAdded = DateTime.Now;
             }
             catch (Exception e)
@@ -233,7 +254,22 @@ namespace KoPlayer.Playlists
             if (duration.Seconds < 10)
                 ret += "0";
             ret += duration.Seconds;
+            TimeSpan test = DurationFromStringToTimespan(ret);
             return ret;
+        }
+
+        public static TimeSpan DurationFromStringToTimespan(string duration)
+        {
+            int hours = 0, minutes, seconds, i = 0;
+
+            string[] splitDuration = duration.Split(':');
+
+            if (splitDuration.Length == 3)
+                hours = Convert.ToInt32(splitDuration[i++]);
+            minutes = Convert.ToInt32(splitDuration[i++]);
+            seconds = Convert.ToInt32(splitDuration[i++]);
+
+            return new TimeSpan(hours, minutes, seconds);
         }
 
         public static int RatingStringToInt(string rating)

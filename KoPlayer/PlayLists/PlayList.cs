@@ -249,7 +249,7 @@ namespace KoPlayer.Playlists
                 this.sortOrder = SortOrder.Ascending;
             this.SortColumnIndex = columnIndex;
             this.sortField = field;
-            Sorting.Sort(field, this.sortOrder, this.sortDictionaries, ref this.outputSongs);
+            this.outputSongs = Sorting.Sort(field, this.sortOrder, this.sortDictionaries, this.outputSongs);
         }
 
         private void ResetSortVariables()

@@ -24,9 +24,12 @@ namespace KoPlayer.Playlists
         /// <param name="sortOrder"></param>
         /// <param name="sortDictionaries"></param>
         /// <param name="sortList">ref. The sorted list is stored here</param>
-        public static void Sort(string field, SortOrder sortOrder,
-            List<Dictionary<string, List<Song>>> sortDictionaries, ref BindingList<Song> sortList)
+        public static BindingList<Song> Sort(string field, SortOrder sortOrder,
+            List<Dictionary<string, List<Song>>> sortDictionaries, BindingList<Song> sortList)
         {
+            if (field.ToLower() == "length")
+                return SortLength(sortOrder, sortList);
+
             //Get the dictionary for the corresponding column
             Dictionary<string, List<Song>> sortDictionary = GetDictionary(field, sortDictionaries);
 
@@ -58,7 +61,37 @@ namespace KoPlayer.Playlists
                 songList.AddRange(sortedDictionary[key]);
             }
             //Sets output. This is a reference
-            sortList = new BindingList<Song>(songList);
+            return new BindingList<Song>(songList);
+        }
+
+        public static BindingList<Song> SortLength(SortOrder sortOrder, BindingList<Song> sortList)
+        {
+            List<Song> sortedList = sortList.ToList();
+
+            sortedList.Sort(delegate(Song song1, Song song2)
+            {
+                return song1.Length.CompareTo(song2.Length);
+            });
+
+            if (sortOrder == SortOrder.Descending)
+                sortedList.Reverse();
+
+            return new BindingList<Song>(sortedList);
+        }
+
+        public static BindingList<Song> SortBindingList(BindingList<Song> sortList, SortOrder sortOrder, string field)
+        {
+            List<Song> sortedList = sortList.ToList();
+
+            sortedList.Sort(delegate(Song song1, Song song2)
+            {
+                return song1.Title.CompareTo(song2.Title);
+            });
+
+            if (sortOrder == SortOrder.Descending)
+                sortedList.Reverse();
+
+            return new BindingList<Song>(sortedList);
         }
 
         /// <summary>

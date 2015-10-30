@@ -84,7 +84,9 @@ namespace KoPlayer.Playlists
 
             this.SortColumnIndex = columnIndex;
             this.sortField = field;
-            Sorting.Sort(field, this.sortOrder, this.sortDictionaries, ref this.outputSongs);
+            this.outputSongs = Sorting.SortBindingList(this.outputSongs, this.sortOrder, field);
+
+            this.outputSongs = Sorting.Sort(field, this.sortOrder, this.sortDictionaries, this.outputSongs);
         }
 
         private Dictionary<string, List<Song>> GetPathListDictionary()
@@ -320,41 +322,6 @@ namespace KoPlayer.Playlists
             return false;
         }
 
-        public void Save()
-        {
-            Stream stream = File.Create(PATH);
-            XmlSerializer serializer = new XmlSerializer(typeof(List<Song>));
-            serializer.Serialize(stream, pathDictionary.Values.ToList());
-            stream.Close();
-        }
-
-        /// <summary>
-        /// Load playlist from file. Returns null if it fails:
-        /// </summary>
-        /// <param name="path"></param>
-        /// <param name="library"></param>
-        /// <returns></returns>
-        public static Library Load()
-        {
-            Stream stream = null;
-            List<Song> loadedLibrary = null;
-            try
-            {
-                stream = File.OpenRead(PATH);
-                XmlSerializer serializer = new XmlSerializer(typeof(List<Song>));
-                loadedLibrary = (List<Song>)serializer.Deserialize(stream);
-            }
-            catch
-            {
-                return null;
-            }
-            finally
-            {
-                if (stream != null) stream.Close();
-            }
-            return new Library(loadedLibrary);
-        }
-
         /// <summary>
         /// Searches for string in all string fields and returns matches in a list
         /// </summary>
@@ -405,6 +372,41 @@ namespace KoPlayer.Playlists
         public override string ToString()
         {
             return this.Name + ", " + this.NumSongs + " songs.";
+        }
+
+        public void Save()
+        {
+            Stream stream = File.Create(PATH);
+            XmlSerializer serializer = new XmlSerializer(typeof(List<Song>));
+            serializer.Serialize(stream, pathDictionary.Values.ToList());
+            stream.Close();
+        }
+
+        /// <summary>
+        /// Load playlist from file. Returns null if it fails:
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="library"></param>
+        /// <returns></returns>
+        public static Library Load()
+        {
+            Stream stream = null;
+            List<Song> loadedLibrary = null;
+            try
+            {
+                stream = File.OpenRead(PATH);
+                XmlSerializer serializer = new XmlSerializer(typeof(List<Song>));
+                loadedLibrary = (List<Song>)serializer.Deserialize(stream);
+            }
+            catch
+            {
+                return null;
+            }
+            finally
+            {
+                if (stream != null) stream.Close();
+            }
+            return new Library(loadedLibrary);
         }
     }
 

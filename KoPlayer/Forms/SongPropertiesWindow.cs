@@ -44,7 +44,7 @@ namespace KoPlayer.Forms
             this.title_box.Text = this.song.Title;
             this.artist_box.Text = this.song.Artist;
             this.album_box.Text = this.song.Album;
-            this.length_box.Text = this.song.Length;
+            this.length_box.Text = Song.DurationFromTimeSpanToString(this.song.Length);
             this.tracknr_box.Text = this.song.TrackNumber.ToString();
             this.discnr_box.Text = this.song.DiscNumber.ToString();
             this.genre_box.Text = this.song.Genre;

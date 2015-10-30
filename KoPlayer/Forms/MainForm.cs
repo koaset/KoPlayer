@@ -115,6 +115,7 @@ namespace KoPlayer.Forms
 
             UpdateShowingPlaylist(true);
             songGridView.AutoGenerateColumns = false;
+            songGridView.Columns["Length"].DefaultCellStyle.Format = "%m\\:ss";
 
             columnSettings = ColumnSettings.Load(COLUMNSETTINGSPATH);
             if (columnSettings == null)
