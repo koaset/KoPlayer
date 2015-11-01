@@ -24,7 +24,7 @@ namespace KoPlayer.Playlists
         public SortOrder SortOrder { get { return sortOrder; } }
 
         private const string PATH = "Library.xml";
-        private const string EXTENSION = ".mp3";
+        private static string[] EXTENSIONS = {".mp3", ".m4a", ".wma", ".aac"};
 
         private BindingList<Song> outputSongs;
         private Dictionary<string, Song> pathDictionary;
@@ -271,16 +271,19 @@ namespace KoPlayer.Playlists
             BackgroundWorker worker = sender as BackgroundWorker;
             string path = e.Argument as string;
 
-            string[] mp3Files = Directory.GetFiles(path, "*" + EXTENSION, SearchOption.AllDirectories);
+            List<string> musicFiles = new List<string>();
+            foreach (string extension in EXTENSIONS)
+                musicFiles.AddRange(Directory.GetFiles(path, "*" + extension, SearchOption.AllDirectories));
+
             int count = 0;
-            foreach (string fileName in mp3Files)
+            foreach (string fileName in musicFiles)
             {
                 if (!Exists(fileName))
                 {
                     Song newSong = new Song(fileName);
                     this.newSongs.Add(newSong);
                     if (count % 50 == 0)
-                        worker.ReportProgress((int)(100 * count / mp3Files.Length));
+                        worker.ReportProgress((int)(100 * count / musicFiles.Count));
                 }
                 count++;
             }

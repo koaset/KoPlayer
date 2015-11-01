@@ -449,9 +449,16 @@ namespace KoPlayer.Forms
         #endregion
 
         #region Add songs
-        private void openToolStripMenuItem_Click(object sender, EventArgs e)
+        private void addsongToolStripMenuItem_Click(object sender, EventArgs e)
         {
             OpenFileDialog dialog = new OpenFileDialog();
+
+            dialog.Filter = "Audio Files (*.mp3,*m4a,*.wav,*.wma,*.aac)|*.mp3;*m4a;*.wav;*.wma;*.aac;|" +
+                        "MP3 files (*.mp3)|*.mp3|" +
+                        "M4A files (*.m4a)|*.m4a|" +
+                        "WAV files (*.wav)|*.wav|" +
+                        "WMA files (*.wma)|*.wma|" +
+                        "AAC files (*.aac)|*.aac";
 
             if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
