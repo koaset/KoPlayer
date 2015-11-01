@@ -1,6 +1,7 @@
 # KoPlayer by Karl-Oskar Smed @koaset
 
 A simple mp3 player with Windows Forms GUI
+Executable can be found in bin folder
 
 Features:
 -Song searching

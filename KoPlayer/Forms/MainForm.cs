@@ -453,12 +453,12 @@ namespace KoPlayer.Forms
         {
             OpenFileDialog dialog = new OpenFileDialog();
 
-            dialog.Filter = "Audio Files (*.mp3,*m4a,*.wav,*.wma,*.aac)|*.mp3;*m4a;*.wav;*.wma;*.aac;|" +
+            dialog.Filter = "Audio Files (*.mp3,*m4a,*.wma,*.aac,*.flac)|*.mp3;*m4a;*.wma;*.aac;*.flac;|" +
                         "MP3 files (*.mp3)|*.mp3|" +
                         "M4A files (*.m4a)|*.m4a|" +
-                        "WAV files (*.wav)|*.wav|" +
                         "WMA files (*.wma)|*.wma|" +
-                        "AAC files (*.aac)|*.aac";
+                        "AAC files (*.aac)|*.aac|" +
+                        "FLAC files (*.flac)|*.flac";
 
             if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
@@ -1732,8 +1732,6 @@ namespace KoPlayer.Forms
                 popup.StartPosition = FormStartPosition.CenterParent;
                 popup.ShowDialog();
             }
-            else
-                throw new Exception("Songs don't exist or are 0");
         }
 
         private void popup_SavePlayingSong(object sender, SavePlayingSongEventArgs e)

@@ -24,12 +24,13 @@ namespace KoPlayer.Playlists
         public SortOrder SortOrder { get { return sortOrder; } }
 
         private const string PATH = "Library.xml";
-        private static string[] EXTENSIONS = {".mp3", ".m4a", ".wma", ".aac"};
+        private static string[] EXTENSIONS = {".mp3", ".m4a", ".wma", ".aac", ".flac"};
 
         private BindingList<Song> outputSongs;
         private Dictionary<string, Song> pathDictionary;
         private List<Dictionary<string, List<Song>>> sortDictionaries;
         private List<Song> newSongs;
+        private List<string> invalidSongPaths;
 
         private SortOrder sortOrder = SortOrder.None;
         private string sortField = "";
@@ -137,7 +138,18 @@ namespace KoPlayer.Playlists
 
         public void Add(string path)
         {
-            Add(new Song(path));
+            Song newSong = null;
+            try
+            {
+                newSong = new Song(path);
+            }
+            catch (SongReadException ex)
+            {
+                MessageBox.Show("File read error");
+            }
+            if (newSong != null)
+                Add(newSong);
+            
         }
 
         public void ResetSearchDictionaries()
@@ -264,6 +276,7 @@ namespace KoPlayer.Playlists
             addFilesWorker.RunWorkerCompleted += addFilesWorker_RunWorkerCompleted;
             addFilesWorker.RunWorkerAsync(path);
             this.outputSongs.RaiseListChangedEvents = false;
+            this.invalidSongPaths = new List<string>();
         }
 
         void addFilesWorker_DoWork(object sender, DoWorkEventArgs e)
@@ -280,10 +293,23 @@ namespace KoPlayer.Playlists
             {
                 if (!Exists(fileName))
                 {
-                    Song newSong = new Song(fileName);
-                    this.newSongs.Add(newSong);
-                    if (count % 50 == 0)
-                        worker.ReportProgress((int)(100 * count / musicFiles.Count));
+                    Song newSong;
+                    try
+                    {
+                        newSong = new Song(fileName);
+                    }
+                    catch
+                    {
+                        newSong = null;
+                        this.invalidSongPaths.Add(fileName);
+                    }
+
+                    if (newSong != null)
+                    {
+                        this.newSongs.Add(newSong);
+                        if (count % 50 == 0)
+                            worker.ReportProgress((int)(100 * count / musicFiles.Count));
+                    }
                 }
                 count++;
             }
@@ -327,6 +353,21 @@ namespace KoPlayer.Playlists
 
             this.outputSongs.ResetBindings();
             OnLibraryChanged(new LibraryChangedEventArgs());
+
+            if (invalidSongPaths.Count > 0)
+            {
+                int numSongs = invalidSongPaths.Count + newSongs.Count;
+                string errorMessage = "An error occured when adding " + invalidSongPaths.Count + 
+                    " out of " + numSongs + " music files found.";
+                if (invalidSongPaths.Count < 10)
+                {
+                    errorMessage += "\nWas unable to add:";
+                    foreach (string path in invalidSongPaths)
+                        errorMessage += "\n" + path;
+                }
+                MessageBox.Show(errorMessage);
+            }
+            invalidSongPaths = null;
         }
 
         private bool Exists(string path)

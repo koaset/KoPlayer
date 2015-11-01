@@ -84,7 +84,9 @@ namespace KoPlayer.Playlists
         public Song(string path) : this()
         {
             this.Path = path;
-            this.Read(path); ;
+            bool readResult = Read(path);
+            if (readResult == false)
+                throw new SongReadException();
         }
 
         /// <summary>
@@ -126,7 +128,7 @@ namespace KoPlayer.Playlists
             }
         }
 
-        private void Read(string path)
+        private bool Read(string path)
         {
             try
             {
@@ -158,10 +160,11 @@ namespace KoPlayer.Playlists
                 Length = track.Properties.Duration;
                 DateAdded = DateTime.Now;
             }
-            catch (Exception e)
+            catch
             {
-                MessageBox.Show("Song read exception: " + e.ToString());
+                return false;
             }
+            return true;
         }
 
         public void SaveTags()
@@ -263,32 +266,6 @@ namespace KoPlayer.Playlists
                 throw new ArgumentException("Object is not a Song");
         }
 
-        /*public static string LengthFromTimeSpanToString(TimeSpan duration)
-        {
-            string ret = "";
-            if (duration.Hours > 0)
-                ret += duration.Hours + ":";
-            ret += duration.Minutes + ":";
-            if (duration.Seconds < 10)
-                ret += "0";
-            ret += duration.Seconds;
-            return ret;
-        }
-
-        public static TimeSpan LengthFromStringToTimespan(string duration)
-        {
-            int hours = 0, minutes, seconds, i = 0;
-
-            string[] splitDuration = duration.Split(':');
-
-            if (splitDuration.Length == 3)
-                hours = Convert.ToInt32(splitDuration[i++]);
-            minutes = Convert.ToInt32(splitDuration[i++]);
-            seconds = Convert.ToInt32(splitDuration[i++]);
-
-            return new TimeSpan(hours, minutes, seconds);
-        }*/
-
         public static int RatingStringToInt(string rating)
         {
             return rating.Length;
@@ -312,6 +289,16 @@ namespace KoPlayer.Playlists
                 return System.Drawing.Image.FromStream(ms);
             }
             return null;
+        }
+    }
+
+    public class SongReadException : Exception
+    {
+        public string Message { get; set; }
+
+        public SongReadException()
+        {
+            this.Message = "Could not read song tags";
         }
     }
 }
