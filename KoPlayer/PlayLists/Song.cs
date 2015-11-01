@@ -135,6 +135,8 @@ namespace KoPlayer.Playlists
                 Title = track.Tag.Title;
                 if (Title == null)
                     Title = "";
+                if (Title == "")
+                    Title = System.IO.Path.GetFileNameWithoutExtension(this.Path);
 
                 if (Artist != null && track.Tag.Performers.Length > 0)
                     Artist = track.Tag.Performers[0];
@@ -218,6 +220,9 @@ namespace KoPlayer.Playlists
             Title = track.Tag.Title;
             if (Title == null)
                 Title = "";
+            if (Title == "")
+                Title = System.IO.Path.GetFileNameWithoutExtension(this.Path);
+            
 
             if (Artist != null && track.Tag.Performers.Length > 0)
                 Artist = track.Tag.Performers[0];
