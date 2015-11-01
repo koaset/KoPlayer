@@ -1,4 +1,4 @@
-﻿using CSCore.CoreAudioAPI;
+using CSCore.CoreAudioAPI;
 using CSCore.SoundOut;
 using CSCore.Streams;
 using KoPlayer.Playlists;
@@ -452,7 +452,17 @@ namespace KoPlayer.Forms
         private void openToolStripMenuItem_Click(object sender, EventArgs e)
         {
             OpenFileDialog dialog = new OpenFileDialog();
-
+            
+            //Filter types of files that show in open file dialog
+            dialog.Filter = "Audio Files (*.mp3,*.wav,*.wma,*.aac,*.pl,*.eq)|*.mp3;*.wav;*.wma;*.aac;*.pl;*.eq|" +
+                            "Playlist Files (*.pl)|*.pl|"+
+                            "Equalizer Files (*.eq)|*.eq|"+
+                            "MP3 files (*.mp3)|*.mp3|" +
+                            "WAV files (*.wav)|*.wav|" +
+                            "WMA files (*.wma)|*.wma|" +
+                            "AAC files (*.aac)|*.aac|" +
+                            "All files (*.*)|*.*";
+            
             if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
                 string path = dialog.FileName;
