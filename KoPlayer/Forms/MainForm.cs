@@ -477,10 +477,17 @@ namespace KoPlayer.Forms
             FolderBrowserDialog dialog = new FolderBrowserDialog();
             if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
-                library.AddFolder(dialog.SelectedPath);
-
+                library.Add(GetSongsPathsFromFolder(dialog.SelectedPath));
                 SetAddFilesStatusStrip();
             }
+        }
+
+        private List<string> GetSongsPathsFromFolder(string folderPath)
+        {
+            List<string> musicFiles = new List<string>();
+            foreach (string extension in Library.EXTENSIONS)
+                musicFiles.AddRange(Directory.GetFiles(folderPath, "*" + extension, SearchOption.AllDirectories));
+            return musicFiles;
         }
 
         private void SetAddFilesStatusStrip()
@@ -1375,7 +1382,7 @@ namespace KoPlayer.Forms
             }
             else if (e.Data.GetDataPresent(DataFormats.FileDrop))
             {
-                if (CanAddFiles((string[])e.Data.GetData(DataFormats.FileDrop)))
+                if (CanAddPaths((string[])e.Data.GetData(DataFormats.FileDrop)))
                     e.Effect = DragDropEffects.Copy;
                 else
                     e.Effect = DragDropEffects.None;
@@ -1422,24 +1429,35 @@ namespace KoPlayer.Forms
 
         private void HandleFileDragDrop(DragEventArgs e)
         {
-            string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
+            string[] paths = (string[])e.Data.GetData(DataFormats.FileDrop);
 
-            if (CanAddFiles(files))
+            if (CanAddPaths(paths))
             {
-                library.Add(files.ToList());
-                SetAddFilesStatusStrip();
-            }
+                List<string> songPaths = new List<string>();
+                foreach (string path in paths)
+                {
+                    if (File.GetAttributes(path).HasFlag(FileAttributes.Directory))
+                        songPaths.AddRange(GetSongsPathsFromFolder(path));
+                    else
+                        songPaths.Add(path);
+                }
 
-            ChangeToPlaylist(library);
+                library.Add(songPaths);
+                SetAddFilesStatusStrip();
+                ChangeToPlaylist(library);
+            }
         }
 
-        private bool CanAddFiles(string[] files)
+        private bool CanAddPaths(string[] paths)
         {
-            if (files == null || files.Length <= 0)
+            if (paths == null || paths.Length <= 0)
                 return false;
-            foreach (string file in files)
+            foreach (string file in paths)
+            {
                 if (!Library.EXTENSIONS.Contains(Path.GetExtension(file.ToLower())))
-                    return false;
+                    if (!File.GetAttributes(file).HasFlag(FileAttributes.Directory))
+                        return false;
+            }
             return true;
         }
 
