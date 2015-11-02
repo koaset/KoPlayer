@@ -479,15 +479,20 @@ namespace KoPlayer.Forms
             {
                 library.AddFolder(dialog.SelectedPath);
 
-                statusStrip1.Items.Add(new ToolStripSeparator());
-                statusStrip1.Items.Add("Adding files...");
-                progressBar = new ToolStripProgressBar("add_progress");
-                progressBar.Minimum = 0;
-                progressBar.Maximum = 100;
-                statusStrip1.Items.Add(progressBar);
-                UpdateStatusStip();
-                library.ReportProgress += library_ReportProgress;
+                SetAddFilesStatusStrip();
             }
+        }
+
+        private void SetAddFilesStatusStrip()
+        {
+            statusStrip1.Items.Add(new ToolStripSeparator());
+            statusStrip1.Items.Add("Adding files...");
+            progressBar = new ToolStripProgressBar("add_progress");
+            progressBar.Minimum = 0;
+            progressBar.Maximum = 100;
+            statusStrip1.Items.Add(progressBar);
+            UpdateStatusStip();
+            library.ReportProgress += library_ReportProgress;
         }
 
         private void library_LibraryChanged(object sender, LibraryChangedEventArgs e)
@@ -1363,41 +1368,79 @@ namespace KoPlayer.Forms
 
         private void songGridView_DragEnter(object sender, DragEventArgs e)
         {
-            if (showingPlaylist != library)
-                e.Effect = DragDropEffects.Move;
+            if (e.Data.GetDataPresent(typeof(DataGridViewSelectedRowCollection)))
+            {
+                if (showingPlaylist != library)
+                    e.Effect = DragDropEffects.Move;
+            }
+            else if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                if (CanAddFiles((string[])e.Data.GetData(DataFormats.FileDrop)))
+                    e.Effect = DragDropEffects.Copy;
+                else
+                    e.Effect = DragDropEffects.None;
+            }
         }
 
         private void songGridView_DragDrop(object sender, DragEventArgs e)
         {
             if (e.Data.GetDataPresent(typeof(DataGridViewSelectedRowCollection)))
+                HandleSongDragDrop(e);
+            else if (e.Data.GetDataPresent(DataFormats.FileDrop))
+                HandleFileDragDrop(e);
+        }
+
+        private void HandleSongDragDrop(DragEventArgs e)
+        {
+            Point p = songGridView.PointToClient(new Point(e.X, e.Y));
+            DataGridView.HitTestInfo info = songGridView.HitTest(p.X, p.Y);
+            if (info.RowIndex >= 0)
             {
-                Point p = songGridView.PointToClient(new Point(e.X, e.Y));
-                DataGridView.HitTestInfo info = songGridView.HitTest(p.X, p.Y);
-                if (info.RowIndex >= 0)
+                DataGridViewSelectedRowCollection rows;
+                rows = (DataGridViewSelectedRowCollection)e.Data.GetData(typeof(DataGridViewSelectedRowCollection));
+
+                IPlaylist pl = showingPlaylist;
+                if (pl != library)
                 {
-                    DataGridViewSelectedRowCollection rows;
-                    rows = (DataGridViewSelectedRowCollection)e.Data.GetData(typeof(DataGridViewSelectedRowCollection));
-
-                    IPlaylist pl = showingPlaylist;
-                    if (pl != library)
+                    List<int> indexes = GetSortedRowIndexes(rows);
+                    foreach (int index in indexes)
+                        pl.Remove(index);
+                    foreach (DataGridViewRow row in rows)
                     {
-                        List<int> indexes = GetSortedRowIndexes(rows);
-                        foreach (int index in indexes)
-                            pl.Remove(index);
-                        foreach (DataGridViewRow row in rows)
-                        {
-                            Song s = (Song)row.DataBoundItem;
-                            Playlist playlist = pl as Playlist;
-                            playlist.Insert(info.RowIndex, s);
-                        }
-
-                        if (showingPlaylist == shuffleQueue)
-                            PopulateShuffleQueue();
-                        else
-                            UpdateShowingPlaylist(true);
+                        Song s = (Song)row.DataBoundItem;
+                        Playlist playlist = pl as Playlist;
+                        playlist.Insert(info.RowIndex, s);
                     }
+
+                    if (showingPlaylist == shuffleQueue)
+                        PopulateShuffleQueue();
+                    else
+                        UpdateShowingPlaylist(true);
                 }
             }
+        }
+
+        private void HandleFileDragDrop(DragEventArgs e)
+        {
+            string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
+
+            if (CanAddFiles(files))
+            {
+                library.Add(files.ToList());
+                SetAddFilesStatusStrip();
+            }
+
+            ChangeToPlaylist(library);
+        }
+
+        private bool CanAddFiles(string[] files)
+        {
+            if (files == null || files.Length <= 0)
+                return false;
+            foreach (string file in files)
+                if (!Library.EXTENSIONS.Contains(Path.GetExtension(file.ToLower())))
+                    return false;
+            return true;
         }
 
         private void playlistGridView_DragOver(object sender, DragEventArgs e)

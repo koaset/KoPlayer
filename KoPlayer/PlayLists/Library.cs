@@ -23,8 +23,8 @@ namespace KoPlayer.Playlists
         public List<Dictionary<string, List<Song>>> SortDictionaries { get { return this.sortDictionaries; } }
         public SortOrder SortOrder { get { return sortOrder; } }
 
-        private const string PATH = "Library.xml";
-        private static string[] EXTENSIONS = {".mp3", ".m4a", ".wma", ".aac", ".flac"};
+        public const string PATH = "Library.xml";
+        public static string[] EXTENSIONS = {".mp3", ".m4a", ".wma", ".aac", ".flac"};
 
         private BindingList<Song> outputSongs;
         private Dictionary<string, Song> pathDictionary;
@@ -143,13 +143,12 @@ namespace KoPlayer.Playlists
             {
                 newSong = new Song(path);
             }
-            catch (SongReadException ex)
+            catch
             {
                 MessageBox.Show("File read error");
             }
             if (newSong != null)
-                Add(newSong);
-            
+                Add(newSong);   
         }
 
         public void ResetSearchDictionaries()
@@ -267,6 +266,17 @@ namespace KoPlayer.Playlists
 
         public void AddFolder(string path)
         {
+            List<string> musicFiles = new List<string>();
+            foreach (string extension in EXTENSIONS)
+                musicFiles.AddRange(Directory.GetFiles(path, "*" + extension, SearchOption.AllDirectories));
+            Add(musicFiles);
+        }
+
+        public void Add(List<string> paths)
+        {
+            for (int i = 0; i < paths.Count; i++)
+                paths[i] = paths[i].ToLower();
+
             this.newSongs = new List<Song>();
             BackgroundWorker addFilesWorker = new BackgroundWorker();
             addFilesWorker.WorkerSupportsCancellation = false;
@@ -274,7 +284,7 @@ namespace KoPlayer.Playlists
             addFilesWorker.DoWork += addFilesWorker_DoWork;
             addFilesWorker.ProgressChanged += addFilesWorker_ProgressChanged;
             addFilesWorker.RunWorkerCompleted += addFilesWorker_RunWorkerCompleted;
-            addFilesWorker.RunWorkerAsync(path);
+            addFilesWorker.RunWorkerAsync(paths);
             this.outputSongs.RaiseListChangedEvents = false;
             this.invalidSongPaths = new List<string>();
         }
@@ -282,12 +292,7 @@ namespace KoPlayer.Playlists
         void addFilesWorker_DoWork(object sender, DoWorkEventArgs e)
         {
             BackgroundWorker worker = sender as BackgroundWorker;
-            string path = e.Argument as string;
-
-            List<string> musicFiles = new List<string>();
-            foreach (string extension in EXTENSIONS)
-                musicFiles.AddRange(Directory.GetFiles(path, "*" + extension, SearchOption.AllDirectories));
-
+            List<string> musicFiles = e.Argument as List<string>;
             int count = 0;
             foreach (string fileName in musicFiles)
             {

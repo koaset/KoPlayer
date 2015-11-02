@@ -222,20 +222,6 @@ namespace KoPlayer.Playlists
             Sorting.AddSongToSortDictionaries(song, this.sortDictionaries);
         }
 
-        public void AddFolder(string path)
-        {
-            try
-            {
-                string[] mp3Files = Directory.GetFiles(path, "*" + EXTENSION, SearchOption.AllDirectories);
-                foreach (string fileName in mp3Files)
-                    songPaths.Add(fileName);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Add folder to playlist exception: " + ex.ToString());
-            }
-        }
-
         public void Sort(int columnIndex, string field)
         {
             if (this.SortColumnIndex == columnIndex)

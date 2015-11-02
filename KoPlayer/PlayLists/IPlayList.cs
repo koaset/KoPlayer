@@ -25,7 +25,6 @@ namespace KoPlayer.Playlists
         Song GetNext();
         Song GetPrevious();
         Song GetRandom();
-        void AddFolder(string path);
         void UpdateSongInfo(Song song);
         void Sort(int columnIndex, string field);
         SortOrder SortOrder { get; }
