@@ -263,24 +263,6 @@ namespace KoPlayer.Playlists
             return pathDictionary.Values.ToList()[Playlist.r.Next(0, pathDictionary.Count)];
         }
 
-
-        /*public void AddFolder(string path)
-        {
-            List<string> musicFiles = new List<string>();
-            foreach (string extension in EXTENSIONS)
-                musicFiles.AddRange(Directory.GetFiles(path, "*" + extension, SearchOption.AllDirectories));
-            Add(musicFiles);
-        }
-
-        public void AddFolders(List<string> folders)
-        {
-            List<string> musicFiles = new List<string>();
-            foreach (string folder in folders)
-                foreach (string extension in EXTENSIONS)
-                    musicFiles.AddRange(Directory.GetFiles(folder, "*" + extension, SearchOption.AllDirectories));
-            Add(musicFiles);
-        }*/
-
         public void Add(List<string> paths)
         {
             for (int i = 0; i < paths.Count; i++)

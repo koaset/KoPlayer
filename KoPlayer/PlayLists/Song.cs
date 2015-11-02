@@ -294,7 +294,7 @@ namespace KoPlayer.Playlists
 
     public class SongReadException : Exception
     {
-        public string Message { get; set; }
+        public new string Message { get; set; }
 
         public SongReadException()
         {

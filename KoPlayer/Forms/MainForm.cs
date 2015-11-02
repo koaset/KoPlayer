@@ -504,8 +504,15 @@ namespace KoPlayer.Forms
 
         private void library_LibraryChanged(object sender, LibraryChangedEventArgs e)
         {
-            UpdateShowingPlaylist(true);
-            PopulateShuffleQueue();
+            foreach (IPlaylist pl in playlists)
+                if (pl.GetType() == typeof(RatingFilterPlaylist))
+                    pl.GetAllSongs();
+
+            if (showingPlaylist != shuffleQueue)
+                UpdateShowingPlaylist(true);
+            else
+                PopulateShuffleQueue();
+
             UpdateStatusStip();
         }
 
@@ -824,7 +831,8 @@ namespace KoPlayer.Forms
             {
                 if (e.KeyCode == Keys.Enter)
                 {
-                    PlaySong(songGridView.SelectedRows[0].DataBoundItem as Song, showingPlaylist);
+                    if (songGridView.SelectedRows.Count == 1)
+                        PlaySong(songGridView.SelectedRows[0].DataBoundItem as Song, showingPlaylist);
                 }
                 else if (e.KeyCode == Keys.Delete)
                 {
@@ -1369,20 +1377,21 @@ namespace KoPlayer.Forms
         {
             if (e.Button == MouseButtons.Left)
             {
-                songGridView.DoDragDrop(e.Item, DragDropEffects.All);
+                DragDropSongs data = new DragDropSongs(DataFormats.FileDrop, e.Item);
+                songGridView.DoDragDrop(data, DragDropEffects.Copy);
             }
         }
 
         private void songGridView_DragEnter(object sender, DragEventArgs e)
         {
-            if (e.Data.GetDataPresent(typeof(DataGridViewSelectedRowCollection)))
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
             {
-                if (showingPlaylist != library)
-                    e.Effect = DragDropEffects.Move;
-            }
-            else if (e.Data.GetDataPresent(DataFormats.FileDrop))
-            {
-                if (CanAddPaths((string[])e.Data.GetData(DataFormats.FileDrop)))
+                if (e.Data.GetType() == typeof(DragDropSongs))
+                {
+                    if (showingPlaylist.GetType() == typeof(Playlist))
+                        e.Effect = DragDropEffects.Copy;
+                }
+                else if (CanAddPaths((string[])e.Data.GetData(DataFormats.FileDrop)))
                     e.Effect = DragDropEffects.Copy;
                 else
                     e.Effect = DragDropEffects.None;
@@ -1391,10 +1400,13 @@ namespace KoPlayer.Forms
 
         private void songGridView_DragDrop(object sender, DragEventArgs e)
         {
-            if (e.Data.GetDataPresent(typeof(DataGridViewSelectedRowCollection)))
-                HandleSongDragDrop(e);
-            else if (e.Data.GetDataPresent(DataFormats.FileDrop))
-                HandleFileDragDrop(e);
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                if (e.Data.GetType() == typeof(DragDropSongs))
+                    HandleSongDragDrop(e);
+                else
+                    HandleFileDragDrop(e);
+            }
         }
 
         private void HandleSongDragDrop(DragEventArgs e)
@@ -1403,18 +1415,22 @@ namespace KoPlayer.Forms
             DataGridView.HitTestInfo info = songGridView.HitTest(p.X, p.Y);
             if (info.RowIndex >= 0)
             {
-                DataGridViewSelectedRowCollection rows;
-                rows = (DataGridViewSelectedRowCollection)e.Data.GetData(typeof(DataGridViewSelectedRowCollection));
-
+                DataGridViewSelectedRowCollection rows = songGridView.SelectedRows;
                 IPlaylist pl = showingPlaylist;
+
                 if (pl != library)
                 {
                     List<int> indexes = GetSortedRowIndexes(rows);
+                    List<Song> songs = new List<Song>();
+
                     foreach (int index in indexes)
-                        pl.Remove(index);
-                    foreach (DataGridViewRow row in rows)
                     {
-                        Song s = (Song)row.DataBoundItem;
+                        songs.Add((Song)songGridView.Rows[index].DataBoundItem);
+                        pl.Remove(index);
+                    }
+
+                    foreach (Song s in songs)
+                    {
                         Playlist playlist = pl as Playlist;
                         playlist.Insert(info.RowIndex, s);
                     }
@@ -1479,23 +1495,27 @@ namespace KoPlayer.Forms
 
         private void playlistGridView_DragDrop(object sender, DragEventArgs e)
         {
-            if (e.Data.GetDataPresent(typeof(DataGridViewSelectedRowCollection)))
+            if (e.Data.GetType() == typeof(DragDropSongs))
             {
+                DragDropSongs data = (DragDropSongs)e.Data;
+                data.ReturnPaths = false;
+
                 Point p = playlistGridView.PointToClient(new Point(e.X, e.Y));
                 DataGridView.HitTestInfo info = playlistGridView.HitTest(p.X, p.Y);
+
                 if (info.RowIndex >= 0)
                 {
-                    DataGridViewSelectedRowCollection rows;
-                    rows = (DataGridViewSelectedRowCollection)e.Data.GetData(typeof(DataGridViewSelectedRowCollection));
+                    DataGridViewSelectedRowCollection rows = songGridView.SelectedRows;
+
+                    List<Song> songs = new List<Song>();
+                        foreach (DataGridViewRow row in rows)
+                             songs.Add((Song)row.DataBoundItem);
 
                     IPlaylist pl = GetPlaylist(playlistGridView.Rows[info.RowIndex].Cells[0].Value.ToString());
-                    if (pl != library)
+                    if (pl.GetType() == typeof(Playlist))
                     {
-                        foreach (DataGridViewRow row in rows)
-                        {
-                            Song s = (Song)row.DataBoundItem;
-                            pl.Add(s.Path);
-                        }
+                        pl.Add(songs);
+
                         if (pl == showingPlaylist)
                             UpdateShowingPlaylist(true);
                     }
