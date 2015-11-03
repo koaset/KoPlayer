@@ -20,8 +20,8 @@ namespace KoPlayer
 
         public override object GetData(string test)
         {
-            DataGridViewSelectedRowCollection rows =
-                (DataGridViewSelectedRowCollection)base.GetData(test);
+            List<DataGridViewRow> rows =
+                (List<DataGridViewRow>)base.GetData(test);
 
             if (ReturnPaths)
             {

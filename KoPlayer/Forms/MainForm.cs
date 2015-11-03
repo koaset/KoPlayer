@@ -57,6 +57,7 @@ namespace KoPlayer.Forms
         private string searchBoxDefault = "Search Library";
         private System.Timers.Timer searchLibraryTimer;
         private int searchLibraryTimerInterval = 500;
+        bool shouldSearch = false;
 
         private Playlist tempPlaylist;
         private int clickedSongIndex;
@@ -951,6 +952,21 @@ namespace KoPlayer.Forms
             indexList.Reverse();
             return indexList;
         }
+
+        private List<DataGridViewRow> GetSortedRowList(DataGridViewSelectedRowCollection rows)
+        {
+            List<DataGridViewRow> ret = new List<DataGridViewRow>();
+
+            foreach (DataGridViewRow row in rows)
+                ret.Add(row);
+
+            ret.Sort(delegate(DataGridViewRow row1, DataGridViewRow row2)
+            {
+                return row2.Index.CompareTo(row1.Index);
+            });
+
+            return ret;
+        }
         #endregion
 
         #region Global hotkeys
@@ -1222,6 +1238,7 @@ namespace KoPlayer.Forms
                 searchBox.Text = searchBoxDefault;
                 searchBox.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
             }
+            this.shouldSearch = false;
         }
 
 
@@ -1229,15 +1246,19 @@ namespace KoPlayer.Forms
         {
             if (searchBox.Text != searchBoxDefault)
             {
-                if (searchLibraryTimer != null)
+                if (shouldSearch || searchBox.Text != "")
                 {
-                    searchLibraryTimer.Stop();
-                    searchLibraryTimer.Dispose();
+                    if (searchLibraryTimer != null)
+                    {
+                        searchLibraryTimer.Stop();
+                        searchLibraryTimer.Dispose();
+                    }
+                    searchLibraryTimer = new System.Timers.Timer(searchLibraryTimerInterval);
+                    searchLibraryTimer.AutoReset = false;
+                    searchLibraryTimer.Elapsed += searchLibraryTimer_Elapsed;
+                    searchLibraryTimer.Start();
+                    this.shouldSearch = true;
                 }
-                searchLibraryTimer = new System.Timers.Timer(searchLibraryTimerInterval);
-                searchLibraryTimer.AutoReset = false;
-                searchLibraryTimer.Elapsed += searchLibraryTimer_Elapsed;
-                searchLibraryTimer.Start();
             }
         }
 
@@ -1377,7 +1398,11 @@ namespace KoPlayer.Forms
         {
             if (e.Button == MouseButtons.Left)
             {
-                DragDropSongs data = new DragDropSongs(DataFormats.FileDrop, e.Item);
+                DataGridViewSelectedRowCollection selectedRows = (DataGridViewSelectedRowCollection)e.Item;
+                List<DataGridViewRow> sortedRows = GetSortedRowList(selectedRows);
+
+                //Create dataobject and do dragdrop
+                DragDropSongs data = new DragDropSongs(DataFormats.FileDrop, sortedRows);
                 songGridView.DoDragDrop(data, DragDropEffects.Copy);
             }
         }
@@ -1415,18 +1440,21 @@ namespace KoPlayer.Forms
             DataGridView.HitTestInfo info = songGridView.HitTest(p.X, p.Y);
             if (info.RowIndex >= 0)
             {
-                DataGridViewSelectedRowCollection rows = songGridView.SelectedRows;
                 IPlaylist pl = showingPlaylist;
-
                 if (pl != library)
                 {
-                    List<int> indexes = GetSortedRowIndexes(rows);
+                    //Get datagridview rows from data
+                    DragDropSongs data = (DragDropSongs)e.Data;
+                    data.ReturnPaths = false;
+                    List<DataGridViewRow> rows = (List<DataGridViewRow>)
+                        data.GetData(DataFormats.FileDrop);
+
                     List<Song> songs = new List<Song>();
 
-                    foreach (int index in indexes)
+                    foreach (DataGridViewRow row in rows)
                     {
-                        songs.Add((Song)songGridView.Rows[index].DataBoundItem);
-                        pl.Remove(index);
+                        songs.Add((Song)row.DataBoundItem);
+                        pl.Remove(row.Index);
                     }
 
                     foreach (Song s in songs)
@@ -1464,6 +1492,11 @@ namespace KoPlayer.Forms
             }
         }
 
+        /// <summary>
+        /// True if paths are directories or files of acceptable extensions
+        /// </summary>
+        /// <param name="paths"></param>
+        /// <returns></returns>
         private bool CanAddPaths(string[] paths)
         {
             if (paths == null || paths.Length <= 0)
@@ -1505,7 +1538,10 @@ namespace KoPlayer.Forms
 
                 if (info.RowIndex >= 0)
                 {
-                    DataGridViewSelectedRowCollection rows = songGridView.SelectedRows;
+
+                    List<DataGridViewRow> rows = (List<DataGridViewRow>)data.GetData(DataFormats.FileDrop);
+                    //Rows recieved are reverse order from what we want here
+                    rows.Reverse();
 
                     List<Song> songs = new List<Song>();
                         foreach (DataGridViewRow row in rows)
@@ -1729,7 +1765,10 @@ namespace KoPlayer.Forms
         private void songGridViewRightClickAddToShuffleQueueNext(object sender, EventArgs e)
         {
             List<Song> songs = new List<Song>();
-            foreach (DataGridViewRow row in songGridView.SelectedRows)
+
+            List<DataGridViewRow> sortedRows = GetSortedRowList(songGridView.SelectedRows);
+
+            foreach (DataGridViewRow row in sortedRows)
                 songs.Add((Song)row.DataBoundItem);
             shuffleQueue.Insert(shuffleQueue.CurrentIndex + 1, songs);
 
@@ -1739,7 +1778,15 @@ namespace KoPlayer.Forms
 
         private void songGridViewRightClickAddToShuffleQueueBottom(object sender, EventArgs e)
         {
-            foreach (DataGridViewRow row in songGridView.SelectedRows)
+            AddToShuffleQueueBottom(songGridView.SelectedRows);
+        }
+
+        private void AddToShuffleQueueBottom(DataGridViewSelectedRowCollection rows)
+        {
+            List<DataGridViewRow> sortedRows = GetSortedRowList(rows);
+            sortedRows.Reverse();
+
+            foreach (DataGridViewRow row in sortedRows)
                 shuffleQueue.Add((Song)row.DataBoundItem);
 
             if (showingPlaylist == shuffleQueue)
