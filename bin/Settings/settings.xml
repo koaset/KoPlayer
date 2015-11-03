@@ -3,7 +3,7 @@
   <FormWidth>1060</FormWidth>
   <FormHeight>600</FormHeight>
   <StartupPlaylist>Library</StartupPlaylist>
-  <Shufflequeue_SourcePlaylistName>Unrated</Shufflequeue_SourcePlaylistName>
+  <Shufflequeue_SourcePlaylistName>Library</Shufflequeue_SourcePlaylistName>
   <Shufflequeue_NumPrevious>5</Shufflequeue_NumPrevious>
   <Shufflequeue_NumNext>15</Shufflequeue_NumNext>
   <RatingHotkeys>

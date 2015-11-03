@@ -253,24 +253,32 @@ namespace KoPlayer.Forms
         #region Shuffle Queue
         private void PopulateShuffleQueue()
         {
-            IPlaylist source = GetPlaylist(settings.Shufflequeue_SourcePlaylistName);
-            if (source == null)
+            if (songGridView.InvokeRequired)
             {
-                source = library;
-                settings.Shufflequeue_SourcePlaylistName = library.Name;
+                songGridView.Invoke(new MethodInvoker(delegate { PopulateShuffleQueue(); }));
             }
-
-            while (shuffleQueue.CurrentIndex > settings.Shufflequeue_NumPrevious)
-                shuffleQueue.Remove(0);
-
-            if (source.NumSongs > 0)
-                while (shuffleQueue.NumSongs - shuffleQueue.CurrentIndex < settings.Shufflequeue_NumNext + 1)
-                    shuffleQueue.Add(source.GetRandom());
-
-            if (showingPlaylist == shuffleQueue)
+            else
             {
-                UpdateShowingPlaylist(true);
-                songGridView.ClearSelection();
+
+                IPlaylist source = GetPlaylist(settings.Shufflequeue_SourcePlaylistName);
+                if (source == null)
+                {
+                    source = library;
+                    settings.Shufflequeue_SourcePlaylistName = library.Name;
+                }
+
+                while (shuffleQueue.CurrentIndex > settings.Shufflequeue_NumPrevious)
+                    shuffleQueue.Remove(0);
+
+                if (source.NumSongs > 0)
+                    while (shuffleQueue.NumSongs - shuffleQueue.CurrentIndex < settings.Shufflequeue_NumNext + 1)
+                        shuffleQueue.Add(source.GetRandom());
+
+                if (showingPlaylist == shuffleQueue)
+                {
+                    UpdateShowingPlaylist(true);
+                    songGridView.ClearSelection();
+                }
             }
         }
 
