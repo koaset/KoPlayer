@@ -212,13 +212,16 @@ namespace KoPlayer.Playlists
 
         public virtual void UpdateSongInfo(Song song)
         {
-            //Remove from all dictionaries
+            RemoveFromSortDictionaries(song);
+            Sorting.AddSongToSortDictionaries(song, this.sortDictionaries);
+        }
+
+        protected void RemoveFromSortDictionaries(Song song)
+        {
             foreach (Dictionary<string, List<Song>> dictionary in this.sortDictionaries)
                 foreach (List<Song> list in dictionary.Values)
                     if (list.Contains(song))
                         list.Remove(song);
-
-            Sorting.AddSongToSortDictionaries(song, this.sortDictionaries);
         }
 
         public void Sort(int columnIndex, string field)

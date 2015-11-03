@@ -76,14 +76,16 @@ namespace KoPlayer.Playlists
 
         public override void UpdateSongInfo(Song song)
         {
-            //Remove from all dictionaries
-            foreach (Dictionary<string, List<Song>> dictionary in this.sortDictionaries)
-                foreach (List<Song> list in dictionary.Values)
-                    if (list.Contains(song))
-                        list.Remove(song);
+            base.RemoveFromSortDictionaries(song);
 
             if ((song.Rating == allowedRating) || (IncludeHigher && (song.Rating > allowedRating)))
                 Sorting.AddSongToSortDictionaries(song, this.sortDictionaries);
+        }
+
+        public void ResetSortDictionaries()
+        {
+            base.outputSongs =  base.GetAllSongs();
+            Sorting.CreateSortDictionaries(outputSongs, base.sortDictionaries);
         }
 
         public override Song GetRandom()

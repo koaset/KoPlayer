@@ -48,7 +48,7 @@
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.volumeTrackBar = new System.Windows.Forms.TrackBar();
-            this.statusStrip1 = new System.Windows.Forms.StatusStrip();
+            this.statusStrip = new System.Windows.Forms.StatusStrip();
             this.playlistGridView = new System.Windows.Forms.DataGridView();
             this.Column1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.previousButton_imageList = new System.Windows.Forms.ImageList(this.components);
@@ -215,11 +215,11 @@
             // 
             // statusStrip1
             // 
-            this.statusStrip1.Location = new System.Drawing.Point(0, 624);
-            this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(1136, 22);
-            this.statusStrip1.TabIndex = 6;
-            this.statusStrip1.Text = "statusStrip1";
+            this.statusStrip.Location = new System.Drawing.Point(0, 624);
+            this.statusStrip.Name = "statusStrip1";
+            this.statusStrip.Size = new System.Drawing.Size(1136, 22);
+            this.statusStrip.TabIndex = 6;
+            this.statusStrip.Text = "statusStrip1";
             // 
             // playlistGridView
             // 
@@ -474,7 +474,7 @@
             this.Controls.Add(this.playpauseButton);
             this.Controls.Add(this.previousButton);
             this.Controls.Add(this.playlistGridView);
-            this.Controls.Add(this.statusStrip1);
+            this.Controls.Add(this.statusStrip);
             this.Controls.Add(this.volumeTrackBar);
             this.Controls.Add(this.albumArtBox);
             this.Controls.Add(this.menuStrip1);
@@ -514,7 +514,7 @@
         private System.Windows.Forms.ToolStripMenuItem setLibraryPathToolStripMenuItem;
         private System.Windows.Forms.PictureBox albumArtBox;
         private System.Windows.Forms.TrackBar volumeTrackBar;
-        private System.Windows.Forms.StatusStrip statusStrip1;
+        private System.Windows.Forms.StatusStrip statusStrip;
         private System.Windows.Forms.DataGridView playlistGridView;
         private System.Windows.Forms.DataGridViewTextBoxColumn Column1;
         private System.Windows.Forms.BindingSource playlistBindingSource;
