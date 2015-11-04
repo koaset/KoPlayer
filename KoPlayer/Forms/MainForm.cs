@@ -64,6 +64,9 @@ namespace KoPlayer.Forms
         private int clickedPlaylistIndex;
 
         ToolStripProgressBar progressBar;
+
+        private string aboutMessage = "KoPlayer 0.9\n(C) Karl-Oskar Smed, 2015" + 
+            "\nhttps://github.com/koaset/KoPlayer\n Icons from: https://icons8.com/";
         #endregion
 
         #region Constructor & Load event
@@ -530,9 +533,7 @@ namespace KoPlayer.Forms
         private void library_ReportProgress(object sender, ReportProgressEventArgs e)
         {
             if (e.ProgressPercentage < 100)
-            {
                 this.progressBar.Value = (int)(e.ProgressPercentage);
-            }
             else if (e.ProgressPercentage == 100)
             {
                 statusStrip.Items.Clear();
@@ -633,6 +634,7 @@ namespace KoPlayer.Forms
                     songInfoLabel.Text = "";
             }
         }
+
         #endregion
 
         #region Playback control
@@ -903,7 +905,8 @@ namespace KoPlayer.Forms
         private void UpdateSongsForRatingFilterPlaylist(List<Song> songs)
         {
             //Might as well remake from scratch if no. songs exceed some number
-            if (songs.Count < 100)
+            int songRatingEditLimit = 100;
+            if (songs.Count < songRatingEditLimit)
             {
                 foreach (Song s in songs)
                     UpdateSongForRatingFilterPlaylist(s);
@@ -1196,7 +1199,7 @@ namespace KoPlayer.Forms
 
         private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("KoPlayer 0.9\n(C) Karl-Oskar Smed, 2015\nhttps://github.com/koaset/KoPlayer\n Icons from: https://icons8.com/");
+            MessageBox.Show(aboutMessage);
         }
         #endregion
 
@@ -1629,6 +1632,7 @@ namespace KoPlayer.Forms
             if (e.Button == System.Windows.Forms.MouseButtons.Right)
                 SetTrayIconContextMenu();
         }
+
         #endregion
 
         #region Right click menus
