@@ -820,7 +820,7 @@ namespace KoPlayer.Forms
             TimeSpan position = musicPlayer.Position;
 
             UpdateSearchBar(length, position);
-            UpdateCurrentTimeLabel();
+            SetCurrentTimeLabel(position);
 
             if (Math.Abs(position.Seconds - oldPosition.Seconds) < 5)
                 currentSongTimePlayed += position - oldPosition;
@@ -829,10 +829,7 @@ namespace KoPlayer.Forms
 
             if (searchBarTimer.Enabled)
                 if (musicPlayer.PlaybackState == PlaybackState.Stopped || position > length)
-                {
-                    StopPlaying();
                     PlayNextSong();
-                }
         }
         #endregion
 
@@ -1084,14 +1081,14 @@ namespace KoPlayer.Forms
             }
         }
 
-        private void UpdateCurrentTimeLabel()
+        private void SetCurrentTimeLabel(TimeSpan time)
         {
             if (currentTime_Label.InvokeRequired)
-                currentTime_Label.Invoke(new MethodInvoker(delegate { UpdateCurrentTimeLabel(); }));
+                currentTime_Label.Invoke(new MethodInvoker(delegate { SetCurrentTimeLabel(time); }));
             else
             {
                 if (!currentTime_Label.IsDisposed)
-                    currentTime_Label.Text = musicPlayer.Position.ToString(Song.LengthFormat);
+                    currentTime_Label.Text = time.ToString(Song.LengthFormat);
             }
         }
 

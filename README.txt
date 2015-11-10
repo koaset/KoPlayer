@@ -1,6 +1,6 @@
 # KoPlayer by Karl-Oskar Smed @koaset
 
-A simple mp3 player with Windows Forms GUI
+A simple music player with Windows Forms GUI
 Executable can be found in bin folder
 
 Features:
@@ -12,4 +12,4 @@ Features:
 -Popup displaying currently playing song info.
 -Drag and drop of songs and song files
 
-Uses CsCore library for mp3 playback and TagLib for reading id3 tags.
+Uses the CsCore library for playback and TagLib for reading id3 tags.
