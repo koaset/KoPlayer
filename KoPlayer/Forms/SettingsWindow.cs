@@ -40,8 +40,8 @@ namespace KoPlayer.Forms
             treeNodes.Add(CreateTreeNode("Song List"));
             treeNodes.Add(CreateTreeNode("Shuffle Queue"));
             treeNodes.Add(CreateTreeNode("Hot Keys"));
-            treeNodes[treeNodes.Count - 1].Nodes.Add(CreateTreeNode("Global")); ;
-            //treeNodes.Add(CreateTreeNode("Last.fm Scrobbler"));
+            treeNodes[treeNodes.Count - 1].Nodes.Add(CreateTreeNode("Global"));
+            treeNodes.Add(CreateTreeNode("last.fm Scrobbler"));
             settingsCategoryView.Nodes.AddRange(treeNodes.ToArray());
             settingsCategoryView.Select();
         }
@@ -90,7 +90,7 @@ namespace KoPlayer.Forms
                 case "Global":
                     SetAndAddControl(new GlobalHotkeySettingsControl(this.settings));
                     break;
-                case "Last.fm Scrobbler":
+                case "last.fm Scrobbler":
                     SetAndAddControl(new LastFMSettingsControl(this.settings));
                     break;
             }

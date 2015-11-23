@@ -74,6 +74,7 @@
     <Compile Include="Forms\SettingsControls\GeneralSettingsControl.Designer.cs">
       <DependentUpon>GeneralSettingsControl.cs</DependentUpon>
     </Compile>
+    <Compile Include="LastFMHandler.cs" />
     <Compile Include="Settings\EqualizerSettings.cs" />
     <Compile Include="Forms\EqualizerWindow.cs">
       <SubType>Form</SubType>

@@ -68,6 +68,8 @@ namespace KoPlayer.Forms
 
         ToolStripProgressBar progressBar;
 
+        private string startupRegKey = "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run";
+
         private string aboutMessage = "KoPlayer 0.9\n(C) Karl-Oskar Smed, 2015" + 
             "\nhttps://github.com/koaset/KoPlayer\n Icons from: https://icons8.com/";
         #endregion
@@ -437,8 +439,7 @@ namespace KoPlayer.Forms
 
         private void SetStartupSetting()
         {
-            RegistryKey key = Registry.CurrentUser.OpenSubKey(
-                    "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
+            RegistryKey key = Registry.CurrentUser.OpenSubKey(startupRegKey, true);
             
             if (settings.RunAtStartup)
                 key.SetValue(this.Text, Path.Combine(Path.GetDirectoryName(

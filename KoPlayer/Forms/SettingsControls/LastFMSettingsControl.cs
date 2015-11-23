@@ -21,5 +21,12 @@ namespace KoPlayer.Forms.SettingsControls
             InitializeComponent();
 
         }
+
+        private void connect_button_Click(object sender, EventArgs e)
+        {
+            string apiKey = "derp";
+            string apiSecret = "herp";
+            var handler = new LastFMHandler(apiKey, apiSecret);
+        }
     }
 }

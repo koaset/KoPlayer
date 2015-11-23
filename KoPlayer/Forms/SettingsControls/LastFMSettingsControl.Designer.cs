@@ -83,6 +83,7 @@
             this.connect_button.TabIndex = 15;
             this.connect_button.Text = "Connect";
             this.connect_button.UseVisualStyleBackColor = true;
+            this.connect_button.Click += new System.EventHandler(this.connect_button_Click);
             // 
             // username_box
             // 
