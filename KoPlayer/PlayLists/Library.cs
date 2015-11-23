@@ -23,7 +23,7 @@ namespace KoPlayer.Playlists
         public List<Dictionary<string, List<Song>>> SortDictionaries { get { return this.sortDictionaries; } }
         public SortOrder SortOrder { get { return sortOrder; } }
 
-        public const string PATH = "Library.xml";
+        public static string PATH = KoPlayer.Forms.MainForm.ApplicationPath + "\\Library.xml";
         public static string[] EXTENSIONS = {".mp3", ".m4a", ".wma", ".aac", ".flac"};
 
         private BindingList<Song> outputSongs;

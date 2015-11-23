@@ -3,25 +3,28 @@ using CSCore.SoundOut;
 using CSCore.Streams;
 using KoPlayer.Playlists;
 using KoPlayer.Forms;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Windows.Forms;
 
 namespace KoPlayer.Forms
 {
     public partial class MainForm : Form
     {
-        #region Constants
-        public const string SETTINGSPATH = @"Settings\settings.xml";
-        public const string PLAYLISTDIRECTORYPATH = @"Playlists\";
-        public const string SHUFFLEQUEUEFILEPATH = @"Playlists\Shuffle Queue.pl";
-        private const string COLUMNSETTINGSPATH = @"Settings\column_settings.xml";
-        private const string DEFAULTCOLUMNSETTINGSPATH = @"Settings\default_column_settings.xml";
-        private const string EQUALIZERPATH = @"Default.eq";
+        #region Path variables
+        public static string ApplicationPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+        public static string SettingsPath = Path.Combine(ApplicationPath, @"Settings\settings.xml");
+        public static string PlaylistDirectoryPath = Path.Combine(ApplicationPath, @"Playlists\");
+        public static string ShuffleQueuePath = Path.Combine(ApplicationPath, @"Playlists\Shuffle Queue.pl");
+        private static string ColumnSettingsPath = Path.Combine(ApplicationPath, @"Settings\column_settings.xml");
+        private static string DefaultColumnSettingsPath = Path.Combine(ApplicationPath, @"Settings\default_column_settings.xml");
+        private static string EqualizerPath = Path.Combine(ApplicationPath, @"Default.eq");
         #endregion
 
         #region Properties
@@ -80,7 +83,7 @@ namespace KoPlayer.Forms
             }
             library.LibraryChanged += library_LibraryChanged;
 
-            settings = Settings.Load(SETTINGSPATH);
+            settings = Settings.Load(SettingsPath);
             if (settings == null)
                 settings = new Settings();
 
@@ -88,11 +91,11 @@ namespace KoPlayer.Forms
             defaultAudioDevice = enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Console);
             this.musicPlayer.OpenCompleted += equalizerSettings_ShouldSet;
 
-            this.equalizerSettings = EqualizerSettings.Load(EQUALIZERPATH);
+            this.equalizerSettings = EqualizerSettings.Load(EqualizerPath);
             if (this.equalizerSettings == null)
             {
                 this.equalizerSettings = new EqualizerSettings();
-                this.equalizerSettings.Save(EQUALIZERPATH);
+                this.equalizerSettings.Save(EqualizerPath);
             }
             this.equalizerSettings.ValueChanged += equalizerSettings_ShouldSet;
 
@@ -121,9 +124,9 @@ namespace KoPlayer.Forms
             songGridView.AutoGenerateColumns = false;
             songGridView.Columns["Length"].DefaultCellStyle.Format = Song.LengthFormat;
 
-            columnSettings = ColumnSettings.Load(COLUMNSETTINGSPATH);
+            columnSettings = ColumnSettings.Load(ColumnSettingsPath);
             if (columnSettings == null)
-                columnSettings = ColumnSettings.Load(DEFAULTCOLUMNSETTINGSPATH);
+                columnSettings = ColumnSettings.Load(DefaultColumnSettingsPath);
             if (columnSettings == null)
                 columnSettings = new ColumnSettings(songGridView.Columns);
 
@@ -203,10 +206,10 @@ namespace KoPlayer.Forms
             playlists = new List<IPlaylist>();
             playlists.Add(library);
 
-            if (!Directory.Exists(PLAYLISTDIRECTORYPATH))
-                Directory.CreateDirectory(PLAYLISTDIRECTORYPATH);
+            if (!Directory.Exists(PlaylistDirectoryPath))
+                Directory.CreateDirectory(PlaylistDirectoryPath);
 
-            shuffleQueue = Playlist.Load(SHUFFLEQUEUEFILEPATH, library);
+            shuffleQueue = Playlist.Load(ShuffleQueuePath, library);
             if (shuffleQueue == null)
             {
                 shuffleQueue = new Playlist(library, "Shuffle Queue");
@@ -214,16 +217,16 @@ namespace KoPlayer.Forms
             }
             playlists.Add(shuffleQueue);
 
-            string[] playlistFiles = Directory.GetFiles(PLAYLISTDIRECTORYPATH, "*.pl", SearchOption.AllDirectories);
+            string[] playlistFiles = Directory.GetFiles(PlaylistDirectoryPath, "*.pl", SearchOption.AllDirectories);
             foreach (string playlistPath in playlistFiles)
-                if (playlistPath != SHUFFLEQUEUEFILEPATH)
+                if (playlistPath != ShuffleQueuePath)
                 {
                     Playlist pl = Playlist.Load(playlistPath, library);
                     if (pl != null)
                         playlists.Add(pl);
                 }
 
-            playlistFiles = Directory.GetFiles(PLAYLISTDIRECTORYPATH, "*.fpl", SearchOption.AllDirectories);
+            playlistFiles = Directory.GetFiles(PlaylistDirectoryPath, "*.fpl", SearchOption.AllDirectories);
             foreach (string playlistPath in playlistFiles)
             {
                 RatingFilterPlaylist pl = RatingFilterPlaylist.Load(playlistPath, library);
@@ -405,12 +408,12 @@ namespace KoPlayer.Forms
             hook.Dispose();
             SettingsWindow settingsWindow = new SettingsWindow(this, this.playlists);
             settingsWindow.StartPosition = FormStartPosition.CenterParent;
-            this.settings.Save(SETTINGSPATH);
+            this.settings.Save(SettingsPath);
             
             if (settingsWindow.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                 SetSettings();
             else
-                this.settings = Settings.Load(SETTINGSPATH);
+                this.settings = Settings.Load(SettingsPath);
             SetUpGlobalHotkeys();
         }
 
@@ -427,7 +430,22 @@ namespace KoPlayer.Forms
             RefreshSongGridView();
             songGridView.Focus();
 
-            settings.Save(SETTINGSPATH);
+            SetStartupSetting();
+
+            settings.Save(SettingsPath);
+        }
+
+        private void SetStartupSetting()
+        {
+            RegistryKey key = Registry.CurrentUser.OpenSubKey(
+                    "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
+            
+            if (settings.RunAtStartup)
+                key.SetValue(this.Text, Path.Combine(Path.GetDirectoryName(
+                    System.Reflection.Assembly.GetExecutingAssembly().Location), "KoPlayer.exe"));
+            else
+                if (key.GetValue(this.Text) != null)
+                    key.DeleteValue(this.Text);
         }
         #endregion
 
@@ -442,10 +460,10 @@ namespace KoPlayer.Forms
             settings.FormWidth = this.Width;
             settings.FormHeight = this.Height;
             settings.StartupPlaylist = showingPlaylist.Name;
-            settings.Save(SETTINGSPATH);
+            settings.Save(SettingsPath);
 
             columnSettings = new ColumnSettings(songGridView.Columns);
-            columnSettings.Save(COLUMNSETTINGSPATH);
+            columnSettings.Save(ColumnSettingsPath);
 
             foreach (IPlaylist pl in playlists)
                 pl.Save();
@@ -677,13 +695,17 @@ namespace KoPlayer.Forms
                 if (inPlaylist == shuffleQueue)
                     PopulateShuffleQueue();
 
-                //Saves changed from tag editing when song is not playing any more
+                // Saves changed from tag editing when song is not playing any more
                 if (songToSave != null)
                     if (songToSave.Path != currentlyPlaying.Path)
                     {
                         songToSave.SaveTags();
                         songToSave = null;
                     }
+
+                // Show song popup according to settings
+                if (settings.PopupOnSongChange)
+                    SongInfoPopup.ShowPopup(song, songInfoPopupTime);
             }
         }
 
@@ -1620,7 +1642,8 @@ namespace KoPlayer.Forms
             if (this.WindowState == FormWindowState.Minimized)
             {
                 trayIcon.Visible = true;
-                this.Hide();
+                if (settings.MinimizeToTray)
+                    this.Hide();
             }
         }
 

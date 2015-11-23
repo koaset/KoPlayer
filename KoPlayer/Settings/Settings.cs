@@ -69,6 +69,10 @@ namespace KoPlayer
         public string[] GlobalHotkeyNames = { "Increase volume", "Decrease volume", "Play / Pause",
                                             "Show song info popup", "Play previous song", "Play next song"};
 
+        public bool RunAtStartup = false;
+        public bool MinimizeToTray = true;
+        public bool PopupOnSongChange = false;
+
         public Settings()
         {
 

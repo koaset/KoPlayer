@@ -68,6 +68,12 @@
     <Compile Include="Forms\MultiSongPropertiesWindow.Designer.cs">
       <DependentUpon>MultiSongPropertiesWindow.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\SettingsControls\GeneralSettingsControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Forms\SettingsControls\GeneralSettingsControl.Designer.cs">
+      <DependentUpon>GeneralSettingsControl.cs</DependentUpon>
+    </Compile>
     <Compile Include="Settings\EqualizerSettings.cs" />
     <Compile Include="Forms\EqualizerWindow.cs">
       <SubType>Form</SubType>
@@ -170,6 +176,9 @@
     <EmbeddedResource Include="Forms\MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Forms\SettingsControls\GeneralSettingsControl.resx">
+      <DependentUpon>GeneralSettingsControl.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\SettingsControls\LastFMSettingsControl.resx">
       <DependentUpon>LastFMSettingsControl.cs</DependentUpon>
     </EmbeddedResource>
@@ -205,7 +214,6 @@
       <DesignTime>True</DesignTime>
     </Compile>
     <None Include="packages.config" />
-    <None Include="Properties\DataSources\KoPlayer.LibraryFiles.PlayList.datasource" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -226,6 +234,9 @@
     <Content Include="Settings\default_column_settings.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Properties\DataSources\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

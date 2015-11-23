@@ -36,6 +36,7 @@ namespace KoPlayer.Forms
         private void CreateTreeViewNodes()
         {
             List<TreeNode> treeNodes = new List<TreeNode>();
+            treeNodes.Add(CreateTreeNode("General"));
             treeNodes.Add(CreateTreeNode("Song List"));
             treeNodes.Add(CreateTreeNode("Shuffle Queue"));
             treeNodes.Add(CreateTreeNode("Hot Keys"));
@@ -52,7 +53,6 @@ namespace KoPlayer.Forms
 
         private void save_Button_Click(object sender, EventArgs e)
         {
-            //callingForm.Settings = tempSettings;
             this.DialogResult = System.Windows.Forms.DialogResult.OK;
             this.Close();
         }
@@ -75,6 +75,9 @@ namespace KoPlayer.Forms
 
             switch (e.Node.Text)
             {
+                case "General":
+                    SetAndAddControl(new GeneralSettingsControl(this.settings));
+                    break;
                 case "Song List":
                     SetAndAddControl(new SongListSettingsControl(this.settings));
                     break;
