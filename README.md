@@ -13,3 +13,5 @@ Features:
 -Drag and drop of songs and song files
 
 Uses the CsCore library for playback and TagLib for reading id3 tags.
+
+![alt tag](https://github.com/koaset/KoPlayer/blob/master/screenshot1.png)
