@@ -1,94 +1,166 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using Lpfm.LastFmScrobbler;
-using Lpfm.LastFmScrobbler.Api;
+﻿using IF.Lastfm.Core.Api;
+using IF.Lastfm.Core.Objects;
+using IF.Lastfm.Core.Scrobblers;
+using KoPlayer.Playlists;
 using Microsoft.Win32;
+using System;
+using System.IO;
+
 
 namespace KoPlayer
 {
-    class LastFMHandler
+    public class LastfmHandler
     {
-        private const string LpfmRegistryNameSpace = "HKEY_CURRENT_USER\\Software\\LastFmScrobbler.KoPlayer";
-        private string apiKey;
-        private string apiSecret;
+        private const string sessionRegistryPath = "Software\\KoPlayer";
+        private const string apiKey = "4eedd270b2824403af15f9a81407f7ce";
+        private const string apiSecret = "963517814b9653e6c9eaeab075f0d336";
 
-        private readonly QueuingScrobbler scrobbler;
+        public event EventHandler StatusChanged;
 
-        public LastFMHandler(string apiKey, string apiSecret)
+        public string Status { get; set; }
+        public bool Enabled { get; set; }
+
+        public string SessionUserName 
         {
-            this.apiKey = apiKey;
-            this.apiSecret = apiSecret;
-
-            string sessionKey = GetSessionKey(apiKey, apiSecret);
-
-            if (String.IsNullOrEmpty(sessionKey))
+            get 
             {
-                throw new Exception("Invalid session key");
+                if (currentSession != null)
+                    return currentSession.Username;
+                else
+                    return "";
+            }
+        }
+
+        private IScrobbler scrobbler;
+        private LastfmClient client;
+        private LastUserSession currentSession;
+
+        public LastfmHandler()
+        {
+            client = new LastfmClient(apiKey, apiSecret);
+
+            currentSession = LoadSession();
+
+            Initialize();
+        }
+
+        public void Initialize()
+        {
+            Enabled = false;
+            Status = "Not Connected";
+        }
+
+        public void TryResumeSession()
+        {
+            Enabled = true;
+
+            if (currentSession != null)
+            {
+                ChangeStatus("Resuming");
+
+                client.Auth.LoadSession(currentSession);
+
+                ChangeStatus("Not Connected");
+                if (client.Auth.UserSession != null)
+                {
+                    scrobbler = new Scrobbler(client.Auth, client.HttpClient);
+
+                    if (client.Auth.Authenticated)
+                        ChangeStatus("Connected");
+                }
+            }
+        }
+
+        public async void TryLoginAsync(string userName, string password)
+        {
+            Enabled = true;
+
+            ChangeStatus("Connecting");
+            var response = await client.Auth.GetSessionTokenAsync(userName, password);
+            scrobbler = new Scrobbler(client.Auth, client.HttpClient);
+
+            if (response.Success)
+            {
+                ChangeStatus("Connected");
+                currentSession = client.Auth.UserSession;
+                SaveSession(currentSession);
             }
             else
-                scrobbler = new QueuingScrobbler(apiKey, apiSecret, sessionKey);
+                ChangeStatus("Not connected");
         }
 
-        private static string GetSessionKey(string apiKey, string apiSecret)
+        public async void ScrobbleSong(Song song)
         {
-            const string sessionKeyRegistryKeyName = "LastFmSessionKey";
-
-            // try get the session key from the registry
-            string sessionKey = GetRegistrySetting(sessionKeyRegistryKeyName, null);
-
-            // if no key found, try getting it online
-            if (string.IsNullOrEmpty(sessionKey))
-            {
-                // instantiate a new scrobbler
-                var scrobbler = new Scrobbler(apiKey, apiSecret);
-
-                try
-                {
-                    sessionKey = scrobbler.GetSession();
-                    SetRegistrySetting(sessionKeyRegistryKeyName, sessionKey);
-                }
-                catch (LastFmApiException exception)
-                {
-                    MessageBox.Show(exception.Message);
-                    // get a url to authenticate this application
-                    string url = scrobbler.GetAuthorisationUri();
-                    // open the URL in the default browser
-                    Process.Start(url);
-                }
-            }
-
-            return sessionKey;
+            var scrobble = new Scrobble(song.Artist, song.Album, song.Title, song.LastPlayed);
+            var response = await scrobbler.ScrobbleAsync(scrobble);
         }
 
-        public static string GetRegistrySetting(string valueName, string defaultValue)
+        private void ChangeStatus(string newStatus)
         {
-            if (string.IsNullOrEmpty(valueName)) throw new ArgumentException("valueName cannot be empty or null", "valueName");
-            valueName = valueName.Trim();
+            Status = newStatus;
+            if (StatusChanged != null)
+                StatusChanged(this, new EventArgs());
+        }
 
-            object regValue = Registry.GetValue(LpfmRegistryNameSpace, valueName, defaultValue);
-
-            if (regValue == null)
+        private void SaveSession(LastUserSession session)
+        {
+            /*using (var sw = new StreamWriter(sessionPath))
             {
-                // Key does not exist
-                return defaultValue;
-            }
+                sw.WriteLine(session.Username);
+                sw.WriteLine(session.Token);
+            }*/
+
+            var key = Registry.CurrentUser.OpenSubKey(sessionRegistryPath, true);
+            if (key == null)
+                key = Registry.CurrentUser.CreateSubKey(sessionRegistryPath);
+            key.Close();
+
+            var usernameKey = Registry.CurrentUser.OpenSubKey(sessionRegistryPath, true);
+            usernameKey.SetValue("username", session.Username);
+            usernameKey.Close();
+
+            var tokenKey = Registry.CurrentUser.OpenSubKey(sessionRegistryPath, true);
+            tokenKey.SetValue("token", session.Token);
+            tokenKey.Close();
+
+            /*
+             RegistryKey key = Registry.CurrentUser.OpenSubKey(startupRegKey, true);
+            
+            if (settings.RunAtStartup)
+                key.SetValue(this.Text, Path.Combine(Path.GetDirectoryName(
+                    System.Reflection.Assembly.GetExecutingAssembly().Location), "KoPlayer.exe"));
+            else
+                if (key.GetValue(this.Text) != null)
+                    key.DeleteValue(this.Text);*/
+        }
+
+        private LastUserSession LoadSession()
+        {
+            var ret = new LastUserSession();
+
+            var usernameKey = Registry.CurrentUser.OpenSubKey(sessionRegistryPath);
+            if (usernameKey == null)
+                return null;
             else
             {
-                return regValue.ToString();
+                ret.Username = usernameKey.GetValue("username").ToString();
+                usernameKey.Close();
             }
-        }
 
-        public static void SetRegistrySetting(string valueName, string value)
-        {
-            if (string.IsNullOrEmpty(valueName)) throw new ArgumentException("valueName cannot be empty or null", "valueName");
-            valueName = valueName.Trim();
+            var tokenKey = Registry.CurrentUser.OpenSubKey(sessionRegistryPath);
+            if (tokenKey == null)
+                return null;
+            else
+            {
+                ret.Token = tokenKey.GetValue("token").ToString();
+                tokenKey.Close();
+            }
 
-            Registry.SetValue(LpfmRegistryNameSpace, valueName, value);
+            if (String.IsNullOrEmpty(ret.Username) ||
+                String.IsNullOrEmpty(ret.Token))
+                return null;
+
+            return ret;
         }
     }
 }

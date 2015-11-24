@@ -49,6 +49,7 @@
   <RunAtStartup>false</RunAtStartup>
   <MinimizeToTray>true</MinimizeToTray>
   <PopupOnSongChange>false</PopupOnSongChange>
+  <ScrobblingEnabled>false</ScrobblingEnabled>
   <RowHeight>17</RowHeight>
   <FontName>Microsoft Sans Serif</FontName>
   <FontSize>8</FontSize>

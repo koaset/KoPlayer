@@ -91,7 +91,7 @@ namespace KoPlayer.Forms
                     SetAndAddControl(new GlobalHotkeySettingsControl(this.settings));
                     break;
                 case "last.fm Scrobbler":
-                    SetAndAddControl(new LastFMSettingsControl(this.settings));
+                    SetAndAddControl(new LastFMSettingsControl(this.settings, callingForm.LastFMHandler));
                     break;
             }
             

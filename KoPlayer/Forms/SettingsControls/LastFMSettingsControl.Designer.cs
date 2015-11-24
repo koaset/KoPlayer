@@ -74,6 +74,7 @@
             this.enable_checkbox.TabIndex = 14;
             this.enable_checkbox.Text = "Enable";
             this.enable_checkbox.UseVisualStyleBackColor = true;
+            this.enable_checkbox.CheckedChanged += new System.EventHandler(this.enable_checkbox_CheckedChanged);
             // 
             // connect_button
             // 
@@ -96,7 +97,7 @@
             // 
             this.password_box.Location = new System.Drawing.Point(42, 119);
             this.password_box.Name = "password_box";
-            this.password_box.PasswordChar = '*';
+            this.password_box.PasswordChar = '●';
             this.password_box.Size = new System.Drawing.Size(112, 20);
             this.password_box.TabIndex = 17;
             // 

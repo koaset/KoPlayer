@@ -30,6 +30,7 @@ namespace KoPlayer.Forms
         #region Properties
         public Settings Settings { get { return settings; } set { settings = value; } }
         public Song CurrentlyPlaying { get { return this.currentlyPlaying; } }
+        public LastfmHandler LastFMHandler { get { return lfmHandler; } }
         #endregion
 
         #region Fields
@@ -70,6 +71,8 @@ namespace KoPlayer.Forms
 
         private string startupRegKey = "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run";
 
+        private LastfmHandler lfmHandler;
+
         private string aboutMessage = "KoPlayer 0.9\n(C) Karl-Oskar Smed, 2015" + 
             "\nhttps://github.com/koaset/KoPlayer\n Icons from: https://icons8.com/";
         #endregion
@@ -102,6 +105,10 @@ namespace KoPlayer.Forms
             this.equalizerSettings.ValueChanged += equalizerSettings_ShouldSet;
 
             SetUpGlobalHotkeys();
+
+            lfmHandler = new LastfmHandler();
+            if (settings.ScrobblingEnabled)
+                lfmHandler.TryResumeSession();
 
             InitializeComponent();
         }
@@ -447,6 +454,7 @@ namespace KoPlayer.Forms
             else
                 if (key.GetValue(this.Text) != null)
                     key.DeleteValue(this.Text);
+            key.Close();
         }
         #endregion
 
@@ -665,7 +673,9 @@ namespace KoPlayer.Forms
                 this.currentlyPlaying.LastPlayed = DateTime.Now;
                 this.currentlyPlaying.PlayCount++;
 
-                //SCROBBLE HERE IF ENABLED
+                if (settings.ScrobblingEnabled)
+                    if (currentlyPlaying.Length.TotalSeconds > 30)
+                        lfmHandler.ScrobbleSong(currentlyPlaying);
 
                 RefreshSongGridView();
             }

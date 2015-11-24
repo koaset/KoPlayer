@@ -10,8 +10,11 @@ Features:
 -Songs can be rated and automatically filtered into a special playlist by rating.  
 -Configurable global hotkeys.  
 -Popup displaying currently playing song info.  
--Drag and drop of songs and song files  
+-Dragging and dropping of songs and song files  
+-Scrobbling to last.fm  
 
-Uses the CsCore library for playback and TagLib for reading id3 tags.  
+Libaries used: CSCore, TagLib# and Inflatable.Lastfm  
+
+Screenshot:  
 
 ![alt tag](https://github.com/koaset/KoPlayer/blob/master/screenshot1.png)

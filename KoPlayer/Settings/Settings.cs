@@ -73,6 +73,8 @@ namespace KoPlayer
         public bool MinimizeToTray = true;
         public bool PopupOnSongChange = false;
 
+        public bool ScrobblingEnabled = false;
+
         public Settings()
         {
 
