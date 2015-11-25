@@ -878,9 +878,11 @@ namespace KoPlayer.Forms
                         PlaySong(songGridView.SelectedRows[0].DataBoundItem as Song, showingPlaylist);
                 }
                 else if (e.KeyCode == Keys.Delete)
-                {
                     DeleteSongs(songGridView.SelectedRows);
-                }
+                else if (e.KeyCode == Keys.Right)
+                    PlayNextSong();
+                else if (e.KeyCode == Keys.Left)
+                    PlayPreviousSong();
             }
         }
 
