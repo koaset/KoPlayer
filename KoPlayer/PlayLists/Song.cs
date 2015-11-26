@@ -244,6 +244,54 @@ namespace KoPlayer.Playlists
             DiscNumber = (int)track.Tag.Disc;
 
             Length = track.Properties.Duration;
+
+            track = null;
+        }
+
+        public System.Drawing.Image ReloadAndGetImage()
+        {
+            TagLib.File track = null;
+            try
+            {
+                track = TagLib.File.Create(this.Path);
+            }
+            catch
+            {
+                throw new SongReloadException();
+            }
+
+            Title = track.Tag.Title;
+            if (Title == null)
+                Title = "";
+            if (Title == "")
+                Title = System.IO.Path.GetFileNameWithoutExtension(this.Path);
+
+
+            if (Artist != null && track.Tag.Performers.Length > 0)
+                Artist = track.Tag.Performers[0];
+            else
+                Artist = "";
+
+            Album = track.Tag.Album;
+            if (Album == null)
+                Album = "";
+
+            Genre = track.Tag.FirstGenre;
+            if (Genre == null)
+                Genre = "";
+
+            TrackNumber = (int)track.Tag.Track;
+            DiscNumber = (int)track.Tag.Disc;
+
+            Length = track.Properties.Duration;
+
+            if (track.Tag.Pictures.Length > 0)
+            {
+                MemoryStream ms = new MemoryStream(track.Tag.Pictures[0].Data.Data);
+                return System.Drawing.Image.FromStream(ms);
+            }
+            return null;
+
         }
 
         public int CompareTo(object obj)
@@ -280,7 +328,7 @@ namespace KoPlayer.Playlists
             return ret;
         }
 
-        public static System.Drawing.Image GetImage(Song song)
+        private static System.Drawing.Image GetImage(Song song)
         {
             TagLib.File tagFile = TagLib.File.Create(song.Path);
             if (tagFile.Tag.Pictures.Length > 0)

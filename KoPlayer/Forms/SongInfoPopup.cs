@@ -20,7 +20,7 @@ namespace KoPlayer.Forms
         /// </summary>
         /// <param name="song"></param>
         /// <param name="interval"></param>
-        private SongInfoPopup(Song song, int interval)
+        private SongInfoPopup(Song song, Image albumArt, int interval)
         {
             InitializeComponent();
 
@@ -33,7 +33,7 @@ namespace KoPlayer.Forms
             album_label.Text = song.Album;
             length_label.Text = song.LengthString;
             rating_label.Text = song.RatingString;
-            pictureBox1.Image = Song.GetImage(song);
+            pictureBox1.Image = albumArt;
 
             this.Show();
 
@@ -65,9 +65,9 @@ namespace KoPlayer.Forms
         /// </summary>
         /// <param name="s"></param>
         /// <param name="time"></param>
-        public static void ShowPopup(Song s, int time)
+        public static void ShowPopup(Song s, Image albumArt, int time)
         {
-            SongInfoPopup popup = new SongInfoPopup(s, time);
+            SongInfoPopup popup = new SongInfoPopup(s, albumArt, time);
         }
     }
 }

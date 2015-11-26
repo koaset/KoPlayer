@@ -57,6 +57,7 @@ namespace KoPlayer.Forms
         private TimeSpan oldPosition;
         private TimeSpan currentSongTimePlayed;
         private Song songToSave;
+        private Image currentAlbumArt;
 
         private string searchBoxDefault = "Search Library";
         private System.Timers.Timer searchLibraryTimer;
@@ -643,7 +644,7 @@ namespace KoPlayer.Forms
 
         private void UpdateSongImage()
         {
-            albumArtBox.Image = Song.GetImage(currentlyPlaying);
+            albumArtBox.Image = currentAlbumArt;
         }
 
         private void UpdateSongInfoLabel()
@@ -716,7 +717,7 @@ namespace KoPlayer.Forms
 
                 // Show song popup according to settings
                 if (settings.PopupOnSongChange)
-                    SongInfoPopup.ShowPopup(song, songInfoPopupTime);
+                    ShowCurrentSongPopup();
             }
         }
 
@@ -729,7 +730,7 @@ namespace KoPlayer.Forms
         {
             try
             {
-                song.Reload();
+                this.currentAlbumArt = song.ReloadAndGetImage();
             }
             catch (SongReloadException ex)
             {
@@ -879,22 +880,28 @@ namespace KoPlayer.Forms
                 }
                 else if (e.KeyCode == Keys.Delete)
                     DeleteSongs(songGridView.SelectedRows);
-                else if (e.KeyCode == Keys.Right)
-                    PlayNextSong();
-                else if (e.KeyCode == Keys.Left)
-                    PlayPreviousSong();
             }
         }
 
         private void MainForm_KeyDown(object sender, KeyEventArgs e)
         {
             if (musicPlayer.PlaybackState == PlaybackState.Playing)
+            {
                 if (e.Control)
                     if (settings.RatingHotkeys.Contains(e.KeyCode))
                     {
                         RateSong(currentlyPlaying, Array.IndexOf(settings.RatingHotkeys, e.KeyCode));
                         RefreshSongGridView();
                     }
+
+                if (!searchBox.Focused && !volumeTrackBar.Focused)
+                {
+                    if (e.KeyCode == Keys.Right)
+                        PlayNextSong();
+                    else if (e.KeyCode == Keys.Left)
+                        PlayPreviousSong();
+                }
+            }
         }
 
         private void RateSongs(DataGridViewSelectedRowCollection rows, int rating)
@@ -1098,7 +1105,7 @@ namespace KoPlayer.Forms
         private void ShowCurrentSongPopup()
         {
             if (currentlyPlaying != null)
-                SongInfoPopup.ShowPopup(currentlyPlaying, songInfoPopupTime);
+                SongInfoPopup.ShowPopup(currentlyPlaying, currentAlbumArt, songInfoPopupTime);
         }
         #endregion
         #endregion
