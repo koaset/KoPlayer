@@ -92,8 +92,6 @@ namespace KoPlayer.Forms
 
         private void SaveSong(Song song)
         {
-            song.Rating = (int)this.rating_numupdownstring.Value;
-
             if (this.saveProperties["Title"])
                 song.Title = this.title_box.Text;
             if (this.saveProperties["Artist"])

@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml.Serialization;
 using System.IO;
+using System.Drawing;
+using System.Drawing.Drawing2D;
 
 namespace KoPlayer.Playlists
 {
@@ -247,7 +249,7 @@ namespace KoPlayer.Playlists
         /// <returns></returns>
         public System.Drawing.Image ReloadAndGetImage()
         {
-            System.Drawing.Image image = null;
+            Image image = null;
             try
             {
                 using (var track = TagLib.File.Create(Path))
@@ -264,14 +266,18 @@ namespace KoPlayer.Playlists
             return image;
         }
 
-        private System.Drawing.Image GetImage(TagLib.File track)
+        private Image GetImage(TagLib.File track)
         {
+            System.Drawing.Image image = null;
             if (track.Tag.Pictures.Length > 0)
             {
                 MemoryStream ms = new MemoryStream(track.Tag.Pictures[0].Data.Data);
-                return System.Drawing.Image.FromStream(ms);
+
+                image = Image.FromStream(ms);
+                
+                ms.Dispose();
             }
-            return null;
+            return image;
         }
 
         /// <summary>

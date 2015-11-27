@@ -51,6 +51,7 @@ namespace KoPlayer.Forms
         private EqualizerSettings equalizerSettings;
 
         private Song currentlyPlaying;
+        private int currentlyPlayingIndex;
         private System.Timers.Timer searchBarTimer;
         private int searchBarTimerInterval = 100;
         private bool stopSearchBarUpdate = false;
