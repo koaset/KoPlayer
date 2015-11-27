@@ -711,7 +711,7 @@ namespace KoPlayer.Forms
                 if (songToSave != null)
                     if (songToSave.Path != currentlyPlaying.Path)
                     {
-                        songToSave.SaveTags();
+                        songToSave.Save();
                         songToSave = null;
                     }
 
@@ -732,15 +732,15 @@ namespace KoPlayer.Forms
             {
                 this.currentAlbumArt = song.ReloadAndGetImage();
             }
-            catch (SongReloadException ex)
+            catch (SongReadException ex)
             {
-                OnSongReloadException(ex, song);
+                OnSongReadException(ex, song);
                 return false;
             }
             return true;
         }
 
-        private void OnSongReloadException(SongReloadException ex, Song song)
+        private void OnSongReadException(SongReadException ex, Song song)
         {
             MessageBox.Show(ex.ToString() + "\nSong will be removed from the library.");
             library.Remove(song);
@@ -1905,11 +1905,11 @@ namespace KoPlayer.Forms
             {
                 try
                 {
-                    s.Reload();
+                    s.ReloadTags();
                 }
-                catch (SongReloadException ex)
+                catch (SongReadException ex)
                 {
-                    OnSongReloadException(ex, s);
+                    OnSongReadException(ex, s);
                     exists = false;
                 }
             }

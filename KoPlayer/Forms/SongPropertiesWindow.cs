@@ -98,7 +98,7 @@ namespace KoPlayer.Forms
             this.song.Rating = (int)this.rating_numupdownstring.Value;
             
             if (this.song != this.mainForm.CurrentlyPlaying)
-                this.song.SaveTags();
+                this.song.Save();
             else
                 OnSavePlayingSong(this.song);
 

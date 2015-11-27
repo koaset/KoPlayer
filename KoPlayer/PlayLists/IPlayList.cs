@@ -39,18 +39,5 @@ namespace KoPlayer.Playlists
             : base(message)
         { }
     }
-
-    public class SongReloadException : Exception
-    {
-        string message;
-        public SongReloadException()
-            : base()
-        { this.message = "Song load failed: File not found"; }
-
-        public override string ToString()
-        {
-            return this.message;
-        }
-    }
 }
 

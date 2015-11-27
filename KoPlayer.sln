@@ -13,6 +13,7 @@ Global
 		{67052809-1860-4109-A131-629F079C7115}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{67052809-1860-4109-A131-629F079C7115}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{67052809-1860-4109-A131-629F079C7115}.Release|Any CPU.Build.0 = Release|Any CPU
+		{67052809-1860-4109-A131-629F079C7115}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

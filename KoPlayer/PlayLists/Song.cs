@@ -66,7 +66,7 @@ namespace KoPlayer.Playlists
         public DateTime LastPlayed { get; set; }
         #endregion
 
-        public Song()
+        private Song()
         {
             Path = "empty";
             Title = "";
@@ -81,6 +81,10 @@ namespace KoPlayer.Playlists
             DateAdded = DateTime.Now;
         }
 
+        /// <summary>
+        /// Creates new object with tags read from file
+        /// </summary>
+        /// <param name="path"></param>
         public Song(string path) : this()
         {
             this.Path = path;
@@ -132,32 +136,14 @@ namespace KoPlayer.Playlists
         {
             try
             {
-                TagLib.File track = TagLib.File.Create(path);
+                using (var track = TagLib.File.Create(path))
+                {
+                    ReadTags(track);
+                }
 
-                Title = track.Tag.Title;
-                if (Title == null)
-                    Title = "";
-                if (Title == "")
-                    Title = System.IO.Path.GetFileNameWithoutExtension(this.Path);
-
-                if (Artist != null && track.Tag.Performers.Length > 0)
-                    Artist = track.Tag.Performers[0];
-                else
-                    Artist = "";
-
-                Album = track.Tag.Album;
-                if (Album == null)
-                    Album = "";
-
-                Genre = track.Tag.FirstGenre;
-                if (Genre == null)
-                    Genre = "";
-
-                TrackNumber = (int)track.Tag.Track;
-                DiscNumber = (int)track.Tag.Disc;
+                // Init props not found in tag
                 Rating = 0;
                 PlayCount = 0;
-                Length = track.Properties.Duration;
                 DateAdded = DateTime.Now;
             }
             catch
@@ -167,7 +153,36 @@ namespace KoPlayer.Playlists
             return true;
         }
 
-        public void SaveTags()
+        private void ReadTags(TagLib.File track)
+        {
+            Title = track.Tag.Title;
+            
+            // Set title to path if it is nothing
+            if (string.IsNullOrEmpty(Title))
+                Title = System.IO.Path.GetFileNameWithoutExtension(this.Path);
+
+            if (Artist != null && track.Tag.Performers.Length > 0)
+                Artist = track.Tag.Performers[0];
+            else
+                Artist = "";
+
+            Album = track.Tag.Album;
+            if (Album == null)
+                Album = "";
+
+            Genre = track.Tag.FirstGenre;
+            if (Genre == null)
+                Genre = "";
+
+            TrackNumber = (int)track.Tag.Track;
+            DiscNumber = (int)track.Tag.Disc;
+            Length = track.Properties.Duration;
+        }
+
+        /// <summary>
+        /// Saves ID3 tags to file
+        /// </summary>
+        public void Save()
         {
             using (TagLib.File track = TagLib.File.Create(Path))
             {
@@ -208,92 +223,62 @@ namespace KoPlayer.Playlists
             }
         }
 
-        public void Reload()
+        /// <summary>
+        /// Reloads ID3 tags from song file
+        /// </summary>
+        public void ReloadTags()
         {
-            TagLib.File track = null;
             try
             {
-                track = TagLib.File.Create(this.Path);
+                using (var track = TagLib.File.Create(Path))
+                {
+                    ReadTags(track);
+                }
             }
             catch
             {
                 throw new SongReloadException();
             }
-
-            Title = track.Tag.Title;
-            if (Title == null)
-                Title = "";
-            if (Title == "")
-                Title = System.IO.Path.GetFileNameWithoutExtension(this.Path);
-            
-
-            if (Artist != null && track.Tag.Performers.Length > 0)
-                Artist = track.Tag.Performers[0];
-            else
-                Artist = "";
-
-            Album = track.Tag.Album;
-            if (Album == null)
-                Album = "";
-
-            Genre = track.Tag.FirstGenre;
-            if (Genre == null)
-                Genre = "";
-
-            TrackNumber = (int)track.Tag.Track;
-            DiscNumber = (int)track.Tag.Disc;
-
-            Length = track.Properties.Duration;
-
-            track = null;
         }
 
+        /// <summary>
+        /// Reloads tags and returns album art if avaliable, else returns null
+        /// </summary>
+        /// <returns></returns>
         public System.Drawing.Image ReloadAndGetImage()
         {
-            TagLib.File track = null;
+            System.Drawing.Image image = null;
             try
             {
-                track = TagLib.File.Create(this.Path);
+                using (var track = TagLib.File.Create(Path))
+                {
+                    ReadTags(track);
+                    image = GetImage(track);
+                }
             }
             catch
             {
                 throw new SongReloadException();
             }
 
-            Title = track.Tag.Title;
-            if (Title == null)
-                Title = "";
-            if (Title == "")
-                Title = System.IO.Path.GetFileNameWithoutExtension(this.Path);
+            return image;
+        }
 
-
-            if (Artist != null && track.Tag.Performers.Length > 0)
-                Artist = track.Tag.Performers[0];
-            else
-                Artist = "";
-
-            Album = track.Tag.Album;
-            if (Album == null)
-                Album = "";
-
-            Genre = track.Tag.FirstGenre;
-            if (Genre == null)
-                Genre = "";
-
-            TrackNumber = (int)track.Tag.Track;
-            DiscNumber = (int)track.Tag.Disc;
-
-            Length = track.Properties.Duration;
-
+        private System.Drawing.Image GetImage(TagLib.File track)
+        {
             if (track.Tag.Pictures.Length > 0)
             {
                 MemoryStream ms = new MemoryStream(track.Tag.Pictures[0].Data.Data);
                 return System.Drawing.Image.FromStream(ms);
             }
             return null;
-
         }
 
+        /// <summary>
+        /// Sortorder according to disc and track numbers
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
         public int CompareTo(object obj)
         {
             if (obj == null) return 1;
@@ -327,17 +312,6 @@ namespace KoPlayer.Playlists
                     ret += "★";
             return ret;
         }
-
-        private static System.Drawing.Image GetImage(Song song)
-        {
-            TagLib.File tagFile = TagLib.File.Create(song.Path);
-            if (tagFile.Tag.Pictures.Length > 0)
-            {
-                MemoryStream ms = new MemoryStream(tagFile.Tag.Pictures[0].Data.Data);
-                return System.Drawing.Image.FromStream(ms);
-            }
-            return null;
-        }
     }
 
     public class SongReadException : Exception
@@ -347,6 +321,19 @@ namespace KoPlayer.Playlists
         public SongReadException()
         {
             this.Message = "Could not read song tags";
+        }
+    }
+
+    public class SongReloadException : Exception
+    {
+        string message;
+        public SongReloadException()
+            : base()
+        { this.message = "Song load failed: File not found"; }
+
+        public override string ToString()
+        {
+            return this.message;
         }
     }
 }
