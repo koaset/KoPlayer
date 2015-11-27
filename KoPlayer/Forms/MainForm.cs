@@ -645,7 +645,10 @@ namespace KoPlayer.Forms
 
         private void UpdateSongImage()
         {
-            albumArtBox.Image = currentAlbumArt;
+            if (albumArtBox.InvokeRequired)
+                albumArtBox.Invoke(new MethodInvoker(delegate { UpdateSongImage(); }));
+            else
+                albumArtBox.Image = currentAlbumArt;
         }
 
         private void UpdateSongInfoLabel()

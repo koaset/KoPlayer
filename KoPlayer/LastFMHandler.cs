@@ -5,6 +5,8 @@ using KoPlayer.Playlists;
 using Microsoft.Win32;
 using System;
 using System.IO;
+using System.Collections.Generic;
+using System.Timers;
 
 
 namespace KoPlayer
@@ -18,11 +20,10 @@ namespace KoPlayer
         public event EventHandler StatusChanged;
 
         public string Status { get; set; }
-        public bool Enabled { get; set; }
 
-        public string SessionUserName 
+        public string SessionUserName
         {
-            get 
+            get
             {
                 if (currentSession != null)
                     return currentSession.Username;
@@ -31,6 +32,8 @@ namespace KoPlayer
             }
         }
 
+        private Timer scrobbleTimer;
+        private List<Scrobble> scrobbleQueue;
         private IScrobbler scrobbler;
         private LastfmClient client;
         private LastUserSession currentSession;
@@ -46,14 +49,19 @@ namespace KoPlayer
 
         public void Initialize()
         {
-            Enabled = false;
             Status = "Not Connected";
+
+            scrobbleTimer = new Timer();
+            scrobbleTimer.Interval = 2500;
+            scrobbleTimer.Enabled = false;
+            scrobbleTimer.AutoReset = false;
+            scrobbleTimer.Elapsed += scrobbleTimer_Elapsed;
+
+            scrobbleQueue = new List<Scrobble>();
         }
 
         public void TryResumeSession()
         {
-            Enabled = true;
-
             if (currentSession != null)
             {
                 ChangeStatus("Resuming");
@@ -73,8 +81,6 @@ namespace KoPlayer
 
         public async void TryLoginAsync(string userName, string password)
         {
-            Enabled = true;
-
             ChangeStatus("Connecting");
             var response = await client.Auth.GetSessionTokenAsync(userName, password);
             scrobbler = new Scrobbler(client.Auth, client.HttpClient);
@@ -89,27 +95,54 @@ namespace KoPlayer
                 ChangeStatus("Not connected");
         }
 
-        public async void ScrobbleSong(Song song)
+        public void ScrobbleSong(Song song)
         {
-            var scrobble = new Scrobble(song.Artist, song.Album, song.Title, song.LastPlayed);
-            var response = await scrobbler.ScrobbleAsync(scrobble);
+            scrobbleTimer.Enabled = true;
+            scrobbleQueue.Add(new Scrobble(song.Artist, song.Album, song.Title, song.LastPlayed));
+        }
+
+        public async void TryScrobble()
+        {
+            if (scrobbleQueue.Count == 0)
+                return;
+
+            var toScrobble = new List<Scrobble>();
+
+            // Only allowed 50 songs in each scrobble
+            if (scrobbleQueue.Count > 50)
+                toScrobble.AddRange(scrobbleQueue.GetRange(0, 50));
+            else
+                toScrobble.AddRange(scrobbleQueue);
+
+            var response = await scrobbler.ScrobbleAsync(toScrobble);
+
+            if (response.Success)
+                scrobbleQueue.RemoveRange(0, toScrobble.Count);
+        }
+
+        private void scrobbleTimer_Elapsed(object sender, ElapsedEventArgs e)
+        {
+            TryScrobble();
         }
 
         private void ChangeStatus(string newStatus)
         {
             Status = newStatus;
+
+            if (Status == "Connected")
+            {
+                if (scrobbleQueue.Count > 0)
+                    scrobbleTimer.Enabled = true;
+            }
+            else
+                scrobbleTimer.Enabled = false;
+
             if (StatusChanged != null)
                 StatusChanged(this, new EventArgs());
         }
 
         private void SaveSession(LastUserSession session)
         {
-            /*using (var sw = new StreamWriter(sessionPath))
-            {
-                sw.WriteLine(session.Username);
-                sw.WriteLine(session.Token);
-            }*/
-
             var key = Registry.CurrentUser.OpenSubKey(sessionRegistryPath, true);
             if (key == null)
                 key = Registry.CurrentUser.CreateSubKey(sessionRegistryPath);
@@ -122,16 +155,6 @@ namespace KoPlayer
             var tokenKey = Registry.CurrentUser.OpenSubKey(sessionRegistryPath, true);
             tokenKey.SetValue("token", session.Token);
             tokenKey.Close();
-
-            /*
-             RegistryKey key = Registry.CurrentUser.OpenSubKey(startupRegKey, true);
-            
-            if (settings.RunAtStartup)
-                key.SetValue(this.Text, Path.Combine(Path.GetDirectoryName(
-                    System.Reflection.Assembly.GetExecutingAssembly().Location), "KoPlayer.exe"));
-            else
-                if (key.GetValue(this.Text) != null)
-                    key.DeleteValue(this.Text);*/
         }
 
         private LastUserSession LoadSession()
