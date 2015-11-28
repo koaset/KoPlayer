@@ -46,7 +46,7 @@ namespace KoPlayer.Playlists
             Sorting.CreateSortDictionaries(outputSongs, this.sortDictionaries);
         }
 
-        public override BindingList<Song> GetAllSongs()
+        public override List<Song> GetAllSongs()
         {
             UpdateSongPaths();
             base.outputSongs = base.GetAllSongs();
@@ -134,7 +134,7 @@ namespace KoPlayer.Playlists
             }
             RatingFilterPlaylist pl = new RatingFilterPlaylist(library, loadedPlaylist.Name, 
                 new List<string>(), loadedPlaylist.AllowedRating, loadedPlaylist.IncludeHigher);
-            library.LibraryChanged += pl.library_LibraryChanged;
+            library.Changed += pl.library_LibraryChanged;
             return pl;
         }
     }

@@ -88,7 +88,7 @@ namespace KoPlayer.Forms
                 library = new Library();
                 library.Save();
             }
-            library.LibraryChanged += library_LibraryChanged;
+            library.Changed += library_LibraryChanged;
 
             settings = Settings.Load(SettingsPath);
             if (settings == null)
@@ -546,7 +546,7 @@ namespace KoPlayer.Forms
             library.ReportProgress += library_ReportProgress;
         }
 
-        private void library_LibraryChanged(object sender, LibraryChangedEventArgs e)
+        private void library_LibraryChanged(object sender, EventArgs e)
         {
             foreach (IPlaylist pl in playlists)
                 if (pl.GetType() == typeof(RatingFilterPlaylist))

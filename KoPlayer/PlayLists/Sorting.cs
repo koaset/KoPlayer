@@ -24,8 +24,8 @@ namespace KoPlayer.Playlists
         /// <param name="sortOrder"></param>
         /// <param name="sortDictionaries"></param>
         /// <param name="sortList">ref. The sorted list is stored here</param>
-        public static BindingList<Song> Sort(string field, SortOrder sortOrder,
-            List<Dictionary<string, List<Song>>> sortDictionaries, BindingList<Song> sortList)
+        public static List<Song> Sort(string field, SortOrder sortOrder,
+            List<Dictionary<string, List<Song>>> sortDictionaries, List<Song> sortList)
         {
             if (field.ToLower() == "length")
                 return SortLength(sortOrder, sortList);
@@ -61,10 +61,10 @@ namespace KoPlayer.Playlists
                 songList.AddRange(sortedDictionary[key]);
             }
             //Sets output. This is a reference
-            return new BindingList<Song>(songList);
+            return songList;
         }
 
-        public static BindingList<Song> SortLength(SortOrder sortOrder, BindingList<Song> sortList)
+        public static List<Song> SortLength(SortOrder sortOrder, List<Song> sortList)
         {
             List<Song> sortedList = sortList.ToList();
 
@@ -76,7 +76,7 @@ namespace KoPlayer.Playlists
             if (sortOrder == SortOrder.Descending)
                 sortedList.Reverse();
 
-            return new BindingList<Song>(sortedList);
+            return sortedList;
         }
 
         /*public static BindingList<Song> SortBindingList(BindingList<Song> sortList, SortOrder sortOrder, string field)
@@ -140,7 +140,7 @@ namespace KoPlayer.Playlists
         /// </summary>
         /// <param name="sourceList"></param>
         /// <param name="sortDictionaries"></param>
-        public static void CreateSortDictionaries(BindingList<Song> sourceList,
+        public static void CreateSortDictionaries(List<Song> sourceList,
             List<Dictionary<string, List<Song>>> sortDictionaries)
         {
             sortDictionaries.Clear();
@@ -154,7 +154,7 @@ namespace KoPlayer.Playlists
         /// <param name="sourceList"></param>
         /// <param name="field"></param>
         /// <returns></returns>
-        public static Dictionary<string, List<Song>> CreateFieldDictionary(BindingList<Song> sourceList, string field)
+        public static Dictionary<string, List<Song>> CreateFieldDictionary(List<Song> sourceList, string field)
         {
             Dictionary<string, List<Song>> fieldDictionary = new Dictionary<string, List<Song>>();
             foreach (Song s in sourceList)

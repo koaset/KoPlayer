@@ -11,6 +11,8 @@ namespace KoPlayer.Playlists
 
     public class Playlist : IPlaylist
     {
+        public event EventHandler Changed;
+
         public static Random r = new Random();
 
         [XmlIgnore]
@@ -24,7 +26,7 @@ namespace KoPlayer.Playlists
 
         private const string EXTENSION = ".mp3";
 
-        protected BindingList<Song> outputSongs;
+        protected List<Song> outputSongs;
         public List<string> songPaths;
         protected Dictionary<string, Song> libraryDictionary;
 
@@ -45,7 +47,7 @@ namespace KoPlayer.Playlists
         public Playlist(Library library, string name, List<string> songPaths)
         {
             this.libraryDictionary = library.PathDictionary;
-            library.LibraryChanged += library_LibraryChanged;
+            library.Changed += library_LibraryChanged;
             this.Name = name;
             this.songPaths = songPaths;
             ResetSortVariables();
@@ -55,9 +57,9 @@ namespace KoPlayer.Playlists
             Sorting.CreateSortDictionaries(this.outputSongs, this.sortDictionaries);
         }
 
-        private BindingList<Song> GetSongsFromLibrary()
+        private List<Song> GetSongsFromLibrary()
         {
-            BindingList<Song> ret = new BindingList<Song>();
+            var ret = new List<Song>();
             if (songPaths.Count == 0)
                 return ret;
             List<string> pathsToBeRemoved = new List<string>();
@@ -75,7 +77,7 @@ namespace KoPlayer.Playlists
             return ret;
         }
 
-        protected void library_LibraryChanged(object sender, LibraryChangedEventArgs e)
+        protected void library_LibraryChanged(object sender, EventArgs e)
         {
             List<int> toBeRemoved = new List<int>();
             for (int i = 0; i < songPaths.Count; i++)
@@ -87,22 +89,35 @@ namespace KoPlayer.Playlists
             toBeRemoved.Reverse();
             foreach (int i in toBeRemoved)
                 this.Remove(i);
+
+            if (toBeRemoved.Count > 0)
+                NotifyChange();
+        }
+
+        protected void NotifyChange()
+        {
+            if (Changed != null)
+                Changed(this, new EventArgs());
         }
 
         public void Add(string path)
         {
-            if (libraryDictionary.Keys.Contains(path))
-                Add(libraryDictionary[path]);
+            if (!libraryDictionary.Keys.Contains(path))
+                return;
+
+            Add(libraryDictionary[path]);
+            NotifyChange();
         }
 
         public void Add(Song song)
         {
-            if (song != null)
-            {
-                songPaths.Add(song.Path);
-                this.outputSongs.Add(libraryDictionary[song.Path]);
-                Sorting.AddSongToSortDictionaries(song, this.sortDictionaries);
-            }
+            if (song == null)
+                return;
+
+            songPaths.Add(song.Path);
+            this.outputSongs.Add(libraryDictionary[song.Path]);
+            Sorting.AddSongToSortDictionaries(song, this.sortDictionaries);
+            NotifyChange();
         }
 
         public void Add(List<Song> songs)
@@ -129,6 +144,7 @@ namespace KoPlayer.Playlists
         public void Insert(int index, Song song)
         {
             this.Insert(index, song.Path);
+            NotifyChange();
         }
 
         public void Insert(int index, List<Song> songs)
@@ -179,7 +195,7 @@ namespace KoPlayer.Playlists
         public virtual void RemoveAll()
         {
             this.songPaths = new List<string>();
-            this.outputSongs = new BindingList<Song>();
+            this.outputSongs.Clear();
             this.CurrentIndex = 0;
             Sorting.CreateSortDictionaries(this.outputSongs, this.sortDictionaries);
         }
@@ -246,12 +262,12 @@ namespace KoPlayer.Playlists
             this.SortColumnIndex = -1;
         }
 
-        public BindingList<Song> GetSongs()
+        public List<Song> GetSongs()
         {
             return outputSongs;
         }
 
-        public virtual BindingList<Song> GetAllSongs()
+        public virtual List<Song> GetAllSongs()
         {
             ResetSortVariables();
             this.outputSongs = GetSongsFromLibrary();
@@ -303,7 +319,7 @@ namespace KoPlayer.Playlists
                 if (stream != null) stream.Close();
             }
             Playlist pl = new Playlist(library, loadedPlaylist.Name, loadedPlaylist.songPaths);
-            library.LibraryChanged += pl.library_LibraryChanged;
+            library.Changed += pl.library_LibraryChanged;
             pl.CurrentIndex = loadedPlaylist.CurrentIndex;
 
             List<string> toBeRemoved = new List<string>();

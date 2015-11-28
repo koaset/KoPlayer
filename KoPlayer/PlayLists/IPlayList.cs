@@ -11,6 +11,8 @@ namespace KoPlayer.Playlists
 {
     public interface IPlaylist
     {
+        event EventHandler Changed;
+
         string Name { get; }
         string Path { get; }
         int NumSongs {get;}
@@ -28,8 +30,8 @@ namespace KoPlayer.Playlists
         void UpdateSongInfo(Song song);
         void Sort(int columnIndex, string field);
         SortOrder SortOrder { get; }
-        BindingList<Song> GetSongs();
-        BindingList<Song> GetAllSongs();
+        List<Song> GetSongs();
+        List<Song> GetAllSongs();
         void Save();
     }
 
