@@ -11,8 +11,9 @@ namespace KoPlayer
     /// </summary>
     class ErrorLogger : IDisposable
     {
-        private Exception ex;
+        private StreamReader sr;
         private StreamWriter sw;
+        private Exception ex;
         private const string logPath = "error.log";
 
         public ErrorLogger(Exception ex)
@@ -25,18 +26,31 @@ namespace KoPlayer
         /// </summary>
         public void Run()
         {
-            using (sw = new StreamWriter(logPath, true))
+            string oldFile = "";
+
+            if (File.Exists(logPath))
+                using (var sr = new StreamReader(logPath))
+                    oldFile = sr.ReadToEnd();
+
+            using (var sw = new StreamWriter(logPath, false))
             {
                 sw.WriteLine(DateTime.Now.ToString());
                 sw.WriteLine("Error: " + ex.ToString());
                 sw.WriteLine();
+                sw.WriteLine(oldFile);
             }
         }
 
         public void Dispose()
         {
+            if (sr != null)
+                sr.Dispose();
+
             if (sw != null)
                 sw.Dispose();
+
+            if (ex != null)
+                ex = null;
         }
     }
 }
