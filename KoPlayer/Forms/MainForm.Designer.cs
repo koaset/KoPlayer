@@ -213,10 +213,10 @@
             this.volumeTrackBar.ValueChanged += new System.EventHandler(this.volumeTrackBar_ValueChanged);
             this.volumeTrackBar.MouseWheel += new System.Windows.Forms.MouseEventHandler(this.volumeTrackBar_MouseWheel);
             // 
-            // statusStrip1
+            // statusStrip
             // 
             this.statusStrip.Location = new System.Drawing.Point(0, 624);
-            this.statusStrip.Name = "statusStrip1";
+            this.statusStrip.Name = "statusStrip";
             this.statusStrip.Size = new System.Drawing.Size(1136, 22);
             this.statusStrip.TabIndex = 6;
             this.statusStrip.Text = "statusStrip1";
@@ -478,6 +478,7 @@
             this.Controls.Add(this.volumeTrackBar);
             this.Controls.Add(this.albumArtBox);
             this.Controls.Add(this.menuStrip1);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.KeyPreview = true;
             this.MainMenuStrip = this.menuStrip1;
             this.MaximumSize = new System.Drawing.Size(1920, 1280);
