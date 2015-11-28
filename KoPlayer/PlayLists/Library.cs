@@ -85,7 +85,7 @@ namespace KoPlayer.Playlists
 
             this.SortColumnIndex = columnIndex;
             this.sortField = field;
-            this.outputSongs = Sorting.SortBindingList(this.outputSongs, this.sortOrder, field);
+            //this.outputSongs = Sorting.SortBindingList(this.outputSongs, this.sortOrder, field);
 
             this.outputSongs = Sorting.Sort(field, this.sortOrder, this.sortDictionaries, this.outputSongs);
         }
@@ -120,7 +120,7 @@ namespace KoPlayer.Playlists
 
         public BindingList<Song> GetAllSongs()
         {
-            ResetSortVariables();
+            //ResetSortVariables();
             this.outputSongs = GetSongsFromPathDictionary();
             return GetSongs();
         }
@@ -374,46 +374,32 @@ namespace KoPlayer.Playlists
             return false;
         }
 
-        /// <summary>
-        /// Searches for string in all string fields and returns matches in a list
-        /// </summary>
-        /// <param name="searchString"></param>
-        /// <returns></returns>
-        public BindingList<Song> Search(string searchString)
+        public SearchResult Search(string searchString)
         {
             ResetSortVariables();
             searchString = searchString.ToLower().Trim();
 
-            Sorting.CreateSortDictionaries(new BindingList<Song>(pathDictionary.Values.ToList()), this.sortDictionaries);
-            this.outputSongs = new BindingList<Song>();
+            var result = new SearchResult(this);
+            result.Name = "Search Results";
+            var resultSongs = new List<Song>();
 
+            // 4 first dictionaryies contain title artist album genre fields
             for (int i = 0; i < 4; i++)
-                AddUniqueSearchResults(searchString, sortDictionaries[i]);
-
-            Sorting.CreateSortDictionaries(this.outputSongs, this.sortDictionaries);
-
-            return this.outputSongs;
-        }
-
-        /// <summary>
-        /// Searches a dictionary for the searchterm and returns a list of not yet added songs
-        /// </summary>
-        /// <param name="keysToAdd"></param>
-        /// <param name="dictionary"></param>
-        /// <param name="addedSongs"></param>
-        /// <returns></returns>
-        private void AddUniqueSearchResults(string searchString,
-            Dictionary<string, List<Song>> dictionary)
-        {
-            List<string> keysToAdd = Searching.WholeStringKeySearch(searchString, dictionary);
-            
-            foreach (string keyToAdd in keysToAdd)
             {
-                List<Song> currentList = dictionary[keyToAdd];
-                foreach (Song s in currentList)
-                    if (!this.outputSongs.Contains(s))
-                        this.outputSongs.Add(s);
+                var dictionary = sortDictionaries[i];
+
+                List<string> keysToAdd = Searching.WholeStringKeySearch(searchString, dictionary);
+
+                foreach (string keyToAdd in keysToAdd)
+                {
+                    List<Song> currentList = dictionary[keyToAdd];
+                    foreach (Song s in currentList)
+                        if (!resultSongs.Contains(s))
+                            result.Add(s);
+                }
             }
+
+            return result;
         }
 
         private Dictionary<string, Song> SongListToPathDictionary()

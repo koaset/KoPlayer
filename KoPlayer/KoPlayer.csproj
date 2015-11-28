@@ -104,6 +104,7 @@
       <DependentUpon>GeneralSettingsControl.cs</DependentUpon>
     </Compile>
     <Compile Include="LastFMHandler.cs" />
+    <Compile Include="Playlists\SearchResult.cs" />
     <Compile Include="Settings\EqualizerSettings.cs" />
     <Compile Include="Forms\EqualizerWindow.cs">
       <SubType>Form</SubType>

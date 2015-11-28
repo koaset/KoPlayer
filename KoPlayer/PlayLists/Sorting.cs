@@ -79,7 +79,7 @@ namespace KoPlayer.Playlists
             return new BindingList<Song>(sortedList);
         }
 
-        public static BindingList<Song> SortBindingList(BindingList<Song> sortList, SortOrder sortOrder, string field)
+        /*public static BindingList<Song> SortBindingList(BindingList<Song> sortList, SortOrder sortOrder, string field)
         {
             List<Song> sortedList = sortList.ToList();
 
@@ -92,7 +92,7 @@ namespace KoPlayer.Playlists
                 sortedList.Reverse();
 
             return new BindingList<Song>(sortedList);
-        }
+        }*/
 
         /// <summary>
         /// Gets the dictionary of the corresponding sorting column

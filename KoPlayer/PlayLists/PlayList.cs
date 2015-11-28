@@ -159,7 +159,7 @@ namespace KoPlayer.Playlists
             }
         }
 
-        public void Remove(List<int> indexes)
+        public virtual void Remove(List<int> indexes)
         {
             foreach (int i in indexes)
                 Remove(i);
@@ -176,7 +176,7 @@ namespace KoPlayer.Playlists
                 Remove(s.Path);
         }
 
-        public void RemoveAll()
+        public virtual void RemoveAll()
         {
             this.songPaths = new List<string>();
             this.outputSongs = new BindingList<Song>();

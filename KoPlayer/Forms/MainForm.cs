@@ -39,6 +39,7 @@ namespace KoPlayer.Forms
         
         private IPlaylist showingPlaylist;
         private IPlaylist playingPlaylist;
+        private IPlaylist searchResults;
         private List<IPlaylist> playlists;
 
         private Settings settings;
@@ -51,7 +52,6 @@ namespace KoPlayer.Forms
         private EqualizerSettings equalizerSettings;
 
         private Song currentlyPlaying;
-        private int currentlyPlayingIndex;
         private System.Timers.Timer searchBarTimer;
         private int searchBarTimerInterval = 100;
         private bool stopSearchBarUpdate = false;
@@ -608,7 +608,8 @@ namespace KoPlayer.Forms
             string text = "";
             if (musicPlayer.PlaybackState != PlaybackState.Stopped && currentlyPlaying != null)
             {
-                int limit = 42; // (128 - 1) / 3 = 42.333;
+                // Upper limit is 128 chars, divided by 3 rounded down = 42
+                int limit = 42;
                 text += ShortenString(currentlyPlaying.Title, limit) + "\n";
                 text += ShortenString(currentlyPlaying.Artist, limit) + "\n";
                 text += ShortenString(currentlyPlaying.Album, limit);
@@ -972,9 +973,8 @@ namespace KoPlayer.Forms
 
         private void DeleteSongs(DataGridViewSelectedRowCollection rows)
         {
-            bool shouldDelete = true;
             if (showingPlaylist.GetType() == typeof(RatingFilterPlaylist))
-                shouldDelete = false;
+                return;
 
             if (rows.Count > 25)
             {
@@ -987,11 +987,8 @@ namespace KoPlayer.Forms
 
                 DialogResult dialogResult = MessageBox.Show(queryMessage, "", MessageBoxButtons.OKCancel);
                 if (dialogResult == DialogResult.Cancel)
-                    shouldDelete = false;
+                    return;
             }
-
-            if (!shouldDelete)
-                return;
 
             if (songGridView.SelectedRows.Count == showingPlaylist.NumSongs)
             {
@@ -1023,9 +1020,10 @@ namespace KoPlayer.Forms
 
             if (showingPlaylist == shuffleQueue)
                 PopulateShuffleQueue();
+            
             showingPlaylist.Save();
-            UpdateShowingPlaylist(false);
 
+            UpdateShowingPlaylist(true);
         }
 
         private List<int> GetSortedRowIndexes(DataGridViewSelectedRowCollection rows)
@@ -1366,8 +1364,9 @@ namespace KoPlayer.Forms
             ChangeToPlaylist(library);
             if (searchBox.Text.Length > 0)
             {
-                songGridView.DataSource = library.Search(searchBox.Text);
-                UpdateShowingPlaylist(false);
+                searchResults = library.Search(searchBox.Text);
+                showingPlaylist = searchResults;
+                UpdateShowingPlaylist(true);
             }
             else if (searchBox.Text.Length == 0)
             {
