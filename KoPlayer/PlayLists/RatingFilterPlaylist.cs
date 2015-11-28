@@ -42,16 +42,13 @@ namespace KoPlayer.Playlists
             this.allowedRating = ratingCutoff;
             this.IncludeHigher = includeHigher;
             UpdateSongPaths();
-            base.outputSongs = base.GetAllSongs();
+            outputSongs = GetSongsFromLibrary();
             Sorting.CreateSortDictionaries(outputSongs, this.sortDictionaries);
         }
 
-        public override List<Song> GetAllSongs()
+        public override List<Song> GetSongs()
         {
-            UpdateSongPaths();
-            base.outputSongs = base.GetAllSongs();
-            //Sorting.CreateSortDictionaries(outputSongs, this.sortDictionaries);
-            return base.outputSongs;
+            return outputSongs;
         }
 
         /// <summary>
@@ -76,15 +73,20 @@ namespace KoPlayer.Playlists
 
         public override void UpdateSongInfo(Song song)
         {
-            base.RemoveFromSortDictionaries(song);
+            RemoveFromSortDictionaries(song);
 
             if ((song.Rating == allowedRating) || (IncludeHigher && (song.Rating > allowedRating)))
                 Sorting.AddSongToSortDictionaries(song, this.sortDictionaries);
+            else
+            {
+                Remove(song.Path);
+                outputSongs.Remove(song);
+            }
         }
 
         public void ResetSortDictionaries()
         {
-            base.outputSongs =  base.GetAllSongs();
+            base.outputSongs =  base.GetSongs();
             Sorting.CreateSortDictionaries(outputSongs, base.sortDictionaries);
         }
 

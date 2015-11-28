@@ -132,7 +132,7 @@ namespace KoPlayer.Forms
 
             SetSongGridViewStyle();
 
-            UpdateShowingPlaylist(true);
+            UpdateShowingPlaylist();
             songGridView.AutoGenerateColumns = false;
             songGridView.Columns["Length"].DefaultCellStyle.Format = Song.LengthFormat;
 
@@ -157,6 +157,7 @@ namespace KoPlayer.Forms
             UpdateTrayIconText();
             SetTrayIconContextMenu();
             SetStatusStrip();
+            UpdateShowingPlaylist();
         }
 
         private void SetSongGridViewStyle()
@@ -185,32 +186,34 @@ namespace KoPlayer.Forms
         #endregion
 
         #region Playlist methods
-        private void UpdateShowingPlaylist(bool getAll)
+        private void UpdateShowingPlaylist()
         {
             if (showingPlaylist == null)
                 return;
 
             if (songGridView.InvokeRequired)
-                songGridView.Invoke(new MethodInvoker(delegate { UpdateShowingPlaylist(getAll); }));
+                songGridView.Invoke(new MethodInvoker(delegate { UpdateShowingPlaylist(); }));
             else
             {
-                if (getAll)
-                    songGridView.DataSource = showingPlaylist.GetAllSongs();
-                else
-                    songGridView.DataSource = showingPlaylist.GetSongs();
+                songGridView.DataSource = null;
+                songGridView.DataSource = new List<Song>(showingPlaylist.GetSongs());
+
                 if (showingPlaylist == shuffleQueue)
                     SetShuffleQueueColors();
             }
 
             if (statusStrip.Items.Count > 0)
                 UpdateStatusStrip();
+
+            if (showingPlaylist == shuffleQueue)
+                songGridView.ClearSelection();
         }
 
         private void UpdateFilterPlaylistSongPaths()
         {
             foreach (IPlaylist pl in playlists)
                 if (pl.GetType() == typeof(RatingFilterPlaylist))
-                    pl.GetAllSongs();
+                    pl.GetSongs();
         }
 
         private void LoadPlaylists()
@@ -293,12 +296,6 @@ namespace KoPlayer.Forms
                 if (source.NumSongs > 0)
                     while (shuffleQueue.NumSongs - shuffleQueue.CurrentIndex < settings.Shufflequeue_NumNext + 1)
                         shuffleQueue.Add(source.GetRandom());
-
-                if (showingPlaylist == shuffleQueue)
-                {
-                    UpdateShowingPlaylist(true);
-                    songGridView.ClearSelection();
-                }
             }
         }
 
@@ -402,11 +399,13 @@ namespace KoPlayer.Forms
             if (playlist != library)
                 ResetSearchBox();
             showingPlaylist = playlist;
-            SetSortGlyph();
+
             if (showingPlaylist == shuffleQueue)
                 PopulateShuffleQueue();
-            UpdateShowingPlaylist(true);
+
+            UpdateShowingPlaylist();
             songGridView.ClearSelection();
+            SetSortGlyph();
             SetPlaylistGridView();
             UpdateStatusStrip();
         }
@@ -437,7 +436,7 @@ namespace KoPlayer.Forms
 
             //last.fm
 
-            UpdateShowingPlaylist(true);
+            UpdateShowingPlaylist();
             ResetSearchBox();
             RefreshSongGridView();
             songGridView.Focus();
@@ -511,7 +510,7 @@ namespace KoPlayer.Forms
                 if (showingPlaylist != library)
                 {
                     showingPlaylist.Add(path);
-                    UpdateShowingPlaylist(true);
+                    UpdateShowingPlaylist();
                 }
             }
         }
@@ -550,12 +549,12 @@ namespace KoPlayer.Forms
         {
             foreach (IPlaylist pl in playlists)
                 if (pl.GetType() == typeof(RatingFilterPlaylist))
-                    pl.GetAllSongs();
+                    pl.GetSongs();
 
-            if (showingPlaylist != shuffleQueue)
-                UpdateShowingPlaylist(true);
-            else
+            if (showingPlaylist == shuffleQueue)
                 PopulateShuffleQueue();
+
+            UpdateShowingPlaylist();
 
             UpdateStatusStrip();
         }
@@ -713,7 +712,12 @@ namespace KoPlayer.Forms
             UpdateSongInfoLabel();
 
             if (inPlaylist == shuffleQueue)
+            {
                 PopulateShuffleQueue();
+
+                if (showingPlaylist == shuffleQueue)
+                    UpdateShowingPlaylist();
+            }
 
             // Saves changed from tag editing when song is not playing any more
             if (songToSave != null)
@@ -930,7 +934,7 @@ namespace KoPlayer.Forms
             RefreshSongGridView();
             showingPlaylist.Save();
             if (showingPlaylist.GetType() == typeof(RatingFilterPlaylist))
-                UpdateShowingPlaylist(true);
+                UpdateShowingPlaylist();
         }
 
         private void RateSong(Song s, int rating)
@@ -942,7 +946,7 @@ namespace KoPlayer.Forms
             RefreshSongGridView();
             playingPlaylist.Save();
             if (showingPlaylist.GetType() == typeof(RatingFilterPlaylist))
-                UpdateShowingPlaylist(true);
+                UpdateShowingPlaylist();
         }
 
         private void UpdateSongForRatingFilterPlaylist(Song song)
@@ -1023,7 +1027,7 @@ namespace KoPlayer.Forms
             
             showingPlaylist.Save();
 
-            UpdateShowingPlaylist(true);
+            UpdateShowingPlaylist();
         }
 
         private List<int> GetSortedRowIndexes(DataGridViewSelectedRowCollection rows)
@@ -1260,7 +1264,7 @@ namespace KoPlayer.Forms
                 if (showingPlaylist != shuffleQueue)
                 {
                     showingPlaylist.Sort(e.ColumnIndex, songGridView.Columns[e.ColumnIndex].HeaderText);
-                    UpdateShowingPlaylist(false);
+                    UpdateShowingPlaylist();
                     SetSortGlyph();
                 }
             }
@@ -1307,7 +1311,7 @@ namespace KoPlayer.Forms
         {
             if (searchBox.Text.Length == 0)
             {
-                UpdateShowingPlaylist(true);
+                UpdateShowingPlaylist();
                 ResetSearchBox();
             }
         }
@@ -1366,15 +1370,11 @@ namespace KoPlayer.Forms
             {
                 searchResults = library.Search(searchBox.Text);
                 showingPlaylist = searchResults;
-                UpdateShowingPlaylist(true);
             }
             else if (searchBox.Text.Length == 0)
-            {
-                UpdateShowingPlaylist(true);
                 library.ResetSearchDictionaries();
-            }
-            SetSortGlyph();
 
+            UpdateShowingPlaylist();
         }
 
         private void searchBox_KeyDown(object sender, KeyEventArgs e)
@@ -1385,7 +1385,7 @@ namespace KoPlayer.Forms
                 if (e.KeyCode == Keys.Escape)
                 {
                     ResetSearchBox();
-                    UpdateShowingPlaylist(true);
+                    UpdateShowingPlaylist();
                 }
                 SetSortGlyph();
             }
@@ -1549,8 +1549,8 @@ namespace KoPlayer.Forms
 
                     if (showingPlaylist == shuffleQueue)
                         PopulateShuffleQueue();
-                    else
-                        UpdateShowingPlaylist(true);
+                    
+                    UpdateShowingPlaylist();
                 }
             }
         }
@@ -1637,7 +1637,7 @@ namespace KoPlayer.Forms
                         pl.Add(songs);
 
                         if (pl == showingPlaylist)
-                            UpdateShowingPlaylist(true);
+                            UpdateShowingPlaylist();
                     }
                 }
             }
@@ -1751,7 +1751,7 @@ namespace KoPlayer.Forms
                     if (showingPlaylist != clickedPlaylist)
                         ChangeToPlaylist(clickedPlaylist);
                     else
-                        UpdateShowingPlaylist(true);
+                        UpdateShowingPlaylist();
                 }
             }
         }
@@ -1859,7 +1859,7 @@ namespace KoPlayer.Forms
             shuffleQueue.Insert(shuffleQueue.CurrentIndex + 1, songs);
 
             if (showingPlaylist == shuffleQueue)
-                UpdateShowingPlaylist(true);
+                UpdateShowingPlaylist();
         }
 
         private void songGridViewRightClickAddToShuffleQueueBottom(object sender, EventArgs e)
@@ -1876,7 +1876,7 @@ namespace KoPlayer.Forms
                 shuffleQueue.Add((Song)row.DataBoundItem);
 
             if (showingPlaylist == shuffleQueue)
-                UpdateShowingPlaylist(true);
+                UpdateShowingPlaylist();
         }
 
         private void songGridViewRightClickShowExplorer(object sender, EventArgs e)

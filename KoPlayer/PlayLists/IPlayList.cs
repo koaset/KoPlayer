@@ -31,7 +31,6 @@ namespace KoPlayer.Playlists
         void Sort(int columnIndex, string field);
         SortOrder SortOrder { get; }
         List<Song> GetSongs();
-        List<Song> GetAllSongs();
         void Save();
     }
 

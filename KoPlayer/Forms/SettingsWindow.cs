@@ -37,8 +37,8 @@ namespace KoPlayer.Forms
         {
             List<TreeNode> treeNodes = new List<TreeNode>();
             treeNodes.Add(CreateTreeNode("General"));
-            treeNodes.Add(CreateTreeNode("Song List"));
             treeNodes.Add(CreateTreeNode("Shuffle Queue"));
+            treeNodes.Add(CreateTreeNode("Song List"));
             treeNodes.Add(CreateTreeNode("Hot Keys"));
             treeNodes[treeNodes.Count - 1].Nodes.Add(CreateTreeNode("Global"));
             treeNodes.Add(CreateTreeNode("last.fm Scrobbler"));
@@ -78,11 +78,11 @@ namespace KoPlayer.Forms
                 case "General":
                     SetAndAddControl(new GeneralSettingsControl(this.settings));
                     break;
-                case "Song List":
-                    SetAndAddControl(new SongListSettingsControl(this.settings));
-                    break;
                 case "Shuffle Queue":
                     SetAndAddControl(new ShuffleQueueSettingsControl(this.settings, this.playlists));
+                    break;
+                case "Song List":
+                    SetAndAddControl(new SongListSettingsControl(this.settings));
                     break;
                 case "Hot Keys":
                     SetAndAddControl(new HotkeySettingsControl(this.settings));

@@ -29,10 +29,10 @@ namespace KoPlayer
             string oldFile = "";
 
             if (File.Exists(logPath))
-                using (var sr = new StreamReader(logPath))
+                using (sr = new StreamReader(logPath))
                     oldFile = sr.ReadToEnd();
 
-            using (var sw = new StreamWriter(logPath, false))
+            using (sw = new StreamWriter(logPath, false))
             {
                 sw.WriteLine(DateTime.Now.ToString());
                 sw.WriteLine("Error: " + ex.ToString());
@@ -48,9 +48,8 @@ namespace KoPlayer
 
             if (sw != null)
                 sw.Dispose();
-
-            if (ex != null)
-                ex = null;
+            
+            ex = null;
         }
     }
 }

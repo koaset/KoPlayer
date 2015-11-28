@@ -57,8 +57,9 @@ namespace KoPlayer.Playlists
             Sorting.CreateSortDictionaries(this.outputSongs, this.sortDictionaries);
         }
 
-        private List<Song> GetSongsFromLibrary()
+        protected List<Song> GetSongsFromLibrary()
         {
+            
             var ret = new List<Song>();
             if (songPaths.Count == 0)
                 return ret;
@@ -262,15 +263,8 @@ namespace KoPlayer.Playlists
             this.SortColumnIndex = -1;
         }
 
-        public List<Song> GetSongs()
+        public virtual List<Song> GetSongs()
         {
-            return outputSongs;
-        }
-
-        public virtual List<Song> GetAllSongs()
-        {
-            ResetSortVariables();
-            this.outputSongs = GetSongsFromLibrary();
             return outputSongs;
         }
 
