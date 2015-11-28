@@ -84,7 +84,6 @@ namespace KoPlayer.Playlists
 
             this.SortColumnIndex = columnIndex;
             this.sortField = field;
-            //this.outputSongs = Sorting.SortBindingList(this.outputSongs, this.sortOrder, field);
 
             this.outputSongs = Sorting.Sort(field, this.sortOrder, this.sortDictionaries, this.outputSongs);
         }
@@ -203,10 +202,8 @@ namespace KoPlayer.Playlists
 
         public void Remove(List<Song> songs)
         {
-            //this.outputSongs.RaiseListChangedEvents = false;
             foreach (Song s in songs)
                 Remove(s.Path);
-            //this.outputSongs.RaiseListChangedEvents = true;
             NotifyChanged();
         }
 
@@ -370,7 +367,6 @@ namespace KoPlayer.Playlists
 
         public SearchResult Search(string searchString)
         {
-            ResetSortVariables();
             searchString = searchString.ToLower().Trim();
 
             var result = new SearchResult(this);

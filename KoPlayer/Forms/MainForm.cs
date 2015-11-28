@@ -207,6 +207,16 @@ namespace KoPlayer.Forms
 
             if (showingPlaylist == shuffleQueue)
                 songGridView.ClearSelection();
+
+            SetSortGlyph();
+        }
+
+        private void SetSortGlyph()
+        {
+            foreach (DataGridViewColumn column in songGridView.Columns)
+                column.HeaderCell.SortGlyphDirection = SortOrder.None;
+            if (showingPlaylist.SortColumnIndex >= 0)
+                songGridView.Columns[showingPlaylist.SortColumnIndex].HeaderCell.SortGlyphDirection = showingPlaylist.SortOrder;
         }
 
         private void UpdateFilterPlaylistSongPaths()
@@ -405,7 +415,6 @@ namespace KoPlayer.Forms
 
             UpdateShowingPlaylist();
             songGridView.ClearSelection();
-            SetSortGlyph();
             SetPlaylistGridView();
             UpdateStatusStrip();
         }
@@ -1265,7 +1274,6 @@ namespace KoPlayer.Forms
                 {
                     showingPlaylist.Sort(e.ColumnIndex, songGridView.Columns[e.ColumnIndex].HeaderText);
                     UpdateShowingPlaylist();
-                    SetSortGlyph();
                 }
             }
             else if (e.Button == System.Windows.Forms.MouseButtons.Right)
@@ -1281,14 +1289,6 @@ namespace KoPlayer.Forms
                 }
                 cm.Show(this, this.PointToClient(Cursor.Position));
             }
-        }
-
-        private void SetSortGlyph()
-        {
-            foreach (DataGridViewColumn column in songGridView.Columns)
-                column.HeaderCell.SortGlyphDirection = SortOrder.None;
-            if (showingPlaylist.SortColumnIndex >= 0)
-                songGridView.Columns[showingPlaylist.SortColumnIndex].HeaderCell.SortGlyphDirection = showingPlaylist.SortOrder;
         }
 
         private void columnHeaderContextMenu_Click(object sender, EventArgs e)
@@ -1387,7 +1387,6 @@ namespace KoPlayer.Forms
                     ResetSearchBox();
                     UpdateShowingPlaylist();
                 }
-                SetSortGlyph();
             }
         }
         #endregion
