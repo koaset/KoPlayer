@@ -79,7 +79,7 @@ namespace KoPlayer
             {
                 if (soundOut != null)
                     return Math.Min(100, Math.Max((int)(soundOut.Volume * 100), 0));
-                return 100;
+                return 1;
             }
             set
             {
