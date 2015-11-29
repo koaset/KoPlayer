@@ -1906,7 +1906,9 @@ namespace KoPlayer.Forms
             shuffleQueue.Insert(shuffleQueue.CurrentIndex + 1, songs);
 
             if (showingPlaylist == shuffleQueue)
+            {
                 UpdateShowingPlaylist();
+            }
         }
 
         private void songGridViewRightClickAddToShuffleQueueBottom(object sender, EventArgs e)

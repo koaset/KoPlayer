@@ -145,6 +145,7 @@ namespace KoPlayer.Playlists
         public void Insert(int index, Song song)
         {
             this.Insert(index, song.Path);
+            outputSongs.Insert(index, song);
             NotifyChange();
         }
 
