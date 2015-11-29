@@ -706,10 +706,17 @@ namespace KoPlayer.Forms
             else
             {
                 if (musicPlayer.PlaybackState != PlaybackState.Stopped)
-                    songInfoLabel.Text =
+                {
+                    int albumCharLimit = 60;
+                    string text =
                           currentlyPlaying.Title + "\n"
-                        + currentlyPlaying.Artist + "\n"
-                        + currentlyPlaying.Album;
+                        + currentlyPlaying.Artist + "\n";
+                    if (currentlyPlaying.Album.Length > albumCharLimit)
+                        text += new string(currentlyPlaying.Album.Take(albumCharLimit).ToArray()) + "...";
+                    else
+                        text += currentlyPlaying.Album;
+                    songInfoLabel.Text = text;
+                }
                 else
                     songInfoLabel.Text = "";
             }
