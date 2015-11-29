@@ -2,7 +2,7 @@
 <Settings xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <FormWidth>1030</FormWidth>
   <FormHeight>600</FormHeight>
-  <StartupPlaylist>Library</StartupPlaylist>
+  <StartupPlaylist>Shuffle Queue</StartupPlaylist>
   <Shufflequeue_SourcePlaylistName>Library</Shufflequeue_SourcePlaylistName>
   <Shufflequeue_NumPrevious>5</Shufflequeue_NumPrevious>
   <Shufflequeue_NumNext>15</Shufflequeue_NumNext>
@@ -49,7 +49,7 @@
   <RunAtStartup>false</RunAtStartup>
   <MinimizeToTray>true</MinimizeToTray>
   <PopupOnSongChange>false</PopupOnSongChange>
-  <ScrobblingEnabled>false</ScrobblingEnabled>
+  <ScrobblingEnabled>true</ScrobblingEnabled>
   <RowHeight>17</RowHeight>
   <FontName>Microsoft Sans Serif</FontName>
   <FontSize>8</FontSize>

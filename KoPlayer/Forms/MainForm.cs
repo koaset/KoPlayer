@@ -234,6 +234,7 @@ namespace KoPlayer.Forms
             if (!Directory.Exists(PlaylistDirectoryPath))
                 Directory.CreateDirectory(PlaylistDirectoryPath);
 
+            // Load shuffle queue
             shuffleQueue = Playlist.Load(ShuffleQueuePath, library);
             if (shuffleQueue == null)
             {
@@ -242,6 +243,7 @@ namespace KoPlayer.Forms
             }
             playlists.Add(shuffleQueue);
 
+            // Load normal playlists
             string[] playlistFiles = Directory.GetFiles(PlaylistDirectoryPath, "*.pl", SearchOption.AllDirectories);
             foreach (string playlistPath in playlistFiles)
                 if (playlistPath != ShuffleQueuePath)
@@ -251,6 +253,7 @@ namespace KoPlayer.Forms
                         playlists.Add(pl);
                 }
 
+            // Load rating playlists
             playlistFiles = Directory.GetFiles(PlaylistDirectoryPath, "*.fpl", SearchOption.AllDirectories);
             foreach (string playlistPath in playlistFiles)
             {
@@ -264,16 +267,39 @@ namespace KoPlayer.Forms
         {
             playlistGridView.Rows.Clear();
             playlistGridView.AllowUserToAddRows = true;
+
+            SortPlaylists();
+
             foreach (IPlaylist playlist in playlists)
-            {
-                DataGridViewRow row = (DataGridViewRow)playlistGridView.Rows[0].Clone();
-                row.Cells[0].Value = playlist.Name;
-                playlistGridView.Rows.Add(row);
-            }
+                AddToPlaylistGridView(playlist);
+
             playlistGridView.AllowUserToAddRows = false;
 
             playlistGridView.ClearSelection();
             playlistGridView.Rows[playlists.IndexOf(showingPlaylist)].Cells[0].Selected = true;
+        }
+
+        private void SortPlaylists()
+        {
+            if (playlists.Count <= 2)
+                return;
+
+            var toSort = playlists.Skip(2).ToList();
+
+            toSort.Sort(delegate(IPlaylist pl1, IPlaylist pl2)
+            {
+                return pl1.Name.CompareTo(pl2.Name);
+            });
+
+            playlists.RemoveRange(2, toSort.Count);
+            playlists.AddRange(toSort);
+        }
+
+        private void AddToPlaylistGridView(IPlaylist playlist)
+        {
+            var row = (DataGridViewRow)playlistGridView.Rows[0].Clone();
+            row.Cells[0].Value = playlist.Name;
+            playlistGridView.Rows.Add(row);
         }
 
         private IPlaylist GetPlaylist(string name)
@@ -367,9 +393,15 @@ namespace KoPlayer.Forms
 
         private void playlistGridView_CellEndEdit(object sender, DataGridViewCellEventArgs e)
         {
-            string currentName = playlistGridView.CurrentCell.Value.ToString();
+            string currentName;
+            if (playlistGridView.CurrentCell.Value == null)
+                currentName = "";
+            else
+                currentName = playlistGridView.CurrentCell.Value.ToString();
+
             string oldName = this.tempPlaylist.Name;
             string oldPath = this.tempPlaylist.Path;
+
             bool acceptable = true;
             foreach (IPlaylist pl in playlists)
             {
@@ -377,6 +409,7 @@ namespace KoPlayer.Forms
                     if (currentName.ToLower() != oldName.ToLower())
                         acceptable = false;
             }
+
             if (acceptable)
             {
                 if (currentName.ToLower() != oldName.ToLower())
@@ -388,6 +421,8 @@ namespace KoPlayer.Forms
                     }
                     catch { }
                 }
+
+                SetPlaylistGridView();
             }
             else
                 playlistGridView.BeginEdit(true);
@@ -1415,7 +1450,7 @@ namespace KoPlayer.Forms
         {
             string name = GetNewPlaylistName(false);
 
-            IPlaylist newPlaylist = new Playlist(library, name);
+            var newPlaylist = new Playlist(library, name);
             playlists.Add(newPlaylist);
             SetPlaylistGridView();
             ChangeToPlaylist(newPlaylist);

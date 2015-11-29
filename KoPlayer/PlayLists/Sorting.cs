@@ -79,21 +79,6 @@ namespace KoPlayer.Playlists
             return sortedList;
         }
 
-        /*public static BindingList<Song> SortBindingList(BindingList<Song> sortList, SortOrder sortOrder, string field)
-        {
-            List<Song> sortedList = sortList.ToList();
-
-            sortedList.Sort(delegate(Song song1, Song song2)
-            {
-                return song1.Title.CompareTo(song2.Title);
-            });
-
-            if (sortOrder == SortOrder.Descending)
-                sortedList.Reverse();
-
-            return new BindingList<Song>(sortedList);
-        }*/
-
         /// <summary>
         /// Gets the dictionary of the corresponding sorting column
         /// </summary>
