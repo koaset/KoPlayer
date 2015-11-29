@@ -7,6 +7,7 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Timers;
+using System.ComponentModel;
 
 
 namespace KoPlayer
@@ -32,7 +33,7 @@ namespace KoPlayer
             }
         }
 
-        private Timer scrobbleTimer;
+        private BackgroundWorker scrobbleWorker;
         private List<Scrobble> scrobbleQueue;
         private IScrobbler scrobbler;
         private LastfmClient client;
@@ -51,11 +52,10 @@ namespace KoPlayer
         {
             Status = "Not Connected";
 
-            scrobbleTimer = new Timer();
-            scrobbleTimer.Interval = 2500;
-            scrobbleTimer.Enabled = false;
-            scrobbleTimer.AutoReset = false;
-            scrobbleTimer.Elapsed += scrobbleTimer_Elapsed;
+            scrobbleWorker = new BackgroundWorker();
+            scrobbleWorker.WorkerSupportsCancellation = false;
+            scrobbleWorker.WorkerReportsProgress = false;
+            scrobbleWorker.DoWork += scrobbleWorker_DoWork;
 
             scrobbleQueue = new List<Scrobble>();
         }
@@ -97,8 +97,19 @@ namespace KoPlayer
 
         public void ScrobbleSong(Song song)
         {
-            scrobbleTimer.Enabled = true;
             scrobbleQueue.Add(new Scrobble(song.Artist, song.Album, song.Title, song.LastPlayed));
+            StartWorker();
+        }
+
+        private void StartWorker()
+        {
+            if (!scrobbleWorker.IsBusy)
+                scrobbleWorker.RunWorkerAsync();
+        }
+
+        private void scrobbleWorker_DoWork(object sender, DoWorkEventArgs e)
+        {
+            TryScrobble();
         }
 
         public async void TryScrobble()
@@ -120,22 +131,12 @@ namespace KoPlayer
                 scrobbleQueue.RemoveRange(0, toScrobble.Count);
         }
 
-        private void scrobbleTimer_Elapsed(object sender, ElapsedEventArgs e)
-        {
-            TryScrobble();
-        }
-
         private void ChangeStatus(string newStatus)
         {
             Status = newStatus;
 
-            if (Status == "Connected")
-            {
-                if (scrobbleQueue.Count > 0)
-                    scrobbleTimer.Enabled = true;
-            }
-            else
-                scrobbleTimer.Enabled = false;
+            if (Status == "Connected" && scrobbleQueue.Count > 0)
+                StartWorker();
 
             if (StatusChanged != null)
                 StatusChanged(this, new EventArgs());

@@ -264,7 +264,7 @@ namespace KoPlayer.Playlists
                 paths[i] = paths[i].ToLower();
 
             this.newSongs = new List<Song>();
-            BackgroundWorker addFilesWorker = new BackgroundWorker();
+            var addFilesWorker = new BackgroundWorker();
             addFilesWorker.WorkerSupportsCancellation = false;
             addFilesWorker.WorkerReportsProgress = true;
             addFilesWorker.DoWork += addFilesWorker_DoWork;
@@ -276,7 +276,7 @@ namespace KoPlayer.Playlists
 
         void addFilesWorker_DoWork(object sender, DoWorkEventArgs e)
         {
-            BackgroundWorker worker = sender as BackgroundWorker;
+            var worker = sender as BackgroundWorker;
             List<string> musicFiles = e.Argument as List<string>;
             int count = 0;
             foreach (string fileName in musicFiles)

@@ -39,7 +39,6 @@ namespace KoPlayer.Forms
         
         private IPlaylist showingPlaylist;
         private IPlaylist playingPlaylist;
-        private IPlaylist searchResults;
         private List<IPlaylist> playlists;
 
         private Settings settings;
@@ -514,7 +513,11 @@ namespace KoPlayer.Forms
         {
             settings.FormWidth = this.Width;
             settings.FormHeight = this.Height;
+
             settings.StartupPlaylist = showingPlaylist.Name;
+            if (settings.StartupPlaylist == "Search Results")
+                settings.StartupPlaylist = library.Name;
+
             settings.Save(SettingsPath);
 
             columnSettings = new ColumnSettings(songGridView.Columns);
@@ -717,6 +720,10 @@ namespace KoPlayer.Forms
         #region Playback control
         private void PlaySong(Song song, IPlaylist inPlaylist)
         {
+            searchBarTimer.Stop();
+            musicPlayer.Stop();
+            musicPlayer.Volume = 0;
+
             // Check Last.fm scrobbling requirements
             if (currentSongTimePlayed.Ticks > 0.8 * musicPlayer.Length.Ticks ||
                 currentSongTimePlayed.TotalMinutes > 4)
@@ -1403,8 +1410,7 @@ namespace KoPlayer.Forms
             ChangeToPlaylist(library);
             if (searchBox.Text.Length > 0)
             {
-                searchResults = library.Search(searchBox.Text);
-                showingPlaylist = searchResults;
+                showingPlaylist = library.Search(searchBox.Text);
             }
             else if (searchBox.Text.Length == 0)
                 library.ResetSearchDictionaries();
