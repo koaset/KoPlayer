@@ -76,7 +76,11 @@ namespace KoPlayer.Playlists
             RemoveFromSortDictionaries(song);
 
             if ((song.Rating == allowedRating) || (IncludeHigher && (song.Rating > allowedRating)))
+            {
+                if (!outputSongs.Contains(song))
+                    Add(song);
                 Sorting.AddSongToSortDictionaries(song, this.sortDictionaries);
+            }
             else
             {
                 Remove(song.Path);
