@@ -321,7 +321,7 @@
             // 
             this.trayIcon.Text = "KoPlayer";
             this.trayIcon.Visible = true;
-            this.trayIcon.DoubleClick += new System.EventHandler(this.showKoPlayer_Event);
+            this.trayIcon.DoubleClick += new System.EventHandler(this.showKoPlayerToggleShow_Event);
             this.trayIcon.MouseDown += new System.Windows.Forms.MouseEventHandler(this.trayIcon_MouseDown);
             // 
             // searchBox

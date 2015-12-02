@@ -18,7 +18,7 @@ namespace KoPlayer
         public static float FontSizeMin = 7f;
         public static float FontSizeMax = 12f;
 
-        public int FormWidth = 1000;
+        public int FormWidth = 1058; // Width of standrad columns
         public int FormHeight = 600;
 
         private int rowHeight = 17;

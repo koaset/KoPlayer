@@ -683,6 +683,11 @@ namespace KoPlayer.Forms
             trayIcon.ContextMenu = cm;
         }
 
+        private void showKoPlayer_Event(object sender, EventArgs e)
+        {
+            ShowKoPlayer();
+        }
+
         private string ShortenString(string s, int limit)
         {
             if (s.Length > limit)
@@ -1693,36 +1698,42 @@ namespace KoPlayer.Forms
 
         #region Minimize to tray
 
-        private void showKoPlayer_Event(object sender, EventArgs e)
+        private void showKoPlayerToggleShow_Event(object sender, EventArgs e)
         {
-            ShowKoPlayer();
+            if (this.WindowState != FormWindowState.Minimized)
+                HideKoPlayer();
+            else
+                ShowKoPlayer();
         }
 
         private void ShowKoPlayer()
         {
-            if (this.WindowState == FormWindowState.Minimized)
+            this.TopMost = true;
+            this.Show();
+            this.WindowState = FormWindowState.Normal;
+            //Updates stops flickering when window de-minimizes
+            this.nextButton.Update();
+            this.playpauseButton.Update();
+            this.previousButton.Update();
+            this.songInfoLabel.Update();
+            this.playlistGridView.Update();
+            this.TopMost = false;
+        }
+
+        private void HideKoPlayer()
+        {
+            trayIcon.Visible = true;
+            if (settings.MinimizeToTray)
             {
-                this.Show();
-                this.WindowState = FormWindowState.Normal;
-                //Updates stops flickering when window de-minimizes
-                this.nextButton.Update();
-                this.playpauseButton.Update();
-                this.previousButton.Update();
-                this.songInfoLabel.Update();
-                this.playlistGridView.Update();
+                this.Hide();
+                this.WindowState = FormWindowState.Minimized;
             }
-            else
-                this.Activate();
         }
 
         private void MainForm_Resize(object sender, EventArgs e)
         {
             if (this.WindowState == FormWindowState.Minimized)
-            {
-                trayIcon.Visible = true;
-                if (settings.MinimizeToTray)
-                    this.Hide();
-            }
+                HideKoPlayer();
         }
 
         private void trayIcon_MouseDown(object sender, MouseEventArgs e)
