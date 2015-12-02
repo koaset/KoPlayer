@@ -202,14 +202,15 @@
             // volumeTrackBar
             // 
             this.volumeTrackBar.AutoSize = false;
+            this.volumeTrackBar.LargeChange = 50;
             this.volumeTrackBar.Location = new System.Drawing.Point(193, 62);
-            this.volumeTrackBar.Maximum = 50;
+            this.volumeTrackBar.Maximum = 1000;
             this.volumeTrackBar.Name = "volumeTrackBar";
             this.volumeTrackBar.Size = new System.Drawing.Size(118, 27);
+            this.volumeTrackBar.SmallChange = 10;
             this.volumeTrackBar.TabIndex = 5;
-            this.volumeTrackBar.TickFrequency = 25;
             this.volumeTrackBar.TickStyle = System.Windows.Forms.TickStyle.None;
-            this.volumeTrackBar.Value = 10;
+            this.volumeTrackBar.Value = 100;
             this.volumeTrackBar.ValueChanged += new System.EventHandler(this.volumeTrackBar_ValueChanged);
             this.volumeTrackBar.MouseWheel += new System.Windows.Forms.MouseEventHandler(this.volumeTrackBar_MouseWheel);
             // 

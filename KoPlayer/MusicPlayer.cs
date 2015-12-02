@@ -78,14 +78,14 @@ namespace KoPlayer
             get
             {
                 if (soundOut != null)
-                    return Math.Min(100, Math.Max((int)(soundOut.Volume * 100), 0));
+                    return Math.Min(100, Math.Max((int)(soundOut.Volume * 1000), 0));
                 return 1;
             }
             set
             {
                 if (soundOut != null)
                 {
-                    soundOut.Volume = Math.Min(1.0f, Math.Max(value / 100f, 0f));
+                    soundOut.Volume = Math.Min(1.0f, Math.Max(value / 1000f, 0f));
                 }
             }
         }

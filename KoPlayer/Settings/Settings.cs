@@ -52,6 +52,7 @@ namespace KoPlayer
         }
 
         public string StartupPlaylist = "Library";
+        public int Volume = 100;
 
         public string Shufflequeue_SourcePlaylistName = "Library";
         public int Shufflequeue_NumPrevious = 5;

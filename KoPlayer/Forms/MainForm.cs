@@ -157,6 +157,7 @@ namespace KoPlayer.Forms
             SetTrayIconContextMenu();
             SetStatusStrip();
             UpdateShowingPlaylist();
+            volumeTrackBar.Value = settings.Volume;
         }
 
         private void SetSongGridViewStyle()
@@ -460,14 +461,14 @@ namespace KoPlayer.Forms
         private void preferencesToolStripMenuItem_Click(object sender, EventArgs e)
         {
             hook.Dispose();
-            SettingsWindow settingsWindow = new SettingsWindow(this, this.playlists);
+            var settingsWindow = new SettingsWindow(this, this.playlists);
             settingsWindow.StartPosition = FormStartPosition.CenterParent;
-            this.settings.Save(SettingsPath);
+            settings.Save(SettingsPath);
             
             if (settingsWindow.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                 SetSettings();
             else
-                this.settings = Settings.Load(SettingsPath);
+                settings = Settings.Load(SettingsPath);
             SetUpGlobalHotkeys();
         }
 
@@ -477,14 +478,10 @@ namespace KoPlayer.Forms
 
             PopulateShuffleQueue();
 
-            //last.fm
-
             UpdateShowingPlaylist();
             ResetSearchBox();
             RefreshSongGridView();
             songGridView.Focus();
-
-            SetStartupSetting();
 
             settings.Save(SettingsPath);
         }
@@ -517,6 +514,8 @@ namespace KoPlayer.Forms
             settings.StartupPlaylist = showingPlaylist.Name;
             if (settings.StartupPlaylist == "Search Results")
                 settings.StartupPlaylist = library.Name;
+
+            settings.Volume = volumeTrackBar.Value;
 
             settings.Save(SettingsPath);
 
@@ -740,9 +739,9 @@ namespace KoPlayer.Forms
             if (currentSongTimePlayed.Ticks > 0.8 * musicPlayer.Length.Ticks ||
                 currentSongTimePlayed.TotalMinutes > 4)
             {
-                this.currentSongTimePlayed = TimeSpan.Zero;
-                this.currentlyPlaying.LastPlayed = DateTime.Now;
-                this.currentlyPlaying.PlayCount++;
+                currentSongTimePlayed = TimeSpan.Zero;
+                currentlyPlaying.LastPlayed = DateTime.Now;
+                currentlyPlaying.PlayCount++;
 
                 if (settings.ScrobblingEnabled)
                     if (currentlyPlaying.Length.TotalSeconds > 30)

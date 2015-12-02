@@ -25,6 +25,7 @@ namespace KoPlayer
             bool createdNew = true;
             using (var mutex = new Mutex(true, "KoPlayer", out createdNew))
             {
+                // If new start app, else bring existing to front
                 if (createdNew)
                     HandleStartup(args);
                 else
@@ -42,6 +43,10 @@ namespace KoPlayer
             }
         }
 
+        /// <summary>
+        /// Runs the application according to the args
+        /// </summary>
+        /// <param name="args"></param>
         static void HandleStartup(string[] args)
         {
             if (args.Length > 0 && args[0] == "-nolog")
@@ -64,6 +69,9 @@ namespace KoPlayer
             }
         }
 
+        /// <summary>
+        /// Starts the main form
+        /// </summary>
         static void Run()
         {
             Application.EnableVisualStyles();
