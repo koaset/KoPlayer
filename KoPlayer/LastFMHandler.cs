@@ -62,21 +62,22 @@ namespace KoPlayer
 
         public void TryResumeSession()
         {
-            if (currentSession != null)
-            {
-                ChangeStatus("Resuming");
+            if (currentSession == null)
+                return;
 
-                client.Auth.LoadSession(currentSession);
+            ChangeStatus("Resuming");
 
-                ChangeStatus("Not Connected");
-                if (client.Auth.UserSession != null)
-                {
-                    scrobbler = new Scrobbler(client.Auth, client.HttpClient);
+            client.Auth.LoadSession(currentSession);
 
-                    if (client.Auth.Authenticated)
-                        ChangeStatus("Connected");
-                }
-            }
+            ChangeStatus("Not Connected");
+
+            if (client.Auth.UserSession == null)
+                return;
+
+            scrobbler = new Scrobbler(client.Auth, client.HttpClient);
+
+            if (client.Auth.Authenticated)
+                ChangeStatus("Connected");
         }
 
         public async void TryLoginAsync(string userName, string password)
@@ -126,7 +127,7 @@ namespace KoPlayer
                 toScrobble.AddRange(scrobbleQueue);
 
             var response = await scrobbler.ScrobbleAsync(toScrobble);
-
+            
             if (response.Success)
                 scrobbleQueue.RemoveRange(0, toScrobble.Count);
         }

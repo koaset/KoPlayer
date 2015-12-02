@@ -1704,7 +1704,7 @@ namespace KoPlayer.Forms
                 ShowKoPlayer();
         }
 
-        private void ShowKoPlayer()
+        public void ShowKoPlayer()
         {
             this.TopMost = true;
             this.Show();
