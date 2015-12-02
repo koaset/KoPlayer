@@ -6,7 +6,7 @@ using System.Linq;
 using System.Windows.Forms;
 using System.Xml.Serialization;
 
-namespace KoPlayer.Playlists
+namespace KoPlayer.Lib
 {
 
     public class Playlist : IPlaylist
@@ -278,10 +278,11 @@ namespace KoPlayer.Playlists
         {
             try
             {
-                Stream stream = File.Create(this.Path);
-                XmlSerializer serializer = new XmlSerializer(typeof(Playlist));
-                serializer.Serialize(stream, this);
-                stream.Close();
+                using (var stream = File.Create(Path))
+                {
+                    XmlSerializer serializer = new XmlSerializer(typeof(Playlist));
+                    serializer.Serialize(stream, this);
+                }
             }
             catch (Exception ex)
             {

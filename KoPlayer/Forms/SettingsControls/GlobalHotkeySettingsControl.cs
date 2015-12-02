@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using KoPlayer.Playlists;
+using KoPlayer.Lib;
 
 namespace KoPlayer.Forms.SettingsControls
 {

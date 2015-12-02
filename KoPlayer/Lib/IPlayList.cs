@@ -7,7 +7,7 @@ using System.Xml.Serialization;
 using System.ComponentModel;
 using System.Windows.Forms;
 
-namespace KoPlayer.Playlists
+namespace KoPlayer.Lib
 {
     public interface IPlaylist
     {

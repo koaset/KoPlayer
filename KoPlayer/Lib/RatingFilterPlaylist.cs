@@ -8,7 +8,7 @@ using System.IO;
 using System.Xml.Serialization;
 using System.Windows.Forms;
 
-namespace KoPlayer.Playlists
+namespace KoPlayer.Lib
 {
     public class RatingFilterPlaylist : Playlist
     {
@@ -126,17 +126,15 @@ namespace KoPlayer.Playlists
             RatingFilterPlaylist loadedPlaylist = null;
             try
             {
-                stream = File.OpenRead(path);
-                XmlSerializer serializer = new XmlSerializer(typeof(RatingFilterPlaylist));
-                loadedPlaylist = (RatingFilterPlaylist)serializer.Deserialize(stream);
+                using (stream = File.OpenRead(path))
+                {
+                    XmlSerializer serializer = new XmlSerializer(typeof(RatingFilterPlaylist));
+                    loadedPlaylist = (RatingFilterPlaylist)serializer.Deserialize(stream);
+                }
             }
             catch
             {
                 return null;
-            }
-            finally
-            {
-                if (stream != null) stream.Close();
             }
             RatingFilterPlaylist pl = new RatingFilterPlaylist(library, loadedPlaylist.Name, 
                 new List<string>(), loadedPlaylist.AllowedRating, loadedPlaylist.IncludeHigher);

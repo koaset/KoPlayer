@@ -3,7 +3,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Windows.Forms;
 
-namespace KoPlayer.Playlists
+namespace KoPlayer.Lib
 {
     public static class Sorting
     {

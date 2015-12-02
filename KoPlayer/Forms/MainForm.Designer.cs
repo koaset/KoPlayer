@@ -457,7 +457,7 @@
             // 
             // playlistBindingSource
             // 
-            this.playlistBindingSource.DataSource = typeof(KoPlayer.Playlists.Playlist);
+            this.playlistBindingSource.DataSource = typeof(KoPlayer.Lib.Playlist);
             // 
             // MainForm
             // 

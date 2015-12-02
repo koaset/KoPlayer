@@ -1,7 +1,7 @@
 ﻿using CSCore.CoreAudioAPI;
 using CSCore.SoundOut;
 using CSCore.Streams;
-using KoPlayer.Playlists;
+using KoPlayer.Lib;
 using KoPlayer.Forms;
 using Microsoft.Win32;
 using System;
@@ -995,7 +995,6 @@ namespace KoPlayer.Forms
             UpdateFilterPlaylistSongPaths();
             UpdateSongsForRatingFilterPlaylist(songs);
             RefreshSongGridView();
-            showingPlaylist.Save();
             if (showingPlaylist.GetType() == typeof(RatingFilterPlaylist))
                 UpdateShowingPlaylist();
         }
@@ -1007,7 +1006,6 @@ namespace KoPlayer.Forms
             UpdateFilterPlaylistSongPaths();
             UpdateSongForRatingFilterPlaylist(s);
             RefreshSongGridView();
-            playingPlaylist.Save();
             if (showingPlaylist.GetType() == typeof(RatingFilterPlaylist))
                 UpdateShowingPlaylist();
         }

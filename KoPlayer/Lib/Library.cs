@@ -6,7 +6,7 @@ using System.Linq;
 using System.Windows.Forms;
 using System.Xml.Serialization;
 
-namespace KoPlayer.Playlists
+namespace KoPlayer.Lib
 {
     public delegate void ReportProgressEventHandler(object sender, ReportProgressEventArgs e);
 
@@ -404,10 +404,11 @@ namespace KoPlayer.Playlists
 
         public void Save()
         {
-            Stream stream = File.Create(PATH);
-            XmlSerializer serializer = new XmlSerializer(typeof(List<Song>));
-            serializer.Serialize(stream, pathDictionary.Values.ToList());
-            stream.Close();
+            using (var stream = File.Create(PATH))
+            {
+                var serializer = new XmlSerializer(typeof(List<Song>));
+                serializer.Serialize(stream, pathDictionary.Values.ToList());
+            }
         }
 
         /// <summary>

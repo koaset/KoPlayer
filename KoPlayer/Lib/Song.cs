@@ -9,7 +9,7 @@ using System.IO;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 
-namespace KoPlayer.Playlists
+namespace KoPlayer.Lib
 {
     public class Song : IComparable
     {

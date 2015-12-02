@@ -1,7 +1,7 @@
 ﻿using IF.Lastfm.Core.Api;
 using IF.Lastfm.Core.Objects;
 using IF.Lastfm.Core.Scrobblers;
-using KoPlayer.Playlists;
+using KoPlayer.Lib;
 using Microsoft.Win32;
 using System;
 using System.IO;
