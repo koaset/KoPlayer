@@ -821,7 +821,8 @@ namespace KoPlayer.Forms
 
         private void OnSongReadException(SongReadException ex, Song song)
         {
-            MessageBox.Show(ex.ToString() + "\nSong will be removed from the library.");
+            MessageBox.Show("Song at " + song.Path +
+                " could not be read and will be removed from the library.");
             library.Remove(song);
         }
 

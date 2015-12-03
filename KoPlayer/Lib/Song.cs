@@ -239,7 +239,7 @@ namespace KoPlayer.Lib
             }
             catch
             {
-                throw new SongReloadException();
+                throw new SongReadException();
             }
         }
 
@@ -260,7 +260,7 @@ namespace KoPlayer.Lib
             }
             catch
             {
-                throw new SongReloadException();
+                throw new SongReadException();
             }
 
             return image;
@@ -327,19 +327,6 @@ namespace KoPlayer.Lib
         public SongReadException()
         {
             this.Message = "Could not read song tags";
-        }
-    }
-
-    public class SongReloadException : Exception
-    {
-        string message;
-        public SongReloadException()
-            : base()
-        { this.message = "Song load failed: File not found"; }
-
-        public override string ToString()
-        {
-            return this.message;
         }
     }
 }
