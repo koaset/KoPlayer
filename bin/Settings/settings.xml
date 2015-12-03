@@ -3,6 +3,7 @@
   <FormWidth>1058</FormWidth>
   <FormHeight>600</FormHeight>
   <StartupPlaylist>Shuffle Queue</StartupPlaylist>
+  <Volume>100</Volume>
   <Shufflequeue_SourcePlaylistName>Library</Shufflequeue_SourcePlaylistName>
   <Shufflequeue_NumPrevious>5</Shufflequeue_NumPrevious>
   <Shufflequeue_NumNext>15</Shufflequeue_NumNext>

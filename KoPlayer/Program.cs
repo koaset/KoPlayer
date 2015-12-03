@@ -69,14 +69,17 @@ namespace KoPlayer
             }
         }
 
-        /// <summary>
-        /// Starts the main form
-        /// </summary>
         static void Run()
         {
+            // Start the main form
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new MainForm());
+            var mainForm = new MainForm();
+            Application.Run(mainForm);
+
+            // Save playlists after form exits
+            foreach (var pl in mainForm.Playlists)
+                pl.Save();
         }
     }
 }

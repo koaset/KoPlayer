@@ -31,6 +31,7 @@ namespace KoPlayer.Forms
         public Settings Settings { get { return settings; } set { settings = value; } }
         public Song CurrentlyPlaying { get { return this.currentlyPlaying; } }
         public LastfmHandler LastFMHandler { get { return lfmHandler; } }
+        public List<IPlaylist> Playlists { get { return playlists; } }
         #endregion
 
         #region Fields
@@ -522,9 +523,6 @@ namespace KoPlayer.Forms
             columnSettings = new ColumnSettings(songGridView.Columns);
             columnSettings.Save(ColumnSettingsPath);
 
-            foreach (IPlaylist pl in playlists)
-                pl.Save();
-
             searchBarTimer.Stop();
             searchBarTimer.Dispose();
             if (searchLibraryTimer != null)
@@ -534,6 +532,8 @@ namespace KoPlayer.Forms
             }
             trayIcon.Dispose();
             musicPlayer.Dispose();
+
+            // Saving of playlists is done after the form has closed (program.cs)
         }
         #endregion
 
@@ -1697,7 +1697,7 @@ namespace KoPlayer.Forms
 
         private void showKoPlayerToggleShow_Event(object sender, EventArgs e)
         {
-            if (this.WindowState != FormWindowState.Minimized)
+            if (WindowState != FormWindowState.Minimized)
                 HideKoPlayer();
             else
                 ShowKoPlayer();
