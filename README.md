@@ -11,7 +11,7 @@ Features:
 -Configurable global hotkeys.  
 -Popup displaying currently playing song info.  
 -Dragging and dropping of songs and song files  
--Scrobbling to last.fm  
+-last.fm scrobbling  
 
 Libaries used: CSCore, TagLib# and Inflatable.Lastfm  
 
