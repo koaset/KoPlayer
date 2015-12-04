@@ -58,22 +58,22 @@ namespace KoPlayer.Lib
         /// <returns></returns>
         public static ShuffleQueue Load(String path, Library library, Settings settings)
         {
-            Stream stream = null;
             Playlist loadedPlaylist = null;
+
+
             try
             {
-                stream = File.OpenRead(path);
-                XmlSerializer serializer = new XmlSerializer(typeof(ShuffleQueue));
-                loadedPlaylist = (ShuffleQueue)serializer.Deserialize(stream);
+                using (var stream = File.OpenRead(path))
+                {
+                    XmlSerializer serializer = new XmlSerializer(typeof(ShuffleQueue));
+                    loadedPlaylist = (ShuffleQueue)serializer.Deserialize(stream);
+                }
             }
             catch
             {
                 return null;
             }
-            finally
-            {
-                if (stream != null) stream.Close();
-            }
+
             ShuffleQueue pl = new ShuffleQueue(library, settings, loadedPlaylist.songPaths);
             library.Changed += pl.library_LibraryChanged;
             pl.CurrentIndex = loadedPlaylist.CurrentIndex;

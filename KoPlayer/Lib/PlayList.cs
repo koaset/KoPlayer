@@ -305,32 +305,25 @@ namespace KoPlayer.Lib
         /// <returns></returns>
         public static Playlist Load(String path, Library library)
         {
-            Stream stream = null;
             Playlist loadedPlaylist = null;
-            try
+
+            using (var stream = File.OpenRead(path))
             {
-                stream = File.OpenRead(path);
                 XmlSerializer serializer = new XmlSerializer(typeof(Playlist));
                 loadedPlaylist = (Playlist)serializer.Deserialize(stream);
             }
-            catch
-            {
-                return null;
-            }
-            finally
-            {
-                if (stream != null) stream.Close();
-            }
-            Playlist pl = new Playlist(library, loadedPlaylist.Name, loadedPlaylist.songPaths);
+
+            var pl = new Playlist(library, loadedPlaylist.Name, loadedPlaylist.songPaths);
             library.Changed += pl.library_LibraryChanged;
             pl.CurrentIndex = loadedPlaylist.CurrentIndex;
 
-            List<string> toBeRemoved = new List<string>();
+            var toBeRemoved = new List<string>();
             foreach (string filePath in pl.songPaths)
                 if (!library.PathDictionary.Keys.Contains(filePath))
                     toBeRemoved.Add(filePath);
             foreach (string filePath in toBeRemoved)
                 pl.Remove(filePath);
+
 
             return pl;
         }

@@ -419,22 +419,21 @@ namespace KoPlayer.Lib
         /// <returns></returns>
         public static Library Load()
         {
-            Stream stream = null;
             List<Song> loadedLibrary = null;
+
             try
             {
-                stream = File.OpenRead(PATH);
-                XmlSerializer serializer = new XmlSerializer(typeof(List<Song>));
-                loadedLibrary = (List<Song>)serializer.Deserialize(stream);
+                using (var stream = File.OpenRead(PATH))
+                {
+                    XmlSerializer serializer = new XmlSerializer(typeof(List<Song>));
+                    loadedLibrary = (List<Song>)serializer.Deserialize(stream);
+                }
             }
             catch
             {
                 return null;
             }
-            finally
-            {
-                if (stream != null) stream.Close();
-            }
+
             return new Library(loadedLibrary);
         }
     }
