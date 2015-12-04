@@ -111,6 +111,7 @@
     </Compile>
     <Compile Include="LastFMHandler.cs" />
     <Compile Include="Lib\SearchResult.cs" />
+    <Compile Include="Lib\ShuffleQueue.cs" />
     <Compile Include="Settings\EqualizerSettings.cs" />
     <Compile Include="Forms\EqualizerWindow.cs">
       <SubType>Form</SubType>

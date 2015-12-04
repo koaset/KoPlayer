@@ -36,7 +36,7 @@ namespace KoPlayer.Forms
 
         #region Fields
         private Library library;
-        private Playlist shuffleQueue;
+        private ShuffleQueue shuffleQueue;
         
         private IPlaylist showingPlaylist;
         private IPlaylist playingPlaylist;
@@ -153,7 +153,8 @@ namespace KoPlayer.Forms
             }
 
             SetPlaylistGridView();
-            PopulateShuffleQueue();
+            shuffleQueue.Source = GetPlaylist(settings.Shufflequeue_SourcePlaylistName);
+            shuffleQueue.Populate();
             UpdateTrayIconText();
             SetTrayIconContextMenu();
             SetStatusStrip();
@@ -236,10 +237,10 @@ namespace KoPlayer.Forms
                 Directory.CreateDirectory(PlaylistDirectoryPath);
 
             // Load shuffle queue
-            shuffleQueue = Playlist.Load(ShuffleQueuePath, library);
+            shuffleQueue = ShuffleQueue.Load(ShuffleQueuePath, library, settings);
             if (shuffleQueue == null)
             {
-                shuffleQueue = new Playlist(library, "Shuffle Queue");
+                shuffleQueue = new ShuffleQueue(library, settings);
                 shuffleQueue.Save();
             }
             playlists.Add(shuffleQueue);
@@ -312,6 +313,7 @@ namespace KoPlayer.Forms
         }
 
         #region Shuffle Queue
+        /*
         private void PopulateShuffleQueue()
         {
             if (songGridView.InvokeRequired)
@@ -320,21 +322,9 @@ namespace KoPlayer.Forms
             }
             else
             {
-                IPlaylist source = GetPlaylist(settings.Shufflequeue_SourcePlaylistName);
-                if (source == null)
-                {
-                    source = library;
-                    settings.Shufflequeue_SourcePlaylistName = library.Name;
-                }
-
-                while (shuffleQueue.CurrentIndex > settings.Shufflequeue_NumPrevious)
-                    shuffleQueue.Remove(0);
-
-                if (source.NumSongs > 0)
-                    while (shuffleQueue.NumSongs - shuffleQueue.CurrentIndex < settings.Shufflequeue_NumNext + 1)
-                        shuffleQueue.Add(source.GetRandom());
+                shuffleQueue.Populate();
             }
-        }
+        }*/
 
         private void SetShuffleQueueColors()
         {
@@ -359,6 +349,11 @@ namespace KoPlayer.Forms
             {
                 if (pl == showingPlaylist)
                     ChangeToPlaylist(library);
+                if (pl == shuffleQueue.Source)
+                {
+                    shuffleQueue.Source = library;
+                    settings.Shufflequeue_SourcePlaylistName = library.Name;
+                }
                 if (pl == playingPlaylist)
                 {
                     StopPlaying();
@@ -447,7 +442,7 @@ namespace KoPlayer.Forms
             showingPlaylist = playlist;
 
             if (showingPlaylist == shuffleQueue)
-                PopulateShuffleQueue();
+                shuffleQueue.Populate();
 
             UpdateShowingPlaylist();
             songGridView.ClearSelection();
@@ -477,7 +472,8 @@ namespace KoPlayer.Forms
         {
             SetSongGridViewStyle();
 
-            PopulateShuffleQueue();
+            shuffleQueue.Source = GetPlaylist(settings.Shufflequeue_SourcePlaylistName);
+            shuffleQueue.Populate();
 
             UpdateShowingPlaylist();
             ResetSearchBox();
@@ -509,6 +505,18 @@ namespace KoPlayer.Forms
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
+            // Stop playback & timers
+            searchBarTimer.Stop();
+            searchBarTimer.Dispose();
+            if (searchLibraryTimer != null)
+            {
+                searchLibraryTimer.Stop();
+                searchLibraryTimer.Dispose();
+            }
+            trayIcon.Dispose();
+            musicPlayer.Dispose();
+
+            // Save settings
             settings.FormWidth = this.Width;
             settings.FormHeight = this.Height;
 
@@ -520,18 +528,9 @@ namespace KoPlayer.Forms
 
             settings.Save(SettingsPath);
 
+            // Save data grid column settings
             columnSettings = new ColumnSettings(songGridView.Columns);
             columnSettings.Save(ColumnSettingsPath);
-
-            searchBarTimer.Stop();
-            searchBarTimer.Dispose();
-            if (searchLibraryTimer != null)
-            {
-                searchLibraryTimer.Stop();
-                searchLibraryTimer.Dispose();
-            }
-            trayIcon.Dispose();
-            musicPlayer.Dispose();
 
             // Saving of playlists is done after the form has closed (program.cs)
         }
@@ -598,7 +597,7 @@ namespace KoPlayer.Forms
                     pl.GetSongs();
 
             if (showingPlaylist == shuffleQueue)
-                PopulateShuffleQueue();
+                shuffleQueue.Populate();
 
             UpdateShowingPlaylist();
 
@@ -775,7 +774,7 @@ namespace KoPlayer.Forms
 
             if (inPlaylist == shuffleQueue)
             {
-                PopulateShuffleQueue();
+                shuffleQueue.Populate();
 
                 if (showingPlaylist == shuffleQueue)
                     UpdateShowingPlaylist();
@@ -1084,7 +1083,7 @@ namespace KoPlayer.Forms
             }
 
             if (showingPlaylist == shuffleQueue)
-                PopulateShuffleQueue();
+                shuffleQueue.Populate();
             
             showingPlaylist.Save();
 
@@ -1598,7 +1597,7 @@ namespace KoPlayer.Forms
                     }
 
                     if (showingPlaylist == shuffleQueue)
-                        PopulateShuffleQueue();
+                        shuffleQueue.Populate();
                     
                     UpdateShowingPlaylist();
                 }
