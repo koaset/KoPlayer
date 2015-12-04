@@ -22,12 +22,25 @@ namespace KoPlayer
         [STAThread]
         static void Main(string[] args)
         {
+#if DEBUG
+            Run();
+#else
+            RunRelease();
+#endif
+        }
+
+        /// <summary>
+        /// Does release build checks before running
+        /// </summary>
+        /// <param name="args"></param>
+        static void RunRelease()
+        {
             bool createdNew = true;
             using (var mutex = new Mutex(true, "KoPlayer", out createdNew))
             {
                 // If new start app, else bring existing to front
                 if (createdNew)
-                    HandleStartup(args);
+                    RunWithErrorLog();
                 else
                 {
                     var current = Process.GetCurrentProcess();
@@ -44,27 +57,19 @@ namespace KoPlayer
         }
 
         /// <summary>
-        /// Runs the application according to the args
+        /// Runs the application with errorlogger
         /// </summary>
-        /// <param name="args"></param>
-        static void HandleStartup(string[] args)
+        static void RunWithErrorLog()
         {
-            if (args.Length > 0 && args[0] == "-nolog")
+            try
             {
                 Run();
             }
-            else
+            catch (Exception e)
             {
-                try
+                using (var errorLogger = new ErrorLogger(e))
                 {
-                    Run();
-                }
-                catch (Exception e)
-                {
-                    using (var errorLogger = new ErrorLogger(e))
-                    {
-                        errorLogger.Run();
-                    }
+                    errorLogger.Run();
                 }
             }
         }
