@@ -1531,7 +1531,8 @@ namespace KoPlayer.Forms
             {
                 if (e.Data.GetType() == typeof(DragDropSongs))
                 {
-                    if (showingPlaylist.GetType() == typeof(Playlist))
+                    if (showingPlaylist.GetType() == typeof(Playlist) ||
+                        showingPlaylist.GetType() == typeof(ShuffleQueue))
                         e.Effect = DragDropEffects.Copy;
                 }
                 else if (CanAddPaths((string[])e.Data.GetData(DataFormats.FileDrop)))
@@ -1639,7 +1640,8 @@ namespace KoPlayer.Forms
             {
                 IPlaylist pl = playlists[info.RowIndex];
 
-                if (pl.GetType() == typeof(Playlist))
+                if (pl.GetType() == typeof(Playlist) ||
+                    pl.GetType() == typeof(ShuffleQueue))
                     e.Effect = DragDropEffects.Copy;
             }
         }
@@ -1666,7 +1668,8 @@ namespace KoPlayer.Forms
                              songs.Add((Song)row.DataBoundItem);
 
                     IPlaylist pl = GetPlaylist(playlistGridView.Rows[info.RowIndex].Cells[0].Value.ToString());
-                    if (pl.GetType() == typeof(Playlist))
+                    if (pl.GetType() == typeof(Playlist) ||
+                    pl.GetType() == typeof(ShuffleQueue))
                     {
                         pl.Add(songs);
 

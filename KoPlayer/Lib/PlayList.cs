@@ -145,7 +145,14 @@ namespace KoPlayer.Lib
         public void Insert(int index, Song song)
         {
             this.Insert(index, song.Path);
-            outputSongs.Insert(index, song);
+
+            if (index == CurrentIndex)
+                outputSongs.Insert(index + 1, song);
+            else if (index < outputSongs.Count)
+                outputSongs.Insert(index, song);
+            else
+                outputSongs.Add(song);
+
             NotifyChange();
         }
 
