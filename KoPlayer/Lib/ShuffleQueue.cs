@@ -50,22 +50,6 @@ namespace KoPlayer.Lib
                     Add(Source.GetRandom());
         }
 
-        public override void Save()
-        {
-            try
-            {
-                using (var stream = File.Create(Path))
-                {
-                    XmlSerializer serializer = new XmlSerializer(typeof(ShuffleQueue));
-                    serializer.Serialize(stream, this);
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Save play list exception: " + ex.ToString());
-            }
-        }
-
         /// <summary>
         /// Load shufflequeue from file. Returns null if it fails
         /// </summary>

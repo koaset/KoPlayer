@@ -99,21 +99,6 @@ namespace KoPlayer.Lib
             return libraryDictionary[songPaths[Playlist.r.Next(0, songPaths.Count)]];
         }
 
-        public override void Save()
-        {
-            try
-            {
-                Stream stream = File.Create(this.Path);
-                XmlSerializer serializer = new XmlSerializer(typeof(RatingFilterPlaylist));
-                serializer.Serialize(stream, this);
-                stream.Close();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Save play list exception: " + ex.ToString());
-            }
-        }
-
         /// <summary>
         /// Load playlist from file. Returns null if it fails:
         /// </summary>

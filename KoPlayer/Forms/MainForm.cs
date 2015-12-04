@@ -213,6 +213,19 @@ namespace KoPlayer.Forms
             SetSortGlyph();
         }
 
+        private void SetShuffleQueueColors()
+        {
+            foreach (DataGridViewRow row in songGridView.Rows)
+            {
+                if (row.Index == shuffleQueue.CurrentIndex)
+                    row.DefaultCellStyle.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
+                else if (row.Index % 2 == 0)
+                    row.DefaultCellStyle.BackColor = Color.White;
+                else
+                    row.DefaultCellStyle.BackColor = System.Drawing.SystemColors.Control;
+            }
+        }
+
         private void SetSortGlyph()
         {
             foreach (DataGridViewColumn column in songGridView.Columns)
@@ -311,34 +324,6 @@ namespace KoPlayer.Forms
                     return pl;
             return null;
         }
-
-        #region Shuffle Queue
-        /*
-        private void PopulateShuffleQueue()
-        {
-            if (songGridView.InvokeRequired)
-            {
-                songGridView.Invoke(new MethodInvoker(delegate { PopulateShuffleQueue(); }));
-            }
-            else
-            {
-                shuffleQueue.Populate();
-            }
-        }*/
-
-        private void SetShuffleQueueColors()
-        {
-            foreach (DataGridViewRow row in songGridView.Rows)
-            {
-                if (row.Index == shuffleQueue.CurrentIndex)
-                    row.DefaultCellStyle.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
-                else if (row.Index % 2 == 0)
-                    row.DefaultCellStyle.BackColor = Color.White;
-                else
-                    row.DefaultCellStyle.BackColor = System.Drawing.SystemColors.Control;
-            }
-        }
-        #endregion
 
         #region Playlist manipulatiom methods
         private void DeletePlaylist(DataGridViewCell cell)

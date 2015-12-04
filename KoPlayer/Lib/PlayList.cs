@@ -280,7 +280,7 @@ namespace KoPlayer.Lib
             {
                 using (var stream = File.Create(Path))
                 {
-                    XmlSerializer serializer = new XmlSerializer(typeof(Playlist));
+                    XmlSerializer serializer = new XmlSerializer(this.GetType());
                     serializer.Serialize(stream, this);
                 }
             }
