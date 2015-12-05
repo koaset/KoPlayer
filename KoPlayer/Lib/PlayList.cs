@@ -324,7 +324,6 @@ namespace KoPlayer.Lib
             foreach (string filePath in toBeRemoved)
                 pl.Remove(filePath);
 
-
             return pl;
         }
 

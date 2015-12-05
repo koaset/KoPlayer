@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<ArrayOfSong xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Song>
+    <Path>Songs\empty10sec.mp3</Path>
+    <Title>empty10sec</Title>
+    <Artist>artist</Artist>
+    <Album>album</Album>
+    <Genre>noise</Genre>
+    <TrackNumber>1</TrackNumber>
+    <DiscNumber>1</DiscNumber>
+    <Rating>0</Rating>
+    <PlayCount>0</PlayCount>
+    <LengthMS>10717</LengthMS>
+    <DateAdded>2015-12-05T17:00:16.5518085+01:00</DateAdded>
+    <LastPlayed>0001-01-01T00:00:00</LastPlayed>
+  </Song>
+</ArrayOfSong>

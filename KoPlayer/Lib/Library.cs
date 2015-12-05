@@ -116,12 +116,6 @@ namespace KoPlayer.Lib
             return outputSongs;
         }
 
-        public List<Song> GetAllSongs()
-        {
-            this.outputSongs = GetSongsFromPathDictionary();
-            return GetSongs();
-        }
-
         private List<Song> GetSongsFromPathDictionary()
         {
             return pathDictionary.Values.ToList();
