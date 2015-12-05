@@ -81,6 +81,8 @@
   </Choose>
   <ItemGroup>
     <Compile Include="LibraryTest.cs" />
+    <Compile Include="PlaylistTest.cs" />
+    <Compile Include="ShuffleQueueTest.cs" />
     <Compile Include="SongTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

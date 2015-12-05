@@ -9,7 +9,7 @@ namespace LibTests
     public class LibraryTest
     {
         [TestMethod]
-        public void CreateLibraryTest()
+        public void LibraryCreate()
         {
             int numSongsExpected = 0;
             string nameExpected = "Library";
@@ -21,7 +21,7 @@ namespace LibTests
         }
 
         [TestMethod]
-        public void SaveTest()
+        public void LibrarySave()
         {
             Library lib = new Library();
             lib.Add(new Song(@"Songs\empty10sec.mp3"));
@@ -37,7 +37,7 @@ namespace LibTests
         }
 
         [TestMethod]
-        public void LoadTest()
+        public void LibraryLoad()
         {
             int numSongsExpected = 1;
 
