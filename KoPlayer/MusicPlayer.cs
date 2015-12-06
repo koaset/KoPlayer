@@ -10,6 +10,7 @@ namespace KoPlayer
 {
     public class MusicPlayer : IDisposable
     {
+        private MMDevice device;
         private ISoundOut soundOut;
         private IWaveSource finalSource;
         private Equalizer equalizer;
@@ -108,11 +109,19 @@ namespace KoPlayer
 
         public MusicPlayer()
         {
-            //soundOut = new WasapiOut();
-            //soundOut.Initialize(null);
+            using (var enumerator = new MMDeviceEnumerator())
+            {
+                device = enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia);
+
+                using (var client = AudioClient.FromMMDevice(device))
+                {
+                    client.Initialize(AudioClientShareMode.Shared,
+                        AudioClientStreamFlags.None, 1000, 0, client.GetMixFormat(), Guid.Empty);
+                }
+            }
         }
 
-        public void Open(string filename, MMDevice device)
+        public void Open(string filename)
         {
             CleanupPlayback();
 
@@ -134,8 +143,9 @@ namespace KoPlayer
                 soundOut = new DirectSoundOut();
 
             soundOut.Initialize(finalSource);
-            soundOut.Volume = deviceVolume;
 
+            soundOut.Volume = deviceVolume;
+            
             if (this.OpenCompleted != null)
                 this.OpenCompleted(this, new EventArgs());
         }

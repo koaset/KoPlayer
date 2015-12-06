@@ -48,7 +48,6 @@ namespace KoPlayer.Forms
         private int songInfoPopupTime = 3000;
 
         private readonly MusicPlayer musicPlayer = new MusicPlayer();
-        private MMDevice defaultAudioDevice;
         private EqualizerSettings equalizerSettings;
 
         private Song currentlyPlaying;
@@ -94,8 +93,6 @@ namespace KoPlayer.Forms
             if (settings == null)
                 settings = new Settings();
 
-            MMDeviceEnumerator enumerator = new MMDeviceEnumerator();
-            defaultAudioDevice = enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia);
             musicPlayer.OpenCompleted += equalizerSettings_ShouldSet;
             musicPlayer.OpenCompleted += musicPlayer_ShouldPlay;
             musicPlayer.DeviceVolume = settings.DeviceVolume;
@@ -744,7 +741,7 @@ namespace KoPlayer.Forms
 
             try
             {
-                this.musicPlayer.Open(song.Path, defaultAudioDevice);
+                this.musicPlayer.Open(song.Path);
             }
             catch (Exception ex)
             {

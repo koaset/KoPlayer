@@ -2,7 +2,7 @@
 <Settings xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <FormWidth>1058</FormWidth>
   <FormHeight>600</FormHeight>
-  <StartupPlaylist>Library</StartupPlaylist>
+  <StartupPlaylist>Shuffle Queue</StartupPlaylist>
   <Volume>100</Volume>
   <DeviceVolume>1</DeviceVolume>
   <Shufflequeue_SourcePlaylistName>Library</Shufflequeue_SourcePlaylistName>
