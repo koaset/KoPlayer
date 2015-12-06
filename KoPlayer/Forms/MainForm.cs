@@ -95,17 +95,18 @@ namespace KoPlayer.Forms
                 settings = new Settings();
 
             MMDeviceEnumerator enumerator = new MMDeviceEnumerator();
-            defaultAudioDevice = enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Console);
-            this.musicPlayer.OpenCompleted += equalizerSettings_ShouldSet;
-            this.musicPlayer.OpenCompleted += musicPlayer_ShouldPlay;
+            defaultAudioDevice = enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia);
+            musicPlayer.OpenCompleted += equalizerSettings_ShouldSet;
+            musicPlayer.OpenCompleted += musicPlayer_ShouldPlay;
+            musicPlayer.DeviceVolume = settings.DeviceVolume;
 
-            this.equalizerSettings = EqualizerSettings.Load(EqualizerPath);
-            if (this.equalizerSettings == null)
+            equalizerSettings = EqualizerSettings.Load(EqualizerPath);
+            if (equalizerSettings == null)
             {
-                this.equalizerSettings = new EqualizerSettings();
-                this.equalizerSettings.Save(EqualizerPath);
+                equalizerSettings = new EqualizerSettings();
+                equalizerSettings.Save(EqualizerPath);
             }
-            this.equalizerSettings.ValueChanged += equalizerSettings_ShouldSet;
+            equalizerSettings.ValueChanged += equalizerSettings_ShouldSet;
 
             SetUpGlobalHotkeys();
 
@@ -510,6 +511,7 @@ namespace KoPlayer.Forms
                 settings.StartupPlaylist = library.Name;
 
             settings.Volume = volumeTrackBar.Value;
+            settings.DeviceVolume = musicPlayer.DeviceVolume;
 
             settings.Save(SettingsPath);
 

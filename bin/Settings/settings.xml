@@ -4,6 +4,7 @@
   <FormHeight>600</FormHeight>
   <StartupPlaylist>Library</StartupPlaylist>
   <Volume>100</Volume>
+  <DeviceVolume>1</DeviceVolume>
   <Shufflequeue_SourcePlaylistName>Library</Shufflequeue_SourcePlaylistName>
   <Shufflequeue_NumPrevious>5</Shufflequeue_NumPrevious>
   <Shufflequeue_NumNext>15</Shufflequeue_NumNext>

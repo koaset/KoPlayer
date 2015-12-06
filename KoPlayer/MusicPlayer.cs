@@ -11,9 +11,12 @@ namespace KoPlayer
     public class MusicPlayer : IDisposable
     {
         private ISoundOut soundOut;
-        private IWaveSource waveSource;
+        private IWaveSource finalSource;
         private Equalizer equalizer;
 
+        private VolumeSource volumeSource;
+        private float deviceVolume = 1f;
+        
         public event EventHandler OpenCompleted;
 
         public event EventHandler<PlaybackStoppedEventArgs> PlaybackStopped
@@ -52,14 +55,14 @@ namespace KoPlayer
         {
             get
             {
-                if (waveSource != null)
-                    return waveSource.GetPosition();
+                if (finalSource != null)
+                    return finalSource.GetPosition();
                 return TimeSpan.Zero;
             }
             set
             {
-                if (waveSource != null)
-                    waveSource.SetPosition(value);
+                if (finalSource != null)
+                    finalSource.SetPosition(value);
             }
         }
 
@@ -67,8 +70,8 @@ namespace KoPlayer
         {
             get
             {
-                if (waveSource != null)
-                    return waveSource.GetLength();
+                if (finalSource != null)
+                    return finalSource.GetLength();
                 return TimeSpan.Zero;
             }
         }
@@ -78,16 +81,35 @@ namespace KoPlayer
             get
             {
                 if (soundOut != null)
-                    return Math.Min(100, Math.Max((int)(soundOut.Volume * 1000), 0));
+                    return Math.Min(100, Math.Max((int)(volumeSource.Volume * 1000), 0));
                 return 1;
             }
             set
             {
                 if (soundOut != null)
                 {
-                    soundOut.Volume = Math.Min(1.0f, Math.Max(value / 1000f, 0f));
+                    volumeSource.Volume = Math.Min(1.0f, Math.Max(value / 1000f, 0f));
                 }
             }
+        }
+
+        public float DeviceVolume
+        {
+            get
+            {
+                return deviceVolume;
+            }
+            set
+            {
+                if (deviceVolume > 0)
+                    deviceVolume = Math.Min(1.0f, value);
+            }
+        }
+
+        public MusicPlayer()
+        {
+            //soundOut = new WasapiOut();
+            //soundOut.Initialize(null);
         }
 
         public void Open(string filename, MMDevice device)
@@ -96,16 +118,24 @@ namespace KoPlayer
 
             var source = CodecFactory.Instance.GetCodec(filename);
 
-            waveSource =
-                CodecFactory.Instance.GetCodec(filename)
+            volumeSource = new VolumeSource(source);
+
+            equalizer = Equalizer.Create10BandEqualizer(volumeSource);
+
+            finalSource = equalizer
                     .ToStereo()
                     .ChangeSampleRate(44100)
-                    .ToSampleSource()
                     .AppendSource(Equalizer.Create10BandEqualizer, out equalizer)
                     .ToWaveSource(16);
+            
+            if (WasapiOut.IsSupportedOnCurrentPlatform)
+                soundOut = new WasapiOut() { Latency = 100, Device = device }; 
+            else
+                soundOut = new DirectSoundOut();
 
-            soundOut = new WasapiOut() {Latency = 100, Device = device};
-            soundOut.Initialize(waveSource);
+            soundOut.Initialize(finalSource);
+            soundOut.Volume = deviceVolume;
+
             if (this.OpenCompleted != null)
                 this.OpenCompleted(this, new EventArgs());
         }
@@ -132,13 +162,14 @@ namespace KoPlayer
         {
             if (soundOut != null)
             {
+                deviceVolume = soundOut.Volume;
                 soundOut.Dispose();
                 soundOut = null;
             }
-            if (waveSource != null)
+            if (finalSource != null)
             {
-                waveSource.Dispose();
-                waveSource = null;
+                finalSource.Dispose();
+                finalSource = null;
             }
         }
 
