@@ -27,48 +27,44 @@ namespace KoPlayer.Lib
             }
         }
         public bool IncludeHigher { get; set; }
-        public override string Path { get { return @"Playlists\" + base.Name + ".fpl"; } }
 
         public RatingFilterPlaylist()
             : base() { }
 
         public RatingFilterPlaylist(Library library, string name, int ratingCutoff, bool andHigher)
-            : this(library, name, new List<string>(), ratingCutoff, andHigher) { }
+            : this(library, name, new List<Song>(), ratingCutoff, andHigher) { }
         
-        public RatingFilterPlaylist(Library library, string name, List<string> songPaths, int ratingCutoff, bool includeHigher)
-            : base(library, name, songPaths) 
+        public RatingFilterPlaylist(Library library, string name, List<Song> songs, int ratingCutoff, bool includeHigher)
+            : base(library, name, songs) 
         {
             this.library = library;
             this.allowedRating = ratingCutoff;
             this.IncludeHigher = includeHigher;
-            UpdateSongPaths();
-            outputSongs = GetSongsFromLibrary();
-            Sorting.CreateSortDictionaries(outputSongs, this.sortDictionaries);
+            UpdateSongs();
+            Sorting.CreateSortDictionaries(songs, this.sortDictionaries);
         }
 
         public override List<Song> GetSongs()
         {
-            return outputSongs;
+            return songs;
         }
 
         /// <summary>
         /// Update songpath list according to smart playlist settings
         /// </summary>
-        private void UpdateSongPaths()
+        public void UpdateSongs()
         {
-            List<Song> songList = new List<Song>();
+            base.songs.Clear();
             library.ResetRatingDictionary();
             Dictionary<string, List<Song>> ratingDictionary = library.GetSortDictionary("rating");
             foreach (string key in ratingDictionary.Keys)
             {
                 if (key.ToString().Length == allowedRating)
-                    songList.AddRange(ratingDictionary[key]);
+                    base.songs.AddRange(ratingDictionary[key]);
                 else if (IncludeHigher)
                     if (key.ToString().Length > allowedRating)
-                        songList.AddRange(ratingDictionary[key]);
+                        base.songs.AddRange(ratingDictionary[key]);
             }
-
-            base.songPaths = songList.Select(x => x.Path).ToList();
         }
 
         public override void UpdateSongInfo(Song song)
@@ -77,54 +73,58 @@ namespace KoPlayer.Lib
 
             if ((song.Rating == allowedRating) || (IncludeHigher && (song.Rating > allowedRating)))
             {
-                if (!outputSongs.Contains(song))
+                if (!songs.Contains(song))
                     Add(song);
                 Sorting.AddSongToSortDictionaries(song, this.sortDictionaries);
             }
             else
             {
                 Remove(song.Path);
-                outputSongs.Remove(song);
+                songs.Remove(song);
             }
         }
 
         public void ResetSortDictionaries()
         {
-            base.outputSongs =  base.GetSongs();
-            Sorting.CreateSortDictionaries(outputSongs, base.sortDictionaries);
+            base.songs =  base.GetSongs();
+            Sorting.CreateSortDictionaries(songs, base.sortDictionaries);
         }
 
         public override Song GetRandom()
         {
-            return libraryDictionary[songPaths[Playlist.r.Next(0, songPaths.Count)]];
+            return songs[Playlist.r.Next(0, songs.Count)];
         }
 
-        /// <summary>
-        /// Load playlist from file. Returns null if it fails:
-        /// </summary>
-        /// <param name="path"></param>
-        /// <param name="library"></param>
-        /// <returns></returns>
-        public static new RatingFilterPlaylist Load(String path, Library library)
+        protected override void SaveHeader(StreamWriter sw)
         {
-            Stream stream = null;
-            RatingFilterPlaylist loadedPlaylist = null;
-            try
-            {
-                using (stream = File.OpenRead(path))
-                {
-                    XmlSerializer serializer = new XmlSerializer(typeof(RatingFilterPlaylist));
-                    loadedPlaylist = (RatingFilterPlaylist)serializer.Deserialize(stream);
-                }
-            }
-            catch
-            {
-                return null;
-            }
-            RatingFilterPlaylist pl = new RatingFilterPlaylist(library, loadedPlaylist.Name, 
-                new List<string>(), loadedPlaylist.AllowedRating, loadedPlaylist.IncludeHigher);
-            library.Changed += pl.library_LibraryChanged;
-            return pl;
+            base.SaveHeader(sw);
+            sw.WriteLine(allowedRating);
+            sw.WriteLine(IncludeHigher);
+        }
+
+        protected override void SaveSongs(StreamWriter sw)
+        { }
+
+        public RatingFilterPlaylist(StreamReader sr, Library library)
+        {
+            ReadHeader(sr);
+            //Init(library);
+
+            this.library = library;
+
+            ResetSortVariables();
+            songs = new List<Song>();
+            this.sortDictionaries = new List<Dictionary<string, List<Song>>>();
+
+            UpdateSongs();
+            Sorting.CreateSortDictionaries(songs, this.sortDictionaries);
+        }
+
+        protected override void ReadHeader(StreamReader sr)
+        {
+            base.ReadHeader(sr);
+            AllowedRating = int.Parse(sr.ReadLine());
+            IncludeHigher = bool.Parse(sr.ReadLine());
         }
     }
 }

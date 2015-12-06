@@ -248,7 +248,7 @@ namespace KoPlayer.Forms
                 Directory.CreateDirectory(PlaylistDirectoryPath);
 
             // Load shuffle queue
-            shuffleQueue = ShuffleQueue.Load(ShuffleQueuePath, library, settings);
+            shuffleQueue = PlaylistFactory.MakePlaylist(ShuffleQueuePath, library, settings) as ShuffleQueue;
             if (shuffleQueue == null)
             {
                 shuffleQueue = new ShuffleQueue(library, settings);
@@ -256,24 +256,15 @@ namespace KoPlayer.Forms
             }
             playlists.Add(shuffleQueue);
 
-            // Load normal playlists
+            // Load other playlists
             string[] playlistFiles = Directory.GetFiles(PlaylistDirectoryPath, "*.pl", SearchOption.AllDirectories);
             foreach (string playlistPath in playlistFiles)
                 if (playlistPath != ShuffleQueuePath)
                 {
-                    Playlist pl = Playlist.Load(playlistPath, library);
+                    var pl = PlaylistFactory.MakePlaylist(playlistPath, library, settings);
                     if (pl != null)
                         playlists.Add(pl);
                 }
-
-            // Load rating playlists
-            playlistFiles = Directory.GetFiles(PlaylistDirectoryPath, "*.fpl", SearchOption.AllDirectories);
-            foreach (string playlistPath in playlistFiles)
-            {
-                RatingFilterPlaylist pl = RatingFilterPlaylist.Load(playlistPath, library);
-                if (pl != null)
-                    playlists.Add(pl);
-            }
         }
 
         private void SetPlaylistGridView()
@@ -1790,6 +1781,7 @@ namespace KoPlayer.Forms
                     RatingFilterInfo filterInfo = popup.GetResult();
                     clickedPlaylist.AllowedRating = filterInfo.AllowedRating;
                     clickedPlaylist.IncludeHigher = filterInfo.IncludeHigher;
+                    clickedPlaylist.UpdateSongs();
                     if (showingPlaylist != clickedPlaylist)
                         ChangeToPlaylist(clickedPlaylist);
                     else

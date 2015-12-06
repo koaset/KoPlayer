@@ -19,14 +19,12 @@ namespace KoPlayer.Lib
         public override void Remove(List<int> indexes)
         {
             foreach (int i in indexes)
-                library.Remove(songPaths[i]);
+                library.Remove(songs[i]);
         }
 
         public override void RemoveAll()
         {
-            var paths = new List<string>(songPaths);
-            foreach (string s in paths)
-                library.Remove(s);
+            songs.Clear();
         }
 
         public override void Save()

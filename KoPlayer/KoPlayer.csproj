@@ -110,6 +110,7 @@
       <DependentUpon>GeneralSettingsControl.cs</DependentUpon>
     </Compile>
     <Compile Include="LastFMHandler.cs" />
+    <Compile Include="Lib\PlaylistFactory.cs" />
     <Compile Include="Lib\SearchResult.cs" />
     <Compile Include="Lib\ShuffleQueue.cs" />
     <Compile Include="Settings\EqualizerSettings.cs" />
