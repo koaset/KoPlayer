@@ -80,6 +80,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="FilterPlaylistTest.cs" />
     <Compile Include="LibraryTest.cs" />
     <Compile Include="PlaylistTest.cs" />
     <Compile Include="ShuffleQueueTest.cs" />

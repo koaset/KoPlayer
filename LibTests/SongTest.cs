@@ -23,7 +23,7 @@ namespace LibTests
         [TestMethod]
         public void SongTag()
         {
-            string titleExpected = "empty10sec";
+            string titleExpected = "empty10sec - 1";
             string artistExpected = "artist";
             string albumExpected = "album";
             string genreExpected = "noise";
