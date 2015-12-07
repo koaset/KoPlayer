@@ -8,8 +8,8 @@ namespace KoPlayer.Lib.Filters
 {
     public class StringFilter : Filter
     {
-        private string searchTerm = null;
-        private string field = "title";
+        private string field;
+        private string searchTerm;
 
         public bool Contains { get; set; }
 
@@ -60,5 +60,16 @@ namespace KoPlayer.Lib.Filters
         {
             return !(song[Field].Contains(searchTerm) ^ Contains);
         }
+
+        protected override void SaveData(System.IO.StreamWriter sw)
+        {
+            sw.WriteLine(Field);
+            sw.WriteLine(SearchTerm);
+            sw.WriteLine(Contains);
+        }
+
+        public StringFilter(System.IO.StreamReader sr)
+            : this(sr.ReadLine(), sr.ReadLine(), bool.Parse(sr.ReadLine()))
+        { }
     }
 }

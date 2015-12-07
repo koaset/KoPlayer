@@ -160,6 +160,43 @@ namespace LibTests
             Assert.AreEqual(3, fpl.NumSongs);
         }
 
+        [TestMethod]
+        public void FilterPlaylistSave()
+        {
+            var lib = CreateLibrary();
+
+            var fpl = new FilterPlaylist(lib, "fpl 1");
+
+            fpl.Filters.Add(new StringFilter("genre", "NoIsE", true));
+            fpl.Filters.Add(new DateFilter(TimeUnit.Day, 10));
+            fpl.Filters.Add(new RatingFilter(RatingFilter.Single(2)));
+            fpl.FilterLibrary();
+
+            try
+            {
+                fpl.Save();
+            }
+            catch
+            {
+                Assert.Fail();
+            }
+        }
+
+        [TestMethod]
+        public void FilterPlaylistLoad()
+        {
+            var lib = CreateLibrary();
+            var set = new KoPlayer.Settings();
+            var loaded = PlaylistFactory.MakePlaylist(@"Playlists/fpl 3.pl", lib, set) as FilterPlaylist;
+
+            Assert.AreEqual(0, loaded.NumSongs);
+
+            loaded.Filters.RemoveAt(2);
+
+            loaded.FilterLibrary();
+            Assert.AreEqual(2, loaded.NumSongs);
+        }
+
         private Library CreateLibrary()
         {
             Library lib = new Library();

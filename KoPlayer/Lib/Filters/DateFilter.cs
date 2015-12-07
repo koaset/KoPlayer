@@ -8,8 +8,8 @@ namespace KoPlayer.Lib.Filters
 {
     public class DateFilter : Filter
     {
-        public int NumUnits { get; private set; }
         public TimeUnit Unit { get; private set; }
+        public int NumUnits { get; private set; }
 
         private DateTime limit;
 
@@ -49,6 +49,16 @@ namespace KoPlayer.Lib.Filters
         {
             return limit <= song.DateAdded;
         }
+
+        protected override void SaveData(System.IO.StreamWriter sw)
+        {
+            sw.WriteLine((int)Unit);
+            sw.WriteLine(NumUnits);
+        }
+
+        public DateFilter(System.IO.StreamReader sr)
+            : this((TimeUnit)int.Parse(sr.ReadLine()), int.Parse(sr.ReadLine()))
+        { }
     }
 
     public enum TimeUnit

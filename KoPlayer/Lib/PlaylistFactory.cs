@@ -25,6 +25,8 @@ namespace KoPlayer.Lib
                             return new ShuffleQueue(sr, library, settings);
                         case "KoPlayer.Lib.RatingFilterPlaylist":
                             return new RatingFilterPlaylist(sr, library);
+                        case "KoPlayer.Lib.FilterPlaylist":
+                            return new FilterPlaylist(sr, library);
                         default:
                             return null;
 

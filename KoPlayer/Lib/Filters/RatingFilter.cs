@@ -34,6 +34,11 @@ namespace KoPlayer.Lib.Filters
             return ret;
         }
 
+        public static List<int> Single(int rating)
+        {
+            return new int[] { rating }.ToList();
+        }
+
         public List<int> AllowedRatings { get; set; }
 
         public RatingFilter(List<int> allowedRatings)
@@ -45,6 +50,34 @@ namespace KoPlayer.Lib.Filters
         protected override bool Allowed(Song song)
         {
             return AllowedRatings.Contains(song.Rating);
+        }
+
+        protected override void SaveData(System.IO.StreamWriter sw)
+        {
+            for (int i = 0; i <= 5; i++)
+            {
+                if (AllowedRatings.Contains(i))
+                    sw.Write("1");
+                else
+                    sw.Write("0");
+            }
+            sw.Write("\n");
+        }
+
+        public RatingFilter(System.IO.StreamReader sr)
+            : this(ReadData(sr))
+        { }
+
+        private static List<int> ReadData(System.IO.StreamReader sr)
+        {
+            string data = sr.ReadLine();
+            var ret = new List<int>();
+
+            for (int i = 0; i <= 5; i++)
+                if (data[i] == '1')
+                    ret.Add(i);
+
+            return ret;
         }
     }
 }
