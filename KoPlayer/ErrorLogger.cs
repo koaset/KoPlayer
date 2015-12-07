@@ -51,5 +51,15 @@ namespace KoPlayer
             
             ex = null;
         }
+
+        /// <summary>
+        /// Writes an exception to the log file
+        /// </summary>
+        /// <param name="ex"></param>
+        public static void Log(Exception ex)
+        {
+            using (var logger = new ErrorLogger(ex))
+                logger.Run();
+        }
     }
 }
