@@ -28,9 +28,11 @@ namespace KoPlayer.Lib
         public static List<Song> Sort(string field, SortOrder sortOrder,
             List<Dictionary<string, List<Song>>> sortDictionaries, List<Song> sortList)
         {
-            if (field.ToLower() == "length")
+            field = field.ToLower();
+
+            if (field == "length")
                 return SortLength(sortOrder, sortList);
-            else if (field.ToLower() == "date added")
+            else if (field == "date added")
                 return SortDate(sortOrder, sortList);
 
             //Get the dictionary for the corresponding column
@@ -52,17 +54,14 @@ namespace KoPlayer.Lib
             List<Song> songList = new List<Song>();
             foreach (string key in keys)
             {
-                //Sorts on track and disc number before sorting if album or artist sorting is chosen
-                if (field.ToLower() == "album" || field.ToLower() == "artist")
-                {
-                    sortedDictionary[key].Sort(delegate(Song song1, Song song2)
-                    {
-                        return song1.CompareTo(song2);
-                    });
-                }
-                //Adds all songs for the current key to the output list
+                // Sorts on track and disc number before sorting if album or artist sorting is chosen
+                if (field == "album" || field == "artist")
+                    sortedDictionary[key].Sort((s1,s2) => s1.CompareTo(s2));
+
+                // Adds all songs for the current key to the output list
                 songList.AddRange(sortedDictionary[key]);
             }
+
             //Sets output. This is a reference
             return songList;
         }
