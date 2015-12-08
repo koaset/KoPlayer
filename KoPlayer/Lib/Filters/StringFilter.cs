@@ -56,9 +56,13 @@ namespace KoPlayer.Lib.Filters
             Contains = contains;
         }
 
+        public StringFilter(StringFilter filter)
+            : this(filter.field, filter.searchTerm, filter.Contains)
+        { }
+
         protected override bool Allowed(Song song)
         {
-            return !(song[Field].Contains(searchTerm) ^ Contains);
+            return !(song[Field].ToLower().Contains(searchTerm) ^ Contains);
         }
 
         protected override void SaveData(System.IO.StreamWriter sw)
@@ -71,5 +75,16 @@ namespace KoPlayer.Lib.Filters
         public StringFilter(System.IO.StreamReader sr)
             : this(sr.ReadLine(), sr.ReadLine(), bool.Parse(sr.ReadLine()))
         { }
+
+        public override string ToString()
+        {
+            string field = char.ToUpper(Field[0]) + Field.Substring(1); ;
+
+            string modifier = " contains: ";
+            if (!Contains)
+                modifier = " does not contain: ";
+
+            return field + modifier + searchTerm;
+        }
     }
 }

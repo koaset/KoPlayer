@@ -26,6 +26,10 @@ namespace KoPlayer.Lib.Filters
             SetLimit(unit, numUnits);
         }
 
+        public DateFilter(DateFilter filter)
+            : this(filter.Unit, filter.NumUnits)
+        { }
+
         private void CalculateLimit()
         {
             switch (Unit)
@@ -59,6 +63,20 @@ namespace KoPlayer.Lib.Filters
         public DateFilter(System.IO.StreamReader sr)
             : this((TimeUnit)int.Parse(sr.ReadLine()), int.Parse(sr.ReadLine()))
         { }
+
+        public override string ToString()
+        {
+            string unit = "";
+
+            if (Unit == TimeUnit.Day)
+                unit = " days";
+            else if (Unit == TimeUnit.Week)
+                unit = " weeks";
+            else if (Unit == TimeUnit.Month)
+                unit = " months";
+
+            return "Date added is in the last " + NumUnits + unit;
+        }
     }
 
     public enum TimeUnit

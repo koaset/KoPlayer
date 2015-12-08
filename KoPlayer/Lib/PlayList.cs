@@ -12,8 +12,6 @@ namespace KoPlayer.Lib
 
     public class Playlist : IPlaylist
     {
-        public event EventHandler Changed;
-
         public static Random r = new Random();
 
         [XmlIgnore]
@@ -96,15 +94,6 @@ namespace KoPlayer.Lib
             toBeRemoved.Reverse();
             foreach (int i in toBeRemoved)
                 this.Remove(i);
-
-            if (toBeRemoved.Count > 0)
-                NotifyChange();
-        }
-
-        protected void NotifyChange()
-        {
-            if (Changed != null)
-                Changed(this, new EventArgs());
         }
 
         public void Add(string path)
@@ -113,7 +102,6 @@ namespace KoPlayer.Lib
                 return;
 
             Add(libraryDictionary[path]);
-            NotifyChange();
         }
 
         public void Add(Song song)
@@ -123,7 +111,6 @@ namespace KoPlayer.Lib
 
             songs.Add(song);
             Sorting.AddSongToSortDictionaries(song, this.sortDictionaries);
-            NotifyChange();
         }
 
         public void Add(List<Song> songs)
@@ -140,8 +127,6 @@ namespace KoPlayer.Lib
                 songs.Insert(index, song);
             else
                 songs.Add(song);
-
-            NotifyChange();
         }
 
         public void Insert(int index, List<Song> songs)
@@ -221,6 +206,11 @@ namespace KoPlayer.Lib
             }
         }
 
+        public virtual Song GetRandom()
+        {
+            return songs[Playlist.r.Next(0, songs.Count)];
+        }
+
         public virtual void UpdateSongInfo(Song song)
         {
             RemoveFromSortDictionaries(song);
@@ -260,11 +250,6 @@ namespace KoPlayer.Lib
         public virtual List<Song> GetSongs()
         {
             return songs;
-        }
-
-        public virtual Song GetRandom()
-        {
-            return songs[Playlist.r.Next(0, songs.Count)];
         }
 
         public virtual void Save()

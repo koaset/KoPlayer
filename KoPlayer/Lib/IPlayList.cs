@@ -9,8 +9,6 @@ namespace KoPlayer.Lib
 {
     public interface IPlaylist
     {
-        event EventHandler Changed;
-
         string Name { get; }
         string Path { get; }
         int NumSongs {get;}

@@ -23,18 +23,16 @@ namespace KoPlayer.Lib
                             return new Playlist(sr, library);
                         case "KoPlayer.Lib.ShuffleQueue":
                             return new ShuffleQueue(sr, library, settings);
-                        case "KoPlayer.Lib.RatingFilterPlaylist":
-                            return new RatingFilterPlaylist(sr, library);
                         case "KoPlayer.Lib.FilterPlaylist":
                             return new FilterPlaylist(sr, library);
                         default:
                             return null;
-
                     }
                 }
             }
-            catch
+            catch (Exception ex)
             {
+                ErrorLogger.Log(ex);
                 return null;
             }
         }

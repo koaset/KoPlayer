@@ -12,7 +12,7 @@ namespace KoPlayer.Forms
     {
         public RatingBox()
         {
-
+            this.Value = 0;
         }
 
         protected override void UpdateEditText()

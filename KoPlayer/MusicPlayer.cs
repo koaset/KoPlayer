@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using CSCore;
 using CSCore.Codecs;
@@ -145,7 +146,7 @@ namespace KoPlayer
             soundOut.Initialize(finalSource);
 
             soundOut.Volume = deviceVolume;
-            
+
             if (this.OpenCompleted != null)
                 this.OpenCompleted(this, new EventArgs());
         }

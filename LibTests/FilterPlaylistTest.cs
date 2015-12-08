@@ -90,20 +90,20 @@ namespace LibTests
 
             var fpl = new FilterPlaylist(lib, "fpl 1");
 
-            var filter = new RatingFilter(RatingFilter.Above(3, true));
+            var filter = new RatingFilter(3, true, false);
             fpl.Filters.Add(filter);
             fpl.FilterLibrary();
             Assert.AreEqual(1, fpl.NumSongs);
 
-            filter.AllowedRatings = RatingFilter.Above(3, false);
+            filter.SetParams(3, true, true);
             fpl.FilterLibrary();
             Assert.AreEqual(2, fpl.NumSongs);
 
-            filter.AllowedRatings = RatingFilter.Below(3, false);
+            filter.SetParams(3, false, true);
             fpl.FilterLibrary();
             Assert.AreEqual(2, fpl.NumSongs);
 
-            filter.AllowedRatings = RatingFilter.Below(3, true);
+            filter.SetParams(3, false, false);
             fpl.FilterLibrary();
             Assert.AreEqual(1, fpl.NumSongs);
         }
@@ -116,7 +116,7 @@ namespace LibTests
             var fpl = new FilterPlaylist(lib, "fpl 1");
 
             fpl.Filters.Add(new StringFilter("genre", "noise", true));
-            fpl.Filters.Add(new RatingFilter(RatingFilter.Below(3, false)));
+            fpl.Filters.Add(new RatingFilter(3, false, true));
             fpl.FilterLibrary();
 
             Assert.AreEqual(2, fpl.NumSongs);
@@ -169,7 +169,7 @@ namespace LibTests
 
             fpl.Filters.Add(new StringFilter("genre", "NoIsE", true));
             fpl.Filters.Add(new DateFilter(TimeUnit.Day, 10));
-            fpl.Filters.Add(new RatingFilter(RatingFilter.Single(2)));
+            fpl.Filters.Add(new RatingFilter(4, true, true));
             fpl.FilterLibrary();
 
             try
@@ -197,10 +197,36 @@ namespace LibTests
             Assert.AreEqual(2, loaded.NumSongs);
         }
 
+        [TestMethod]
+        public void FilterPlaylistLibraryChange()
+        {
+            var lib = new Library();
+
+            var fpl = new FilterPlaylist(lib, "fpl 4");
+
+            fpl.Filters.Add(new StringFilter("genre", "noise", true));
+
+            fpl.FilterLibrary();
+
+            Assert.AreEqual(0, fpl.NumSongs);
+
+            AddSongsToLibrary(lib);
+            lib.Changed += (s, e) => { };
+            fpl.FilterLibrary();
+            Assert.AreEqual(2, fpl.NumSongs);
+        }
+
         private Library CreateLibrary()
         {
             Library lib = new Library();
 
+            AddSongsToLibrary(lib);
+
+            return lib;
+        }
+
+        private void AddSongsToLibrary(Library lib)
+        {
             var song = new Song(@"Songs\empty10sec.mp3");
             song.Rating = 3;
             song.DateAdded = DateTime.Now.AddDays(-1);
@@ -214,8 +240,6 @@ namespace LibTests
             song.DateAdded = DateTime.Now.AddMonths(-3);
             song.Rating = 5;
             lib.Add(song);
-
-            return lib;
         }
     }
 }

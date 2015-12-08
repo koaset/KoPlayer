@@ -10,15 +10,25 @@ namespace KoPlayer.Lib
 {
     public class FilterPlaylist : Playlist
     {
-        public List<Filter> Filters { get; private set; }
+        public List<Filter> Filters { get; set; }
 
         private Library library;
 
         public FilterPlaylist(Library library, string name)
-            : base(library, name)
+            : this(library, name, null)
         {
             this.library = library;
             Filters = new List<Filter>();
+        }
+
+        public FilterPlaylist(Library library, string name, List<Filter> filters)
+            : base(library, name)
+        {
+            this.library = library;
+
+            Filters = filters ?? new List<Filter>();
+
+            FilterLibrary();
         }
 
         public void FilterLibrary()
@@ -28,10 +38,11 @@ namespace KoPlayer.Lib
 
             foreach (var filter in Filters)
             {
-                filter.ApplyTo(songs);
                 if (songs.Count == 0)
                     break;
+                filter.ApplyTo(songs);
             }
+            Sorting.CreateSortDictionaries(songs, this.sortDictionaries);
         }
 
         protected override void SaveHeader(StreamWriter sw)

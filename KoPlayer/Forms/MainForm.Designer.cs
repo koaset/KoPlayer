@@ -168,14 +168,14 @@
             this.playNextToolStripMenuItem.Name = "playNextToolStripMenuItem";
             this.playNextToolStripMenuItem.Size = new System.Drawing.Size(144, 22);
             this.playNextToolStripMenuItem.Text = "Play Next";
-            this.playNextToolStripMenuItem.Click += new System.EventHandler(this.playNextButton_Click);
+            this.playNextToolStripMenuItem.Click += new System.EventHandler(this.nextButton_Click);
             // 
             // playPreviousToolStripMenuItem
             // 
             this.playPreviousToolStripMenuItem.Name = "playPreviousToolStripMenuItem";
             this.playPreviousToolStripMenuItem.Size = new System.Drawing.Size(144, 22);
             this.playPreviousToolStripMenuItem.Text = "Play Previous";
-            this.playPreviousToolStripMenuItem.Click += new System.EventHandler(this.playPreviousButton_Click);
+            this.playPreviousToolStripMenuItem.Click += new System.EventHandler(this.previousButton_Click);
             // 
             // equalizerToolStripMenuItem
             // 
@@ -207,7 +207,7 @@
             this.volumeTrackBar.Maximum = 1000;
             this.volumeTrackBar.Name = "volumeTrackBar";
             this.volumeTrackBar.Size = new System.Drawing.Size(118, 27);
-            this.volumeTrackBar.SmallChange = 10;
+            this.volumeTrackBar.SmallChange = 25;
             this.volumeTrackBar.TabIndex = 5;
             this.volumeTrackBar.TickStyle = System.Windows.Forms.TickStyle.None;
             this.volumeTrackBar.Value = 100;

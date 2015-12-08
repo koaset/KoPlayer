@@ -8,7 +8,105 @@ namespace KoPlayer.Lib.Filters
 {
     public class RatingFilter : Filter
     {
-        public static List<int> Above(int val, bool strict)
+        public int EdgeRating
+        {
+            get
+            {
+                return edgeRating;
+            }
+            set 
+            {
+                edgeRating = value;
+                SetAllowedRatings();
+            }
+        }
+
+
+        public bool AndAbove
+        {
+            get
+            {
+                return andAbove;
+            }
+            set
+            {
+                andAbove = value;
+                SetAllowedRatings();
+            }
+        }
+
+        public bool Inclusive
+        {
+            get
+            {
+                return inclusive;
+            }
+            set
+            {
+                inclusive = value;
+                SetAllowedRatings();
+            }
+        }
+
+        private List<int> allowedRatings;
+        private int edgeRating;
+        private bool andAbove;
+        private bool inclusive;
+
+        public void SetParams(int edgeRating, bool andAbove, bool inclusive)
+        {
+            this.edgeRating = edgeRating;
+            this.andAbove = andAbove;
+            this.inclusive = inclusive;
+            SetAllowedRatings();
+        }
+
+        private void SetAllowedRatings()
+        {
+            allowedRatings.Clear();
+
+            if (andAbove)
+                allowedRatings = Above(edgeRating, !inclusive);
+            else
+                allowedRatings = Below(edgeRating, !inclusive);
+        }
+
+        public RatingFilter(int edgeRating, bool andAbove, bool inclusive)
+            : base()
+        {
+            allowedRatings = new List<int>();
+            SetParams(edgeRating, andAbove, inclusive);
+        }
+
+        public RatingFilter(System.IO.StreamReader sr)
+            : this(int.Parse(sr.ReadLine()), bool.Parse(sr.ReadLine()), bool.Parse(sr.ReadLine()))
+        { }
+
+        public RatingFilter(RatingFilter filter)
+            : this(filter.edgeRating, filter.andAbove, filter.inclusive)
+        { }
+
+        protected override bool Allowed(Song song)
+        {
+            return allowedRatings.Contains(song.Rating);
+        }
+
+        protected override void SaveData(System.IO.StreamWriter sw)
+        {
+            sw.WriteLine(edgeRating);
+            sw.WriteLine(andAbove);
+            sw.WriteLine(inclusive);
+        }
+
+        public override string ToString()
+        {
+            string ret = "Ratings: ";
+            foreach (int r in allowedRatings)
+                ret += r + " ";
+            return ret;
+        }
+
+        private static List<int> Above(int val, bool strict)
         {
             var ret = new List<int>();
 
@@ -21,7 +119,7 @@ namespace KoPlayer.Lib.Filters
             return ret;
         }
 
-        public static List<int> Below(int val, bool strict)
+        private static List<int> Below(int val, bool strict)
         {
             var ret = new List<int>();
 
@@ -34,50 +132,9 @@ namespace KoPlayer.Lib.Filters
             return ret;
         }
 
-        public static List<int> Single(int rating)
+        private static List<int> Single(int rating)
         {
             return new int[] { rating }.ToList();
-        }
-
-        public List<int> AllowedRatings { get; set; }
-
-        public RatingFilter(List<int> allowedRatings)
-            : base()
-        {
-            AllowedRatings = allowedRatings ?? new List<int>();
-        }
-
-        protected override bool Allowed(Song song)
-        {
-            return AllowedRatings.Contains(song.Rating);
-        }
-
-        protected override void SaveData(System.IO.StreamWriter sw)
-        {
-            for (int i = 0; i <= 5; i++)
-            {
-                if (AllowedRatings.Contains(i))
-                    sw.Write("1");
-                else
-                    sw.Write("0");
-            }
-            sw.Write("\n");
-        }
-
-        public RatingFilter(System.IO.StreamReader sr)
-            : this(ReadData(sr))
-        { }
-
-        private static List<int> ReadData(System.IO.StreamReader sr)
-        {
-            string data = sr.ReadLine();
-            var ret = new List<int>();
-
-            for (int i = 0; i <= 5; i++)
-                if (data[i] == '1')
-                    ret.Add(i);
-
-            return ret;
         }
     }
 }
