@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Linq;
 using System.Windows.Forms;
+using System;
 
 namespace KoPlayer.Lib
 {
@@ -29,6 +30,8 @@ namespace KoPlayer.Lib
         {
             if (field.ToLower() == "length")
                 return SortLength(sortOrder, sortList);
+            else if (field.ToLower() == "date added")
+                return SortDate(sortOrder, sortList);
 
             //Get the dictionary for the corresponding column
             Dictionary<string, List<Song>> sortDictionary = GetDictionary(field, sortDictionaries);
@@ -68,10 +71,19 @@ namespace KoPlayer.Lib
         {
             List<Song> sortedList = sortList.ToList();
 
-            sortedList.Sort(delegate(Song song1, Song song2)
-            {
-                return song1.Length.CompareTo(song2.Length);
-            });
+            sortedList.Sort((s1, s2) => s1.Length.CompareTo(s2.Length));
+
+            if (sortOrder == SortOrder.Descending)
+                sortedList.Reverse();
+
+            return sortedList;
+        }
+
+        public static List<Song> SortDate(SortOrder sortOrder, List<Song> sortList)
+        {
+            List<Song> sortedList = sortList.ToList();
+
+            sortedList.Sort((s1, s2) => s1.DateAdded.CompareTo(s2.DateAdded));
 
             if (sortOrder == SortOrder.Descending)
                 sortedList.Reverse();
