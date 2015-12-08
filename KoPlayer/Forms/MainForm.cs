@@ -775,6 +775,7 @@ namespace KoPlayer.Forms
             try
             {
                 this.currentAlbumArt = song.ReloadAndGetImage();
+                UpdateSongForFilterPlaylists(song);
             }
             catch (SongReadException ex)
             {
@@ -945,7 +946,10 @@ namespace KoPlayer.Forms
             }
 
             library.ResetSearchDictionaries();
-            UpdateSongsForRatingFilterPlaylist(songs);
+
+            foreach (Song s in songs)
+                UpdateSongForFilterPlaylists(s);
+
             RefreshSongGridView();
             if (showingPlaylist.GetType() == typeof(FilterPlaylist))
                 UpdateShowingPlaylist();
@@ -955,27 +959,16 @@ namespace KoPlayer.Forms
         {
             s.Rating = rating;
             library.UpdateSongInfo(currentlyPlaying);
-            UpdateSongForRatingFilterPlaylist(s);
+            UpdateSongForFilterPlaylists(s);
             RefreshSongGridView();
             if (showingPlaylist.GetType() == typeof(FilterPlaylist))
                 UpdateShowingPlaylist();
         }
 
-        private void UpdateSongForRatingFilterPlaylist(Song song)
+        private void UpdateSongForFilterPlaylists(Song song)
         {
             foreach (IPlaylist pl in playlists)
                 pl.UpdateSongInfo(song);
-        }
-
-        private void UpdateSongsForRatingFilterPlaylist(List<Song> songs)
-        {
-            //Might as well remake from scratch if no. songs exceed some number
-            int songRatingEditLimit = 100;
-            if (songs.Count < songRatingEditLimit)
-            {
-                foreach (Song s in songs)
-                    UpdateSongForRatingFilterPlaylist(s);
-            }
         }
 
         private void DeleteSongs(DataGridViewSelectedRowCollection rows)
@@ -1898,6 +1891,7 @@ namespace KoPlayer.Forms
                 MultiSongPropertiesWindow multiSongWindow = new MultiSongPropertiesWindow(this, songs,
                     this.showingPlaylist, this.library);
                 multiSongWindow.SavePlayingSong += popup_SavePlayingSong;
+                multiSongWindow.SongChanged += songPropertiesWindow_SongChanged;
                 popup = multiSongWindow;
             }
             else
@@ -1905,6 +1899,7 @@ namespace KoPlayer.Forms
                 SongPropertiesWindow singleSongWindow = new SongPropertiesWindow(this, songs[0],
                     this.clickedSongIndex, this.showingPlaylist, this.library);
                 singleSongWindow.SavePlayingSong += popup_SavePlayingSong;
+                singleSongWindow.SongChanged += songPropertiesWindow_SongChanged;
                 popup = singleSongWindow;
             }
 
@@ -1912,9 +1907,15 @@ namespace KoPlayer.Forms
             popup.ShowDialog();
         }
 
+        private void songPropertiesWindow_SongChanged(object sender, SongChangedEventArgs e)
+        {
+            UpdateSongForFilterPlaylists(e.ChangedSong);
+            UpdateShowingPlaylist();
+        }
+
         private void popup_SavePlayingSong(object sender, SavePlayingSongEventArgs e)
         {
-            songToSave = e.savingSong;
+            songToSave = e.SavingSong;
         }
         #endregion
 

@@ -60,7 +60,7 @@ namespace KoPlayer.Lib.Filters
             : this(filter.field, filter.searchTerm, filter.Contains)
         { }
 
-        protected override bool Allowed(Song song)
+        public override bool Allowed(Song song)
         {
             return !(song[Field].ToLower().Contains(searchTerm) ^ Contains);
         }

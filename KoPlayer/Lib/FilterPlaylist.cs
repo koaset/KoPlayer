@@ -45,6 +45,22 @@ namespace KoPlayer.Lib
             Sorting.CreateSortDictionaries(songs, this.sortDictionaries);
         }
 
+        public override void UpdateSongInfo(Song song)
+        {
+            RemoveFromSortDictionaries(song);
+
+            bool allowed = Filters.All(f => f.Allowed(song));
+
+            if (!allowed)
+                songs.Remove(song);
+            else
+            {
+                if (!songs.Contains(song))
+                    songs.Add(song);
+                Sorting.AddSongToSortDictionaries(song, this.sortDictionaries);
+            }
+        }
+
         protected override void SaveHeader(StreamWriter sw)
         {
             base.SaveHeader(sw);

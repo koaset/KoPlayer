@@ -21,6 +21,6 @@ namespace KoPlayer.Lib.Filters
         }
 
         protected abstract void SaveData(StreamWriter sw);
-        protected abstract bool Allowed(Song song);
+        public abstract bool Allowed(Song song);
     }
 }

@@ -86,7 +86,7 @@ namespace KoPlayer.Lib.Filters
             : this(filter.edgeRating, filter.andAbove, filter.inclusive)
         { }
 
-        protected override bool Allowed(Song song)
+        public override bool Allowed(Song song)
         {
             return allowedRatings.Contains(song.Rating);
         }

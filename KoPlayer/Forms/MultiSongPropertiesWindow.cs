@@ -14,6 +14,7 @@ namespace KoPlayer.Forms
     public partial class MultiSongPropertiesWindow : Form
     {
         public event SavePlayingSongEventHandler SavePlayingSong;
+        public event SongChangedEventHandler SongChanged;
 
         //private Song song;
         private List<Song> songs;
@@ -112,8 +113,15 @@ namespace KoPlayer.Forms
             else
                 OnSavePlayingSong(song);
 
+            OnSongChanged(song);
+
             this.library.UpdateSongInfo(song);
-            
+        }
+
+        private void OnSongChanged(Song song)
+        {
+            if (SongChanged != null)
+                SongChanged(this, new SongChangedEventArgs(song));
         }
 
         private void OnSavePlayingSong(Song song)

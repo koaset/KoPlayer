@@ -12,10 +12,12 @@ using KoPlayer.Lib;
 namespace KoPlayer.Forms
 {
     public delegate void SavePlayingSongEventHandler(object sender, SavePlayingSongEventArgs e);
+    public delegate void SongChangedEventHandler(object sender, SongChangedEventArgs e);
 
     public partial class SongPropertiesWindow : Form
     {
         public event SavePlayingSongEventHandler SavePlayingSong;
+        public event SongChangedEventHandler SongChanged;
 
         private Song song;
         private int currentIndex;
@@ -96,14 +98,22 @@ namespace KoPlayer.Forms
             this.song.DiscNumber = Convert.ToInt32(this.discnr_box.Text);
             this.song.Genre = this.genre_box.Text;
             this.song.Rating = (int)this.rating_numupdownstring.Value;
-            
+
             if (this.song != this.mainForm.CurrentlyPlaying)
                 this.song.Save();
             else
                 OnSavePlayingSong(this.song);
 
+            OnSongChanged(this.song);
+
             this.library.UpdateSongInfo(this.song);
             
+        }
+
+        private void OnSongChanged(Song song)
+        {
+            if (SongChanged != null)
+                SongChanged(this, new SongChangedEventArgs(song));
         }
 
         private void OnSavePlayingSong(Song song)
@@ -138,11 +148,21 @@ namespace KoPlayer.Forms
 
     public class SavePlayingSongEventArgs : EventArgs
     {
-        public Song savingSong { get; set; }
+        public Song SavingSong { get; set; }
         public SavePlayingSongEventArgs(Song savingSong)
             : base()
         {
-            this.savingSong = savingSong;
+            SavingSong = savingSong;
+        }
+    }
+
+    public class SongChangedEventArgs : EventArgs
+    {
+        public Song ChangedSong { get; set; }
+        public SongChangedEventArgs(Song changedSong)
+            : base()
+        {
+            ChangedSong = changedSong;
         }
     }
 }

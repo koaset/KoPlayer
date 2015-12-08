@@ -49,7 +49,7 @@ namespace KoPlayer.Lib.Filters
             }
         }
 
-        protected override bool Allowed(Song song)
+        public override bool Allowed(Song song)
         {
             return limit <= song.DateAdded;
         }
