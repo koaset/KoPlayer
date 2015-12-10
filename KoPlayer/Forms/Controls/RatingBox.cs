@@ -13,6 +13,8 @@ namespace KoPlayer.Forms
         public RatingBox()
         {
             this.Value = 0;
+            this.Minimum = 0;
+            this.Maximum = 5;
         }
 
         protected override void UpdateEditText()

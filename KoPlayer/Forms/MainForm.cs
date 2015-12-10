@@ -583,7 +583,7 @@ namespace KoPlayer.Forms
         }
         #endregion
 
-        #region Control updates
+       #region Control updates
 
         private void RefreshSongGridView()
         {
@@ -698,7 +698,7 @@ namespace KoPlayer.Forms
                 playpauseButton.ImageList = playButton_imageList;
         }
 
-        #endregion
+        #endregion 
 
         #region Playback control
         private void PlaySong(Song song, IPlaylist inPlaylist)
