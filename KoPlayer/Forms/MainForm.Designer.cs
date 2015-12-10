@@ -61,9 +61,9 @@
             this.searchBox = new System.Windows.Forms.TextBox();
             this.playButton_imageList = new System.Windows.Forms.ImageList(this.components);
             this.pauseButton_imageList = new System.Windows.Forms.ImageList(this.components);
-            this.nextButton = new System.Windows.Forms.Button();
-            this.playpauseButton = new System.Windows.Forms.Button();
-            this.previousButton = new System.Windows.Forms.Button();
+            this.nextButton = new KoPlayer.Forms.Controls.KoPlayerButton();
+            this.playpauseButton = new KoPlayer.Forms.Controls.KoPlayerButton();
+            this.previousButton = new KoPlayer.Forms.Controls.KoPlayerButton();
             this.albumArtBox = new System.Windows.Forms.PictureBox();
             this.songsBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.songGridView = new KoPlayer.Forms.DataGridViewPlus();
@@ -369,10 +369,6 @@
             this.nextButton.TabIndex = 10;
             this.nextButton.UseVisualStyleBackColor = true;
             this.nextButton.Click += new System.EventHandler(this.nextButton_Click);
-            this.nextButton.MouseDown += new System.Windows.Forms.MouseEventHandler(this.nextButton_MouseDown);
-            this.nextButton.MouseEnter += new System.EventHandler(this.nextButton_MouseEnter);
-            this.nextButton.MouseLeave += new System.EventHandler(this.nextButton_MouseLeave);
-            this.nextButton.MouseUp += new System.Windows.Forms.MouseEventHandler(this.nextButton_MouseUp);
             // 
             // playpauseButton
             // 
@@ -388,10 +384,6 @@
             this.playpauseButton.TabIndex = 9;
             this.playpauseButton.UseVisualStyleBackColor = true;
             this.playpauseButton.Click += new System.EventHandler(this.playpauseButton_Click);
-            this.playpauseButton.MouseDown += new System.Windows.Forms.MouseEventHandler(this.playpauseButton_MouseDown);
-            this.playpauseButton.MouseEnter += new System.EventHandler(this.playpauseButton_MouseEnter);
-            this.playpauseButton.MouseLeave += new System.EventHandler(this.playpauseButton_MouseLeave);
-            this.playpauseButton.MouseUp += new System.Windows.Forms.MouseEventHandler(this.playpauseButton_MouseUp);
             // 
             // previousButton
             // 
@@ -407,10 +399,6 @@
             this.previousButton.TabIndex = 8;
             this.previousButton.UseVisualStyleBackColor = true;
             this.previousButton.Click += new System.EventHandler(this.previousButton_Click);
-            this.previousButton.MouseDown += new System.Windows.Forms.MouseEventHandler(this.previousButton_MouseDown);
-            this.previousButton.MouseEnter += new System.EventHandler(this.previousButton_MouseEnter);
-            this.previousButton.MouseLeave += new System.EventHandler(this.previousButton_MouseLeave);
-            this.previousButton.MouseUp += new System.Windows.Forms.MouseEventHandler(this.previousButton_MouseUp);
             // 
             // albumArtBox
             // 

@@ -97,6 +97,9 @@
   <ItemGroup>
     <Compile Include="DragDropSongs.cs" />
     <Compile Include="ErrorLogger.cs" />
+    <Compile Include="Forms\Controls\KoPlayerButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Forms\FilterPopup.cs">
       <SubType>Form</SubType>
     </Compile>
