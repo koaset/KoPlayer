@@ -839,13 +839,9 @@ namespace KoPlayer.Forms
         private void PlayOrPause()
         {
             if (musicPlayer.PlaybackState == PlaybackState.Paused)
-            {
                 PlayMusic();
-            }
             else if (musicPlayer.PlaybackState == PlaybackState.Playing)
-            {
                 PauseMusic();
-            }
             else if (musicPlayer.PlaybackState == PlaybackState.Stopped)
             {
                 if (songGridView.Rows.Count > showingPlaylist.CurrentIndex)
@@ -1009,10 +1005,8 @@ namespace KoPlayer.Forms
                                 StopPlaying();
                         }
                         else
-                        {
                             if (playingPlaylist.CurrentIndex == i)
                                 StopPlaying();
-                        }
                     }
                 }
                 showingPlaylist.Remove(indexList);
@@ -1043,10 +1037,7 @@ namespace KoPlayer.Forms
             foreach (DataGridViewRow row in rows)
                 ret.Add(row);
 
-            ret.Sort(delegate(DataGridViewRow row1, DataGridViewRow row2)
-            {
-                return row2.Index.CompareTo(row1.Index);
-            });
+            ret.Sort((r1, r2) => r2.Index.CompareTo(r1.Index));
 
             return ret;
         }
@@ -1076,9 +1067,8 @@ namespace KoPlayer.Forms
 
         void hook_KeyPressed(object sender, KeyPressedEventArgs e)
         {
-            foreach (GlobalHotkey hk in settings.GlobalHotkeys)
-                if (e.Modifier == hk.Modifier)
-                    if (e.Key == hk.Key)
+            foreach (var hk in settings.GlobalHotkeys)
+                if (e.Modifier == hk.Modifier && e.Key == hk.Key)
                         switch (hk.Action)
                         {
                             case GlobalHotkeyAction.IncreaseVolume:
@@ -1773,29 +1763,21 @@ namespace KoPlayer.Forms
                 cm.MenuItems.Add(CreateMenuItem("Resume", playpauseButton_Click));
             cm.MenuItems.Add(CreateMenuItem("Queue next in shuffle queue", songGridViewRightClickAddToShuffleQueueNext));
             cm.MenuItems.Add(CreateMenuItem("Add songs to shuffle queue", songGridViewRightClickAddToShuffleQueueBottom));
+
             MenuItem ratingMenu = new MenuItem("Set Rating");
-            #region Rating menu
-            ratingMenu.MenuItems.Add("Rate 0");
-            ratingMenu.MenuItems.Add("Rate 1");
-            ratingMenu.MenuItems.Add("Rate 2");
-            ratingMenu.MenuItems.Add("Rate 3");
-            ratingMenu.MenuItems.Add("Rate 4");
-            ratingMenu.MenuItems.Add("Rate 5");
-            ratingMenu.MenuItems[0].Click += (o, e) => { RateSongs(songGridView.SelectedRows, 0); };
-            ratingMenu.MenuItems[1].Click += (o, e) => { RateSongs(songGridView.SelectedRows, 1); };
-            ratingMenu.MenuItems[2].Click += (o, e) => { RateSongs(songGridView.SelectedRows, 2); };
-            ratingMenu.MenuItems[3].Click += (o, e) => { RateSongs(songGridView.SelectedRows, 3); };
-            ratingMenu.MenuItems[4].Click += (o, e) => { RateSongs(songGridView.SelectedRows, 4); };
-            ratingMenu.MenuItems[5].Click += (o, e) => { RateSongs(songGridView.SelectedRows, 5); };
-            #endregion
+            for (int i = 0; i <= 5; i++)
+            {
+                ratingMenu.MenuItems.Add("Rate " + i);
+                ratingMenu.MenuItems[i].Click += (o, e) => { RateSongs(songGridView.SelectedRows, 0); };
+            }
             cm.MenuItems.Add(ratingMenu);
+
             cm.MenuItems.Add(CreateMenuItem("Show file in explorer", songGridViewRightClickShowExplorer));
             if (showingPlaylist.GetType() != typeof(FilterPlaylist))
                 cm.MenuItems.Add(CreateMenuItem("Delete", songGridViewRightClickDelete));
             cm.MenuItems.Add(CreateMenuItem("Properties", songGridViewRightClickProperties));
             return cm;
         }
-
         #region Right click menu events
 
         private void songGridViewRightClickPlay(object sender, EventArgs e)
@@ -1888,7 +1870,7 @@ namespace KoPlayer.Forms
             Form popup;
             if (songs.Count > 1)
             {
-                MultiSongPropertiesWindow multiSongWindow = new MultiSongPropertiesWindow(this, songs,
+                var multiSongWindow = new MultiSongPropertiesWindow(this, songs,
                     this.showingPlaylist, this.library);
                 multiSongWindow.SavePlayingSong += popup_SavePlayingSong;
                 multiSongWindow.SongChanged += songPropertiesWindow_SongChanged;
@@ -1896,7 +1878,7 @@ namespace KoPlayer.Forms
             }
             else
             {
-                SongPropertiesWindow singleSongWindow = new SongPropertiesWindow(this, songs[0],
+                var singleSongWindow = new SongPropertiesWindow(this, songs[0],
                     this.clickedSongIndex, this.showingPlaylist, this.library);
                 singleSongWindow.SavePlayingSong += popup_SavePlayingSong;
                 singleSongWindow.SongChanged += songPropertiesWindow_SongChanged;
