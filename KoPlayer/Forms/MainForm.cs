@@ -1774,8 +1774,9 @@ namespace KoPlayer.Forms
             MenuItem ratingMenu = new MenuItem("Set Rating");
             for (int i = 0; i <= 5; i++)
             {
-                ratingMenu.MenuItems.Add("Rate " + i);
-                ratingMenu.MenuItems[i].Click += (o, e) => { RateSongs(songGridView.SelectedRows, 0); };
+                int rating = i;
+                ratingMenu.MenuItems.Add("Rate " + rating);
+                ratingMenu.MenuItems[i].Click += (o, e) => { RateSongs(songGridView.SelectedRows, rating); };
             }
             cm.MenuItems.Add(ratingMenu);
 
@@ -1785,6 +1786,7 @@ namespace KoPlayer.Forms
             cm.MenuItems.Add(CreateMenuItem("Properties", songGridViewRightClickProperties));
             return cm;
         }
+
         #region Right click menu events
 
         private void songGridViewRightClickPlay(object sender, EventArgs e)
