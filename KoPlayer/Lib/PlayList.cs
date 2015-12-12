@@ -121,9 +121,7 @@ namespace KoPlayer.Lib
 
         public void Insert(int index, Song song)
         {
-            if (index == CurrentIndex)
-                songs.Insert(index + 1, song);
-            else if (index < songs.Count)
+            if (index < songs.Count)
                 songs.Insert(index, song);
             else
                 songs.Add(song);

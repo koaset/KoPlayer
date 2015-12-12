@@ -1515,6 +1515,11 @@ namespace KoPlayer.Forms
                     {
                         songs.Add((Song)row.DataBoundItem);
                         pl.Remove(row.Index);
+
+                        if (playingPlaylist == shuffleQueue &&
+                            showingPlaylist == playingPlaylist &&
+                            row.Index == shuffleQueue.CurrentIndex)
+                            shuffleQueue.CurrentIndex = info.RowIndex;
                     }
 
                     foreach (Song s in songs)
