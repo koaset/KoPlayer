@@ -364,15 +364,15 @@ namespace KoPlayer.Lib
             searchString = searchString.ToLower().Trim();
 
             var result = new SearchResult(this);
-            result.Name = "Search Results";
-            var resultSongs = new List<Song>();
+            var resultSongs = result.GetSongs();
 
             // 4 first dictionaryies contain title artist album genre fields
             for (int i = 0; i < 4; i++)
             {
                 var dictionary = sortDictionaries[i];
 
-                List<string> keysToAdd = Searching.WholeStringKeySearch(searchString, dictionary);
+                List<string> keysToAdd = dictionary.Where(x => 
+                    x.Key.ToLower().Contains(searchString)).Select(x => x.Key).ToList();
 
                 foreach (string keyToAdd in keysToAdd)
                 {

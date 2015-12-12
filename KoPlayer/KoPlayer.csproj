@@ -194,7 +194,6 @@
       <DependentUpon>SongListSettingsControl.cs</DependentUpon>
     </Compile>
     <Compile Include="Lib\Library.cs" />
-    <Compile Include="Lib\Searching.cs" />
     <Compile Include="Lib\Sorting.cs" />
     <Compile Include="Settings\ColumnSettings.cs" />
     <Compile Include="Lib\IPlaylist.cs" />
