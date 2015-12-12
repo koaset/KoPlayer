@@ -18,9 +18,9 @@ namespace KoPlayer.Forms
         private Settings settings;
         private MainForm callingForm;
         private Control showingSettings;
-        private List<IPlaylist> playlists;
+        private List<PlaylistBase> playlists;
 
-        public SettingsWindow(MainForm callingForm, List<IPlaylist> playlists)
+        public SettingsWindow(MainForm callingForm, List<PlaylistBase> playlists)
         {
             this.callingForm = callingForm;
             this.playlists = playlists;

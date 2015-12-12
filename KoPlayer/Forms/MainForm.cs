@@ -32,16 +32,16 @@ namespace KoPlayer.Forms
         public Settings Settings { get { return settings; } set { settings = value; } }
         public Song CurrentlyPlaying { get { return this.currentlyPlaying; } }
         public LastfmHandler LastFMHandler { get { return lfmHandler; } }
-        public List<IPlaylist> Playlists { get { return playlists; } }
+        public List<PlaylistBase> Playlists { get { return playlists; } }
         #endregion
 
         #region Fields
         private Library library;
         private ShuffleQueue shuffleQueue;
         
-        private IPlaylist showingPlaylist;
-        private IPlaylist playingPlaylist;
-        private List<IPlaylist> playlists;
+        private PlaylistBase showingPlaylist;
+        private PlaylistBase playingPlaylist;
+        private List<PlaylistBase> playlists;
 
         private Settings settings;
         private ColumnSettings columnSettings;
@@ -235,7 +235,7 @@ namespace KoPlayer.Forms
 
         private void LoadPlaylists()
         {
-            playlists = new List<IPlaylist>();
+            playlists = new List<PlaylistBase>();
             playlists.Add(library);
 
             if (!Directory.Exists(PlaylistDirectoryPath))
@@ -268,7 +268,7 @@ namespace KoPlayer.Forms
 
             SortPlaylists();
 
-            foreach (IPlaylist playlist in playlists)
+            foreach (PlaylistBase playlist in playlists)
                 AddToPlaylistGridView(playlist);
 
             playlistGridView.AllowUserToAddRows = false;
@@ -284,7 +284,7 @@ namespace KoPlayer.Forms
 
             var toSort = playlists.Skip(2).ToList();
 
-            toSort.Sort(delegate(IPlaylist pl1, IPlaylist pl2)
+            toSort.Sort(delegate(PlaylistBase pl1, PlaylistBase pl2)
             {
                 return pl1.Name.CompareTo(pl2.Name);
             });
@@ -293,16 +293,16 @@ namespace KoPlayer.Forms
             playlists.AddRange(toSort);
         }
 
-        private void AddToPlaylistGridView(IPlaylist playlist)
+        private void AddToPlaylistGridView(PlaylistBase playlist)
         {
             var row = (DataGridViewRow)playlistGridView.Rows[0].Clone();
             row.Cells[0].Value = playlist.Name;
             playlistGridView.Rows.Add(row);
         }
 
-        private IPlaylist GetPlaylist(string name)
+        private PlaylistBase GetPlaylist(string name)
         {
-            foreach (IPlaylist pl in playlists)
+            foreach (PlaylistBase pl in playlists)
                 if (pl.Name.ToLower() == name.ToLower())
                     return pl;
             return null;
@@ -312,7 +312,7 @@ namespace KoPlayer.Forms
         private void DeletePlaylist(DataGridViewCell cell)
         {
             bool deleted = false;
-            IPlaylist pl = playlists[cell.RowIndex];
+            PlaylistBase pl = playlists[cell.RowIndex];
             if (pl != library && pl != shuffleQueue)
             {
                 if (pl == showingPlaylist)
@@ -367,7 +367,7 @@ namespace KoPlayer.Forms
             string oldPath = this.tempPlaylist.Path;
 
             bool acceptable = true;
-            foreach (IPlaylist pl in playlists)
+            foreach (PlaylistBase pl in playlists)
             {
                 if (currentName.ToLower() == pl.Name.ToLower())
                     if (currentName.ToLower() != oldName.ToLower())
@@ -400,7 +400,7 @@ namespace KoPlayer.Forms
             ChangeToPlaylist(playlists[e.RowIndex]);
         }
 
-        private void ChangeToPlaylist(IPlaylist playlist)
+        private void ChangeToPlaylist(PlaylistBase playlist)
         {
             if (showingPlaylist == playlist)
                 return;
@@ -583,7 +583,7 @@ namespace KoPlayer.Forms
         }
         #endregion
 
-       #region Control updates
+        #region Control updates
 
         private void RefreshSongGridView()
         {
@@ -701,7 +701,7 @@ namespace KoPlayer.Forms
         #endregion 
 
         #region Playback control
-        private void PlaySong(Song song, IPlaylist inPlaylist)
+        private void PlaySong(Song song, PlaylistBase inPlaylist)
         {
             searchBarTimer.Stop();
             musicPlayer.Stop();
@@ -970,7 +970,7 @@ namespace KoPlayer.Forms
 
         private void UpdateSongForFilterPlaylists(Song song)
         {
-            foreach (IPlaylist pl in playlists)
+            foreach (PlaylistBase pl in playlists)
                 pl.UpdateSongInfo(song);
         }
 
@@ -1419,7 +1419,7 @@ namespace KoPlayer.Forms
                 else
                     name = "New filter playlist " + i;
 
-                foreach (IPlaylist pl in playlists)
+                foreach (PlaylistBase pl in playlists)
                 {
                     if (pl.Name.ToLower() == name.ToLower())
                         taken = true;
@@ -1500,7 +1500,7 @@ namespace KoPlayer.Forms
             DataGridView.HitTestInfo info = songGridView.HitTest(p.X, p.Y);
             if (info.RowIndex >= 0)
             {
-                IPlaylist pl = showingPlaylist;
+                PlaylistBase pl = showingPlaylist;
                 if (pl != library)
                 {
                     //Get datagridview rows from data
@@ -1584,7 +1584,7 @@ namespace KoPlayer.Forms
 
             if (info.RowIndex >= 0)
             {
-                IPlaylist pl = playlists[info.RowIndex];
+                PlaylistBase pl = playlists[info.RowIndex];
 
                 if (pl.GetType() == typeof(Playlist) ||
                     pl.GetType() == typeof(ShuffleQueue))
@@ -1613,7 +1613,7 @@ namespace KoPlayer.Forms
                         foreach (DataGridViewRow row in rows)
                              songs.Add((Song)row.DataBoundItem);
 
-                    IPlaylist pl = GetPlaylist(playlistGridView.Rows[info.RowIndex].Cells[0].Value.ToString());
+                    PlaylistBase pl = GetPlaylist(playlistGridView.Rows[info.RowIndex].Cells[0].Value.ToString());
                     if (pl.GetType() == typeof(Playlist) ||
                     pl.GetType() == typeof(ShuffleQueue))
                     {

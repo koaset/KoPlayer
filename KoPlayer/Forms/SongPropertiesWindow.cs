@@ -21,11 +21,11 @@ namespace KoPlayer.Forms
 
         private Song song;
         private int currentIndex;
-        private IPlaylist currentPlaylist;
+        private PlaylistBase currentPlaylist;
         private Library library;
         private MainForm mainForm;
 
-        public SongPropertiesWindow(MainForm mainForm, Song song, int clickedIndex, IPlaylist currentPlaylist, Library library)
+        public SongPropertiesWindow(MainForm mainForm, Song song, int clickedIndex, PlaylistBase currentPlaylist, Library library)
         {
             this.mainForm = mainForm;
             this.song = song;

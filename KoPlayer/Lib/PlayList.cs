@@ -4,33 +4,18 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
-using System.Xml;
-using System.Xml.Serialization;
 
 namespace KoPlayer.Lib
 {
 
-    public class Playlist : IPlaylist
+    public class Playlist : PlaylistBase
     {
         public static Random r = new Random();
-
-        [XmlIgnore]
-        public virtual string Path { get { return @"Playlists\" + Name + ".pl"; } }
-        public string Name { get; set; }
-        [XmlIgnore]
-        public int SortColumnIndex { get; set; }
-        [XmlIgnore]
-        public int NumSongs { get { return songs.Count; } }
-        public int CurrentIndex { get; set; }
+        public override string Path { get { return @"Playlists\" + Name + ".pl"; } }
 
         private const string EXTENSION = ".mp3";
 
-        protected List<Song> songs;
         protected Dictionary<string, Song> libraryDictionary;
-
-        public SortOrder SortOrder { get { return sortOrder; } }
-        private SortOrder sortOrder;
-        private string sortField = "";
 
         protected List<Dictionary<string, List<Song>>> sortDictionaries;
 
@@ -96,7 +81,7 @@ namespace KoPlayer.Lib
                 this.Remove(i);
         }
 
-        public void Add(string path)
+        public override void Add(string path)
         {
             if (!libraryDictionary.Keys.Contains(path))
                 return;
@@ -113,7 +98,7 @@ namespace KoPlayer.Lib
             Sorting.AddSongToSortDictionaries(song, this.sortDictionaries);
         }
 
-        public void Add(List<Song> songs)
+        public override void Add(List<Song> songs)
         {
             foreach (Song s in songs)
                 Add(s);
@@ -133,7 +118,7 @@ namespace KoPlayer.Lib
                 this.Insert(index, s);
         }
 
-        public void Remove(int index)
+        public override void Remove(int index)
         {
             if (CurrentIndex > index)
                 CurrentIndex--;
@@ -154,7 +139,7 @@ namespace KoPlayer.Lib
             }
         }
 
-        public virtual void Remove(List<int> indexes)
+        public override void Remove(List<int> indexes)
         {
             foreach (int i in indexes)
                 Remove(i);
@@ -165,51 +150,20 @@ namespace KoPlayer.Lib
             Remove(song.Path);
         }
 
-        public void Remove(List<Song> songs)
+        public override void Remove(List<Song> songs)
         {
             foreach (Song s in songs)
                 Remove(s.Path);
         }
 
-        public virtual void RemoveAll()
+        public override void RemoveAll()
         {
             songs.Clear();
             this.CurrentIndex = 0;
             Sorting.CreateSortDictionaries(this.songs, this.sortDictionaries);
         }
 
-        public Song GetNext()
-        {
-            if (songs.Count == 0)
-                return null;
-            if (CurrentIndex + 1 < songs.Count)
-                return songs[++CurrentIndex];
-            else
-            {
-                CurrentIndex = 0;
-                return songs[CurrentIndex];
-            }
-        }
-
-        public Song GetPrevious()
-        {
-            if (songs.Count == 0)
-                return null;
-            if (CurrentIndex > 0)
-                return songs[--CurrentIndex];
-            else
-            {
-                CurrentIndex = songs.Count - 1;
-                return songs[CurrentIndex];
-            }
-        }
-
-        public virtual Song GetRandom()
-        {
-            return songs[Playlist.r.Next(0, songs.Count)];
-        }
-
-        public virtual void UpdateSongInfo(Song song)
+        public override void UpdateSongInfo(Song song)
         {
             RemoveFromSortDictionaries(song);
             Sorting.AddSongToSortDictionaries(song, this.sortDictionaries);
@@ -223,7 +177,7 @@ namespace KoPlayer.Lib
                         list.Remove(song);
         }
 
-        public void Sort(int columnIndex, string field)
+        public override void Sort(int columnIndex, string field)
         {
             if (this.SortColumnIndex == columnIndex)
             {
@@ -239,18 +193,7 @@ namespace KoPlayer.Lib
             this.songs = Sorting.Sort(field, this.sortOrder, this.sortDictionaries, this.songs);
         }
 
-        protected void ResetSortVariables()
-        {
-            this.sortOrder = System.Windows.Forms.SortOrder.None;
-            this.SortColumnIndex = -1;
-        }
-
-        public virtual List<Song> GetSongs()
-        {
-            return songs;
-        }
-
-        public virtual void Save()
+        public override void Save()
         {
             try
             {

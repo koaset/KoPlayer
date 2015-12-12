@@ -16,11 +16,11 @@ namespace KoPlayer.Forms.SettingsControls
         Settings settings;
         List<string> playlistNames;
 
-        public ShuffleQueueSettingsControl(Settings settings, List<IPlaylist> playlists)
+        public ShuffleQueueSettingsControl(Settings settings, List<PlaylistBase> playlists)
         {
             this.settings = settings;
             this.playlistNames = new List<string>();
-            foreach (IPlaylist pl in playlists)
+            foreach (PlaylistBase pl in playlists)
                 if (pl.Name != "Shuffle Queue")
                     this.playlistNames.Add(pl.Name);
 

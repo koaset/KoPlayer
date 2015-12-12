@@ -10,29 +10,24 @@ namespace KoPlayer.Lib
 {
     public delegate void ReportProgressEventHandler(object sender, ReportProgressEventArgs e);
 
-    public class Library : IPlaylist
+    public class Library : PlaylistBase
     {
         public event ReportProgressEventHandler ReportProgress;
         public event EventHandler Changed;
 
-        public string Name { get { return "Library"; } }
-        public string Path { get { return PATH; } }
-        public int SortColumnIndex { get; set; }
+        public override string Name { get { return "Library"; } }
+        public override string Path { get { return PATH; } }
         public Dictionary<string, Song> PathDictionary { get { return pathDictionary; } }
         public List<Dictionary<string, List<Song>>> SortDictionaries { get { return this.sortDictionaries; } }
-        public SortOrder SortOrder { get { return sortOrder; } }
 
         public static string PATH = KoPlayer.Forms.MainForm.ApplicationPath + "\\Library.xml";
         public static string[] EXTENSIONS = {".mp3", ".m4a", ".wma", ".aac", ".flac"};
 
-        private List<Song> outputSongs;
         private Dictionary<string, Song> pathDictionary;
         private List<Dictionary<string, List<Song>>> sortDictionaries;
         private List<Song> newSongs;
         private List<string> invalidSongPaths;
 
-        private SortOrder sortOrder = SortOrder.None;
-        private string sortField = "";
         private bool raiseLibraryChangedEvent = true;
 
         public Dictionary<string, List<Song>> GetSortDictionary(string field)
@@ -44,33 +39,25 @@ namespace KoPlayer.Lib
                 throw new PlaylistException("Sortdictionary field does not exist");
         }
 
-        public int NumSongs
-        {
-            get { return this.pathDictionary.Count; }
-        }
-
-        [XmlIgnore]
-        public int CurrentIndex { get; set; }
-
         public Library()
             : this(null) {}
 
         public Library(List<Song> songs)
         {
             if (songs != null)
-                this.outputSongs = songs;
+                this.songs = songs;
             else
-                this.outputSongs = new List<Song>();
+                this.songs = new List<Song>();
 
             this.pathDictionary = SongListToPathDictionary();
             this.CurrentIndex = 0;
             ResetSortVariables();
 
             sortDictionaries = new List<Dictionary<string, List<Song>>>();
-            Sorting.CreateSortDictionaries(this.outputSongs, this.sortDictionaries);
+            Sorting.CreateSortDictionaries(this.songs, this.sortDictionaries);
         }
 
-        public void Sort(int columnIndex, string field)
+        public override void Sort(int columnIndex, string field)
         {
             if (this.SortColumnIndex == columnIndex)
             {
@@ -85,7 +72,7 @@ namespace KoPlayer.Lib
             this.SortColumnIndex = columnIndex;
             this.sortField = field;
 
-            this.outputSongs = Sorting.Sort(field, this.sortOrder, this.sortDictionaries, this.outputSongs);
+            this.songs = Sorting.Sort(field, this.sortOrder, this.sortDictionaries, this.songs);
         }
 
         private Dictionary<string, List<Song>> GetPathListDictionary()
@@ -100,7 +87,7 @@ namespace KoPlayer.Lib
             return ret;
         }
 
-        public void UpdateSongInfo(Song song)
+        public override void UpdateSongInfo(Song song)
         {
             //Remove from all dictionaries
             foreach (Dictionary<string, List<Song>> dictionary in this.sortDictionaries)
@@ -111,23 +98,12 @@ namespace KoPlayer.Lib
             Sorting.AddSongToSortDictionaries(song, this.sortDictionaries);
         }
 
-        public List<Song> GetSongs()
-        {
-            return outputSongs;
-        }
-
         private List<Song> GetSongsFromPathDictionary()
         {
             return pathDictionary.Values.ToList();
         }
 
-        private void ResetSortVariables()
-        {
-            this.sortOrder = System.Windows.Forms.SortOrder.None;
-            this.SortColumnIndex = -1;
-        }
-
-        public void Add(string path)
+        public override void Add(string path)
         {
             Song newSong = null;
             try
@@ -144,14 +120,14 @@ namespace KoPlayer.Lib
 
         public void ResetSearchDictionaries()
         {
-            Sorting.CreateSortDictionaries(this.outputSongs, this.sortDictionaries);
+            Sorting.CreateSortDictionaries(this.songs, this.sortDictionaries);
         }
 
         public void ResetRatingDictionary()
         {
             int index = Array.IndexOf(Sorting.SortColumns, "rating");
-            this.outputSongs = GetSongsFromPathDictionary();
-            this.sortDictionaries[index] = Sorting.CreateFieldDictionary(this.outputSongs, "rating");
+            this.songs = GetSongsFromPathDictionary();
+            this.sortDictionaries[index] = Sorting.CreateFieldDictionary(this.songs, "rating");
         }
 
         public void Add(Song song)
@@ -159,28 +135,28 @@ namespace KoPlayer.Lib
             if (song != null)
                 if (!pathDictionary.ContainsKey(song.Path))
                 {
-                    outputSongs.Add(song);
+                    songs.Add(song);
                     this.pathDictionary.Add(song.Path, song);
                     Sorting.AddSongToSortDictionaries(song, sortDictionaries);
                     NotifyChanged();
                 }
         }
 
-        public void Add(List<Song> songs)
+        public override void Add(List<Song> songs)
         {
             foreach (Song s in songs)
                 Add(s);
         }
 
-        public void Remove(int index)
+        public override void Remove(int index)
         {
-            Sorting.RemoveSongFromSortDictionaries(outputSongs[index], sortDictionaries);
-            this.pathDictionary.Remove(outputSongs[index].Path);
-            outputSongs.Remove(outputSongs[index]);
+            Sorting.RemoveSongFromSortDictionaries(songs[index], sortDictionaries);
+            this.pathDictionary.Remove(songs[index].Path);
+            songs.Remove(songs[index]);
             NotifyChanged();
         }
 
-        public void Remove(List<int> indexes)
+        public override void Remove(List<int> indexes)
         {
             raiseLibraryChangedEvent = false;
             foreach (int i in indexes)
@@ -194,7 +170,7 @@ namespace KoPlayer.Lib
             Remove(song.Path);
         }
 
-        public void Remove(List<Song> songs)
+        public override void Remove(List<Song> songs)
         {
             foreach (Song s in songs)
                 Remove(s.Path);
@@ -204,52 +180,21 @@ namespace KoPlayer.Lib
         public void Remove(string path)
         {
             Song toBeRemoved = null;
-            foreach (Song s in outputSongs)
+            foreach (Song s in songs)
                 if (s.Path == path)
                     toBeRemoved = s;
             Sorting.RemoveSongFromSortDictionaries(toBeRemoved, sortDictionaries);
-            outputSongs.Remove(toBeRemoved);
+            songs.Remove(toBeRemoved);
             this.pathDictionary.Remove(toBeRemoved.Path);
             this.NotifyChanged();
         }
 
-        public void RemoveAll()
+        public override void RemoveAll()
         {
-            this.outputSongs = new List<Song>();
+            this.songs = new List<Song>();
             this.pathDictionary.Clear();
-            Sorting.CreateSortDictionaries(this.outputSongs, this.sortDictionaries);
+            Sorting.CreateSortDictionaries(this.songs, this.sortDictionaries);
             this.NotifyChanged();
-        }
-
-        public Song GetNext()
-        {
-            if (outputSongs.Count == 0)
-                return null;
-            if (CurrentIndex + 1 < outputSongs.Count)
-                return outputSongs[++CurrentIndex];
-            else
-            {
-                CurrentIndex = 0;
-                return outputSongs[CurrentIndex];
-            }
-        }
-
-        public Song GetPrevious()
-        {
-            if (outputSongs.Count == 0)
-                return null;
-            if (CurrentIndex > 0)
-                return outputSongs[--CurrentIndex];
-            else
-            {
-                CurrentIndex = outputSongs.Count - 1;
-                return outputSongs[CurrentIndex];
-            }
-        }
-
-        public Song GetRandom()
-        {
-            return pathDictionary.Values.ToList()[Playlist.r.Next(0, pathDictionary.Count)];
         }
 
         public void Add(List<string> paths)
@@ -321,9 +266,9 @@ namespace KoPlayer.Lib
 
         void addFilesWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            List<Song> newLibrary = new List<Song>(this.outputSongs.ToList());
+            List<Song> newLibrary = new List<Song>(this.songs.ToList());
             newLibrary.AddRange(newSongs);
-            this.outputSongs = new List<Song>(newLibrary);
+            this.songs = new List<Song>(newLibrary);
 
             foreach (Song s in newSongs)
                 if (!pathDictionary.Keys.Contains(s.Path))
@@ -331,7 +276,7 @@ namespace KoPlayer.Lib
 
             Save();
 
-            Sorting.CreateSortDictionaries(this.outputSongs, this.sortDictionaries);
+            Sorting.CreateSortDictionaries(this.songs, this.sortDictionaries);
 
             NotifyChanged();
 
@@ -353,10 +298,7 @@ namespace KoPlayer.Lib
 
         private bool Exists(string path)
         {
-            foreach (Song s in outputSongs)
-                if (s.Path == path)
-                    return true;
-            return false;
+            return songs.Any(s => s.Path == path);
         }
 
         public SearchResult Search(string searchString)
@@ -388,7 +330,7 @@ namespace KoPlayer.Lib
 
         private Dictionary<string, Song> SongListToPathDictionary()
         {
-            return outputSongs.ToDictionary(x => x.Path, x => x);
+            return songs.ToDictionary(x => x.Path, x => x);
         }
 
         public override string ToString()
@@ -396,7 +338,7 @@ namespace KoPlayer.Lib
             return this.Name + ", " + this.NumSongs + " songs.";
         }
 
-        public void Save()
+        public override void Save()
         {
             using (var stream = File.Create(PATH))
             {

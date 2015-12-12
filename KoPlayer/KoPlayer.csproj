@@ -124,6 +124,7 @@
     <Compile Include="Lib\FilterPlaylist.cs" />
     <Compile Include="Lib\Filters\RatingFilter.cs" />
     <Compile Include="Lib\Filters\StringFilter.cs" />
+    <Compile Include="Lib\PlaylistBase.cs" />
     <Compile Include="Lib\PlaylistFactory.cs" />
     <Compile Include="Lib\SearchResult.cs" />
     <Compile Include="Lib\ShuffleQueue.cs" />
@@ -196,7 +197,6 @@
     <Compile Include="Lib\Library.cs" />
     <Compile Include="Lib\Sorting.cs" />
     <Compile Include="Settings\ColumnSettings.cs" />
-    <Compile Include="Lib\IPlaylist.cs" />
     <Compile Include="Lib\Playlist.cs" />
     <Compile Include="Lib\Song.cs" />
     <Compile Include="Forms\MainForm.cs">

@@ -12,7 +12,7 @@ namespace KoPlayer.Lib
     public class ShuffleQueue : Playlist
     {
         [XmlIgnore]
-        public IPlaylist Source { get; set; }
+        public PlaylistBase Source { get; set; }
         [XmlIgnore]
         public Settings Settings { get; set; }
         private Library library;
@@ -47,7 +47,7 @@ namespace KoPlayer.Lib
 
             if (Source.NumSongs > 0)
                 while (NumSongs - CurrentIndex < Settings.Shufflequeue_NumNext + 1)
-                    Add(Source.GetRandom());
+                    Add(Source.GetRandom(false));
         }
 
         public ShuffleQueue(StreamReader sr, Library library, Settings settings)

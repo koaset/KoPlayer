@@ -18,12 +18,12 @@ namespace KoPlayer.Forms
 
         //private Song song;
         private List<Song> songs;
-        private IPlaylist currentPlaylist;
+        private PlaylistBase currentPlaylist;
         private Library library;
         private MainForm mainForm;
         private Dictionary<string, bool> saveProperties;
 
-        public MultiSongPropertiesWindow(MainForm mainForm, List<Song> songs, IPlaylist currentPlaylist, Library library)
+        public MultiSongPropertiesWindow(MainForm mainForm, List<Song> songs, PlaylistBase currentPlaylist, Library library)
         {
             this.mainForm = mainForm;
             this.songs = songs;
