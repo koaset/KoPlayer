@@ -50,6 +50,17 @@ namespace KoPlayer.Lib
                     Add(Source.GetRandom(false));
         }
 
+        public override void Insert(int index, List<Song> songs)
+        {
+            if (index < CurrentIndex)
+                CurrentIndex += songs.Count;
+
+            if (index == CurrentIndex)
+                index++;
+
+            base.Insert(index, songs);
+        }
+
         public ShuffleQueue(StreamReader sr, Library library, Settings settings)
             : base(sr, library)
         {

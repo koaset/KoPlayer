@@ -104,18 +104,12 @@ namespace KoPlayer.Lib
                 Add(s);
         }
 
-        public void Insert(int index, Song song)
+        public virtual void Insert(int index, List<Song> songs)
         {
-            if (index < songs.Count)
-                songs.Insert(index, song);
+            if (index < this.songs.Count)
+                this.songs.InsertRange(index, songs);
             else
-                songs.Add(song);
-        }
-
-        public void Insert(int index, List<Song> songs)
-        {
-            foreach (Song s in songs)
-                this.Insert(index, s);
+                this.songs.InsertRange(this.songs.Count - 1, songs);
         }
 
         public override void Remove(int index)

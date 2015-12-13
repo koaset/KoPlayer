@@ -1496,22 +1496,24 @@ namespace KoPlayer.Forms
 
         private void HandleSongDragDrop(DragEventArgs e)
         {
-            Point p = songGridView.PointToClient(new Point(e.X, e.Y));
-            DataGridView.HitTestInfo info = songGridView.HitTest(p.X, p.Y);
+            var p = songGridView.PointToClient(new Point(e.X, e.Y));
+            var info = songGridView.HitTest(p.X, p.Y);
             if (info.RowIndex >= 0)
             {
-                PlaylistBase pl = showingPlaylist;
+                var pl = showingPlaylist;
                 if (pl != library)
                 {
                     //Get datagridview rows from data
-                    DragDropSongs data = (DragDropSongs)e.Data;
+                    var data = (DragDropSongs)e.Data;
                     data.ReturnPaths = false;
-                    List<DataGridViewRow> rows = (List<DataGridViewRow>)
+                    var rows = (List<DataGridViewRow>)
                         data.GetData(DataFormats.FileDrop);
 
-                    List<Song> songs = new List<Song>();
+                    var playlist = pl as Playlist;
 
-                    foreach (DataGridViewRow row in rows)
+                    var songs = new List<Song>();
+
+                    foreach (var row in rows)
                     {
                         songs.Add((Song)row.DataBoundItem);
                         pl.Remove(row.Index);
@@ -1522,11 +1524,9 @@ namespace KoPlayer.Forms
                             shuffleQueue.CurrentIndex = info.RowIndex;
                     }
 
-                    foreach (Song s in songs)
-                    {
-                        Playlist playlist = pl as Playlist;
-                        playlist.Insert(info.RowIndex, s);
-                    }
+                    songs.Reverse();
+
+                    playlist.Insert(info.RowIndex, songs);
 
                     if (showingPlaylist == shuffleQueue)
                         shuffleQueue.Populate();
@@ -1542,7 +1542,7 @@ namespace KoPlayer.Forms
 
             if (CanAddPaths(paths))
             {
-                List<string> songPaths = new List<string>();
+                var songPaths = new List<string>();
                 foreach (string path in paths)
                 {
                     if (File.GetAttributes(path).HasFlag(FileAttributes.Directory))
@@ -1578,7 +1578,7 @@ namespace KoPlayer.Forms
         private void playlistGridView_DragOver(object sender, DragEventArgs e)
         {
             Point p = playlistGridView.PointToClient(new Point(e.X, e.Y));
-            DataGridView.HitTestInfo info = playlistGridView.HitTest(p.X, p.Y);
+            var info = playlistGridView.HitTest(p.X, p.Y);
 
             e.Effect = DragDropEffects.None;
 
@@ -1600,12 +1600,12 @@ namespace KoPlayer.Forms
                 data.ReturnPaths = false;
 
                 Point p = playlistGridView.PointToClient(new Point(e.X, e.Y));
-                DataGridView.HitTestInfo info = playlistGridView.HitTest(p.X, p.Y);
+                var info = playlistGridView.HitTest(p.X, p.Y);
 
                 if (info.RowIndex >= 0)
                 {
 
-                    List<DataGridViewRow> rows = (List<DataGridViewRow>)data.GetData(DataFormats.FileDrop);
+                    var rows = (List<DataGridViewRow>)data.GetData(DataFormats.FileDrop);
                     //Rows recieved are reverse order from what we want here
                     rows.Reverse();
 
@@ -1613,7 +1613,7 @@ namespace KoPlayer.Forms
                         foreach (DataGridViewRow row in rows)
                              songs.Add((Song)row.DataBoundItem);
 
-                    PlaylistBase pl = GetPlaylist(playlistGridView.Rows[info.RowIndex].Cells[0].Value.ToString());
+                    var pl = GetPlaylist(playlistGridView.Rows[info.RowIndex].Cells[0].Value.ToString());
                     if (pl.GetType() == typeof(Playlist) ||
                     pl.GetType() == typeof(ShuffleQueue))
                     {
