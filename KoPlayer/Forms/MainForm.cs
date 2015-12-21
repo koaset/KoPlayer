@@ -65,7 +65,7 @@ namespace KoPlayer.Forms
         private int searchLibraryTimerInterval = 500;
         bool shouldSearch = false;
 
-        private Playlist tempPlaylist;
+        private Playlist renamingPlaylist;
         private int clickedSongIndex;
         private int clickedPlaylistIndex;
 
@@ -263,18 +263,10 @@ namespace KoPlayer.Forms
 
         private void SetPlaylistGridView()
         {
-            playlistGridView.Rows.Clear();
-            playlistGridView.AllowUserToAddRows = true;
-
             SortPlaylists();
-
-            foreach (PlaylistBase playlist in playlists)
-                AddToPlaylistGridView(playlist);
-
-            playlistGridView.AllowUserToAddRows = false;
-
-            playlistGridView.ClearSelection();
-            playlistGridView.Rows[playlists.IndexOf(showingPlaylist)].Cells[0].Selected = true;
+            playlistGridView.DataSource = null;
+            playlistGridView.Columns.Clear();
+            playlistGridView.DataSource = playlists;
         }
 
         private void SortPlaylists()
@@ -284,20 +276,10 @@ namespace KoPlayer.Forms
 
             var toSort = playlists.Skip(2).ToList();
 
-            toSort.Sort(delegate(PlaylistBase pl1, PlaylistBase pl2)
-            {
-                return pl1.Name.CompareTo(pl2.Name);
-            });
+            toSort.Sort((pl1, pl2) => pl1.Name.CompareTo(pl2.Name));
 
             playlists.RemoveRange(2, toSort.Count);
             playlists.AddRange(toSort);
-        }
-
-        private void AddToPlaylistGridView(PlaylistBase playlist)
-        {
-            var row = (DataGridViewRow)playlistGridView.Rows[0].Clone();
-            row.Cells[0].Value = playlist.Name;
-            playlistGridView.Rows.Add(row);
         }
 
         private PlaylistBase GetPlaylist(string name)
@@ -351,45 +333,59 @@ namespace KoPlayer.Forms
 
         private void RenamePlaylist()
         {
-            this.tempPlaylist = GetPlaylist(playlistGridView.CurrentCell.Value.ToString()) as Playlist;
+            renamingPlaylist = GetPlaylist(playlistGridView.CurrentCell.Value.ToString()) as Playlist;
             playlistGridView.BeginEdit(true);
+        }
+
+        private void playlistGridView_CellValidating(object sender, DataGridViewCellValidatingEventArgs e)
+        {
+            if (renamingPlaylist == null)
+                return;
+
+            string currentName = e.FormattedValue.ToString();
+
+            string oldName = this.renamingPlaylist.Name;
+            string oldPath = this.renamingPlaylist.Path;
+            
+            if (string.IsNullOrEmpty(currentName))
+                e.Cancel = true;
+            else
+            {
+                foreach (PlaylistBase pl in playlists)
+                {
+                    if (currentName.ToLower() == pl.Name.ToLower())
+                        if (currentName.ToLower() != oldName.ToLower())
+                        {
+                            e.Cancel = true;
+                            break;
+                        }
+                }
+            }
+            
         }
 
         private void playlistGridView_CellEndEdit(object sender, DataGridViewCellEventArgs e)
         {
-            string currentName;
-            if (playlistGridView.CurrentCell.Value == null)
-                currentName = "";
-            else
-                currentName = playlistGridView.CurrentCell.Value.ToString();
+            string currentName = playlistGridView.Rows[e.RowIndex].Cells[0].Value.ToString();
 
-            string oldName = this.tempPlaylist.Name;
-            string oldPath = this.tempPlaylist.Path;
+            string oldName = renamingPlaylist.Name;
+            string oldPath = renamingPlaylist.Path;
 
-            bool acceptable = true;
-            foreach (PlaylistBase pl in playlists)
+            if (currentName.ToLower() != oldName.ToLower())
             {
-                if (currentName.ToLower() == pl.Name.ToLower())
-                    if (currentName.ToLower() != oldName.ToLower())
-                        acceptable = false;
-            }
-
-            if (acceptable)
-            {
-                if (currentName.ToLower() != oldName.ToLower())
+                renamingPlaylist.Name = currentName;
+                try
                 {
-                    tempPlaylist.Name = currentName;
-                    try
-                    {
-                        System.IO.File.Move(oldPath, tempPlaylist.Path);
-                    }
-                    catch { }
+                    if (File.Exists(oldPath))
+                        System.IO.File.Move(oldPath, renamingPlaylist.Path);
                 }
-
-                SetPlaylistGridView();
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Playlist rename exception: " + ex.Message);
+                }
             }
-            else
-                playlistGridView.BeginEdit(true);
+
+            renamingPlaylist = null;
         }
         
         #endregion

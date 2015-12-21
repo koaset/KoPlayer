@@ -231,6 +231,7 @@
             this.playlistGridView.AllowUserToResizeRows = false;
             this.playlistGridView.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
+            this.playlistGridView.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this.playlistGridView.BackgroundColor = System.Drawing.SystemColors.ButtonHighlight;
             this.playlistGridView.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.None;
             this.playlistGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
@@ -248,6 +249,7 @@
             this.playlistGridView.TabIndex = 7;
             this.playlistGridView.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.playlistGridView_CellClick);
             this.playlistGridView.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.playlistGridView_CellEndEdit);
+            this.playlistGridView.CellValidating += new System.Windows.Forms.DataGridViewCellValidatingEventHandler(this.playlistGridView_CellValidating);
             this.playlistGridView.DragDrop += new System.Windows.Forms.DragEventHandler(this.playlistGridView_DragDrop);
             this.playlistGridView.DragOver += new System.Windows.Forms.DragEventHandler(this.playlistGridView_DragOver);
             this.playlistGridView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.playlistGridView_KeyDown);
