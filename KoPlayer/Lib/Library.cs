@@ -213,7 +213,7 @@ namespace KoPlayer.Lib
             this.invalidSongPaths = new List<string>();
         }
 
-        void addFilesWorker_DoWork(object sender, DoWorkEventArgs e)
+        private void addFilesWorker_DoWork(object sender, DoWorkEventArgs e)
         {
             var worker = sender as BackgroundWorker;
             List<string> musicFiles = e.Argument as List<string>;
@@ -246,7 +246,7 @@ namespace KoPlayer.Lib
             worker.ReportProgress(100);
         }
 
-        void addFilesWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        private void addFilesWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             OnReportProgress(new ReportProgressEventArgs(e.ProgressPercentage));
         }
@@ -264,7 +264,7 @@ namespace KoPlayer.Lib
                     Changed(this, new EventArgs());
         }
 
-        void addFilesWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        private void addFilesWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             List<Song> newLibrary = new List<Song>(this.songs.ToList());
             newLibrary.AddRange(newSongs);
@@ -308,13 +308,13 @@ namespace KoPlayer.Lib
             var result = new SearchResult(this);
             var resultSongs = result.GetSongs();
 
-            // 4 first dictionaryies contain title artist album genre fields
+            // 4 first dictionaries contain title, artist, album and genre fields
             for (int i = 0; i < 4; i++)
             {
                 var dictionary = sortDictionaries[i];
 
-                List<string> keysToAdd = dictionary.Where(x => 
-                    x.Key.ToLower().Contains(searchString)).Select(x => x.Key).ToList();
+                var keysToAdd = dictionary.Where(x => x.Key.ToLower()
+                    .Contains(searchString)).Select(x => x.Key).ToList();
 
                 foreach (string keyToAdd in keysToAdd)
                 {

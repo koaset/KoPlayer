@@ -20,13 +20,12 @@ namespace KoPlayer
 
         public override object GetData(string test)
         {
-            List<DataGridViewRow> rows =
-                (List<DataGridViewRow>)base.GetData(test);
+            var rows = (List<DataGridViewRow>)base.GetData(test);
 
             if (ReturnPaths)
             {
-                List<string> paths = new List<string>();
-                foreach (DataGridViewRow row in rows)
+                var paths = new List<string>();
+                foreach (var row in rows)
                 {
                     Song s = (Song)row.DataBoundItem;
                     if (!paths.Contains(s.Path))

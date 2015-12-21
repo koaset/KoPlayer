@@ -197,7 +197,7 @@ namespace KoPlayer.Forms
             else
             {
                 songGridView.DataSource = null;
-                songGridView.DataSource = new List<Song>(showingPlaylist.GetSongs());
+                songGridView.DataSource = showingPlaylist.GetSongs();
 
                 if (showingPlaylist == shuffleQueue)
                     SetShuffleQueueColors();
@@ -936,7 +936,6 @@ namespace KoPlayer.Forms
                 else if (e.KeyCode == Keys.Left)
                     PlayPreviousSong();
             }
-
         }
 
         private void RateSongs(DataGridViewSelectedRowCollection rows, int rating)
@@ -1313,7 +1312,6 @@ namespace KoPlayer.Forms
             this.shouldSearch = false;
         }
 
-
         private void searchBox_TextChanged(object sender, EventArgs e)
         {
             if (searchBox.Text == searchBoxDefault)
@@ -1334,7 +1332,7 @@ namespace KoPlayer.Forms
             }
         }
 
-        void searchLibraryTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        private void searchLibraryTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
             searchLibraryTimer.Stop();
 
@@ -1405,7 +1403,7 @@ namespace KoPlayer.Forms
             ChangeToPlaylist(newPlaylist);
         }
 
-        string GetNewPlaylistName(bool filter)
+        private string GetNewPlaylistName(bool filter)
         {
             string name = "";
             int i = 0;
@@ -1504,7 +1502,7 @@ namespace KoPlayer.Forms
                 var pl = showingPlaylist;
                 if (pl != library)
                 {
-                    //Get datagridview rows from data
+                    // Get datagridview rows from data
                     var data = (DragDropSongs)e.Data;
                     data.ReturnPaths = false;
                     var rows = (List<DataGridViewRow>)
@@ -1513,7 +1511,7 @@ namespace KoPlayer.Forms
                     var playlist = pl as Playlist;
 
                     var songs = new List<Song>();
-
+                                        
                     foreach (var row in rows)
                     {
                         songs.Add((Song)row.DataBoundItem);
