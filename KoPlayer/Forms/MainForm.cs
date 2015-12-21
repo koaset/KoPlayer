@@ -361,31 +361,27 @@ namespace KoPlayer.Forms
                         }
                 }
             }
-            
-        }
 
-        private void playlistGridView_CellEndEdit(object sender, DataGridViewCellEventArgs e)
-        {
-            string currentName = playlistGridView.Rows[e.RowIndex].Cells[0].Value.ToString();
-
-            string oldName = renamingPlaylist.Name;
-            string oldPath = renamingPlaylist.Path;
-
-            if (currentName.ToLower() != oldName.ToLower())
+            // save change file name as well
+            if (!e.Cancel)
             {
-                renamingPlaylist.Name = currentName;
-                try
+                if (currentName.ToLower() != oldName.ToLower())
                 {
-                    if (File.Exists(oldPath))
-                        System.IO.File.Move(oldPath, renamingPlaylist.Path);
+                    renamingPlaylist.Name = currentName;
+                    try
+                    {
+                        if (File.Exists(oldPath))
+                            System.IO.File.Move(oldPath, renamingPlaylist.Path);
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show("Playlist rename exception: " + ex.Message);
+                    }
                 }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Playlist rename exception: " + ex.Message);
-                }
-            }
 
-            renamingPlaylist = null;
+                renamingPlaylist = null;
+            }
+            
         }
         
         #endregion

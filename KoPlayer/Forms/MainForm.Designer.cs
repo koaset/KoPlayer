@@ -248,7 +248,6 @@
             this.playlistGridView.Size = new System.Drawing.Size(175, 345);
             this.playlistGridView.TabIndex = 7;
             this.playlistGridView.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.playlistGridView_CellClick);
-            this.playlistGridView.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.playlistGridView_CellEndEdit);
             this.playlistGridView.CellValidating += new System.Windows.Forms.DataGridViewCellValidatingEventHandler(this.playlistGridView_CellValidating);
             this.playlistGridView.DragDrop += new System.Windows.Forms.DragEventHandler(this.playlistGridView_DragDrop);
             this.playlistGridView.DragOver += new System.Windows.Forms.DragEventHandler(this.playlistGridView_DragOver);
