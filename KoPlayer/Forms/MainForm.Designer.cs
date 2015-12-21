@@ -509,9 +509,6 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn Column1;
         private System.Windows.Forms.BindingSource playlistBindingSource;
         private System.Windows.Forms.BindingSource songsBindingSource;
-        private System.Windows.Forms.Button previousButton;
-        private System.Windows.Forms.Button playpauseButton;
-        private System.Windows.Forms.Button nextButton;
         private System.Windows.Forms.TrackBar searchBar;
         private System.Windows.Forms.Label songInfoLabel;
         private System.Windows.Forms.ToolStripMenuItem newPlaylistToolStripMenuItem;
@@ -530,5 +527,8 @@
         private System.Windows.Forms.ImageList pauseButton_imageList;
         private System.Windows.Forms.ToolStripMenuItem equalizerToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem newRatingFilterPlaylistToolStripMenuItem;
+        private Controls.KoPlayerButton previousButton;
+        private Controls.KoPlayerButton playpauseButton;
+        private Controls.KoPlayerButton nextButton;
     }
 }

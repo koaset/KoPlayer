@@ -485,8 +485,7 @@ namespace KoPlayer.Forms
             musicPlayer.Dispose();
 
             // Save settings
-            settings.FormWidth = this.Width;
-            settings.FormHeight = this.Height;
+            SaveFormDimensions();
 
             settings.StartupPlaylist = showingPlaylist.Name;
             if (settings.StartupPlaylist == "Search Results")
@@ -503,6 +502,16 @@ namespace KoPlayer.Forms
 
             // Saving of playlists is done after the form has closed (program.cs)
         }
+
+        private void SaveFormDimensions()
+        {
+            this.Show();
+            this.WindowState = FormWindowState.Normal;
+            settings.FormWidth = this.Width;
+            settings.FormHeight = this.Height;
+            this.Hide();
+        }
+
         #endregion
 
         #region Add songs
