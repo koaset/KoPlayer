@@ -55,8 +55,8 @@ namespace KoPlayer.Lib
             if (index < CurrentIndex)
                 CurrentIndex += songs.Count;
 
-            if (index == CurrentIndex)
-                index++;
+            /*if (index == CurrentIndex)
+                index++;*/
 
             base.Insert(index, songs);
         }

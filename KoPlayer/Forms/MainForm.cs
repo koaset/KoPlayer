@@ -1497,42 +1497,50 @@ namespace KoPlayer.Forms
         {
             var p = songGridView.PointToClient(new Point(e.X, e.Y));
             var info = songGridView.HitTest(p.X, p.Y);
-            if (info.RowIndex >= 0)
-            {
+
+            if (info.RowIndex < 0)
+                return;
                 var pl = showingPlaylist;
-                if (pl != library)
-                {
-                    // Get datagridview rows from data
-                    var data = (DragDropSongs)e.Data;
-                    data.ReturnPaths = false;
-                    var rows = (List<DataGridViewRow>)
-                        data.GetData(DataFormats.FileDrop);
 
-                    var playlist = pl as Playlist;
+            if (pl == library)
+                return;
 
-                    var songs = new List<Song>();
-                                        
-                    foreach (var row in rows)
-                    {
-                        songs.Add((Song)row.DataBoundItem);
-                        pl.Remove(row.Index);
+            // Get datagridview rows from data
+            var data = (DragDropSongs)e.Data;
+            data.ReturnPaths = false;
+            var rows = (List<DataGridViewRow>)
+                data.GetData(DataFormats.FileDrop);
 
-                        if (playingPlaylist == shuffleQueue &&
-                            showingPlaylist == playingPlaylist &&
-                            row.Index == shuffleQueue.CurrentIndex)
-                            shuffleQueue.CurrentIndex = info.RowIndex;
-                    }
+            var playlist = pl as Playlist;
 
-                    songs.Reverse();
+            var songs = new List<Song>();
+            
+            int originalIndex = -1;
+            if (showingPlaylist == shuffleQueue)
+                originalIndex = shuffleQueue.CurrentIndex;
+  
+            foreach (var row in rows)
+            {
+                songs.Add((Song)row.DataBoundItem);
+                pl.Remove(row.Index);
 
-                    playlist.Insert(info.RowIndex, songs);
-
-                    if (showingPlaylist == shuffleQueue)
-                        shuffleQueue.Populate();
-                    
-                    UpdateShowingPlaylist();
-                }
+                if (playingPlaylist == shuffleQueue &&
+                    showingPlaylist == playingPlaylist &&
+                    row.Index == shuffleQueue.CurrentIndex)
+                    shuffleQueue.CurrentIndex = info.RowIndex;
             }
+
+            songs.Reverse();
+
+            if (originalIndex != -1 && info.RowIndex == originalIndex)
+                playlist.Insert(info.RowIndex + 1, songs);
+            else
+                playlist.Insert(info.RowIndex, songs);
+
+            if (showingPlaylist == shuffleQueue)
+                shuffleQueue.Populate();
+                    
+            UpdateShowingPlaylist();
         }
 
         private void HandleFileDragDrop(DragEventArgs e)
