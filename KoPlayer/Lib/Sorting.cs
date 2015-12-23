@@ -42,8 +42,7 @@ namespace KoPlayer.Lib
                 throw new PlaylistException("Invalid field name");
 
             //Create a dictionary sorted on they keys
-            SortedDictionary<string, List<Song>> sortedDictionary;
-            sortedDictionary = new SortedDictionary<string, List<Song>>(sortDictionary);
+            var sortedDictionary = new SortedDictionary<string, List<Song>>(sortDictionary);
 
             //Get list of keys and reverse order if needed
             IEnumerable<string> keys = sortedDictionary.Keys;
@@ -68,7 +67,7 @@ namespace KoPlayer.Lib
 
         public static List<Song> SortLength(SortOrder sortOrder, List<Song> sortList)
         {
-            List<Song> sortedList = sortList.ToList();
+            var sortedList = sortList.ToList();
 
             sortedList.Sort((s1, s2) => s1.Length.CompareTo(s2.Length));
 
@@ -80,7 +79,7 @@ namespace KoPlayer.Lib
 
         public static List<Song> SortDate(SortOrder sortOrder, List<Song> sortList)
         {
-            List<Song> sortedList = sortList.ToList();
+            var sortedList = sortList.ToList();
 
             sortedList.Sort((s1, s2) => s1.DateAdded.CompareTo(s2.DateAdded));
 
@@ -100,10 +99,8 @@ namespace KoPlayer.Lib
             List<Dictionary<string, List<Song>>> sortDictionaries)
         {
             for (int i = 0; i < Sorting.SortColumns.Length; i++)
-            {
                 if (field.ToLower() == Sorting.SortColumns[i].ToLower())
                     return sortDictionaries[i];
-            }
             return null;
         }
 
@@ -142,6 +139,13 @@ namespace KoPlayer.Lib
             sortDictionaries.Clear();
             for (int i = 0; i < Sorting.SortColumns.Length; i++)
                 sortDictionaries.Add(CreateFieldDictionary(sourceList, Sorting.SortColumns[i]));
+
+            if (sourceList.Count == 2)
+            {
+                int i = 2;
+                i++;
+            }
+
         }
 
         /// <summary>
@@ -152,7 +156,7 @@ namespace KoPlayer.Lib
         /// <returns></returns>
         public static Dictionary<string, List<Song>> CreateFieldDictionary(List<Song> sourceList, string field)
         {
-            Dictionary<string, List<Song>> fieldDictionary = new Dictionary<string, List<Song>>();
+            var fieldDictionary = new Dictionary<string, List<Song>>();
             foreach (Song s in sourceList)
                 AddSongToFieldDictionary(fieldDictionary, field, s);
             return fieldDictionary;
@@ -170,7 +174,7 @@ namespace KoPlayer.Lib
                 dictionary[song[field]].Add(song);
             else
             {
-                List<Song> newEntry = new List<Song>();
+                var newEntry = new List<Song>();
                 newEntry.Add(song);
                 if (song[field] != null)
                     dictionary.Add(song[field], newEntry);

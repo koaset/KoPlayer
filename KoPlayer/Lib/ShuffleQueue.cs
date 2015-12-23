@@ -47,16 +47,13 @@ namespace KoPlayer.Lib
 
             if (Source.NumSongs > 0)
                 while (NumSongs - CurrentIndex < Settings.Shufflequeue_NumNext + 1)
-                    Add(Source.GetRandom(false));
+                    Add(Source.GetRandom(Settings.Shufflequeue_WeighRating));
         }
 
         public override void Insert(int index, List<Song> songs)
         {
             if (index < CurrentIndex)
                 CurrentIndex += songs.Count;
-
-            /*if (index == CurrentIndex)
-                index++;*/
 
             base.Insert(index, songs);
         }

@@ -9,6 +9,8 @@ namespace KoPlayer.Lib
 {
     public abstract class PlaylistBase
     {
+        public static Random r = new Random();
+
         [System.ComponentModel.DisplayName("Name")]
         public virtual string Name { get; set; }
 
@@ -38,7 +40,7 @@ namespace KoPlayer.Lib
 
         public virtual List<Song> GetSongs()
         {
-            return songs;
+            return new List<Song>(songs);
         }
 
         public virtual Song GetNext()
@@ -69,7 +71,52 @@ namespace KoPlayer.Lib
 
         public virtual Song GetRandom(bool weighRating)
         {
-            return songs[Playlist.r.Next(0, songs.Count)];
+            if (!weighRating)
+                return songs[PlaylistBase.r.Next(0, songs.Count)];
+
+            try
+            {
+                return GetRandomWeighted();
+            }
+            catch (Exception ex)
+            {
+                ErrorLogger.Log(ex);
+                return songs[PlaylistBase.r.Next(0, songs.Count)];
+            }
+        }
+
+        private Song GetRandomWeighted()
+        {
+            int acc = 0;
+
+            var ratingDicts = sortDictionaries[Array.IndexOf(Sorting.SortColumns, "rating")];
+
+            foreach (var key in ratingDicts.Keys)
+                acc += ratingDicts[key].Count * (key.Length + 1);
+
+            int rand = PlaylistBase.r.Next(0, acc);
+
+            acc = 0;
+            // determine which rating dictionary the song is in
+            foreach (var key in ratingDicts.Keys)
+            {
+                int next = ratingDicts[key].Count * (key.Length + 1);
+
+                if (rand < acc + next)
+                {
+                    // song is in this dictionary
+                    // calculate index:
+                    int diff = rand - acc;
+                    diff -= diff % (key.Length + 1);
+                    int index = diff / (key.Length + 1);
+                    return ratingDicts[key][index];
+                }
+                else
+                    acc += next;
+            }
+
+            // This shouldn't happen
+            throw new Exception("Rating weighing error");
         }
 
         public abstract void Add(string path);

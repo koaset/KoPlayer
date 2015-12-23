@@ -10,7 +10,6 @@ namespace KoPlayer.Lib
 
     public class Playlist : PlaylistBase
     {
-        public static Random r = new Random();
         public override string Path { get { return @"Playlists\" + Name + ".pl"; } }
 
         private const string EXTENSION = ".mp3";
@@ -29,7 +28,7 @@ namespace KoPlayer.Lib
         {
             this.Name = name;
             this.songs = songs;
-
+            
             Init(library);
         }
 
@@ -157,6 +156,9 @@ namespace KoPlayer.Lib
 
         public override void UpdateSongInfo(Song song)
         {
+            if (!songs.Contains(song))
+                return;
+
             RemoveFromSortDictionaries(song);
             Sorting.AddSongToSortDictionaries(song, this.sortDictionaries);
         }

@@ -153,7 +153,6 @@ namespace KoPlayer.Forms
 
             SetPlaylistGridView();
 
-            
             playlistGridView.ClearSelection();
             // Select proper playlist in gridview
             foreach (DataGridViewRow row in playlistGridView.Rows)
@@ -414,6 +413,7 @@ namespace KoPlayer.Forms
 
             UpdateShowingPlaylist();
             songGridView.ClearSelection();
+
             SetPlaylistGridView();
             UpdateStatusStrip();
         }
@@ -791,7 +791,7 @@ namespace KoPlayer.Forms
             try
             {
                 this.currentAlbumArt = song.ReloadAndGetImage();
-                UpdateSongForFilterPlaylists(song);
+                UpdateSong(song);
             }
             catch (SongReadException ex)
             {
@@ -959,7 +959,7 @@ namespace KoPlayer.Forms
             library.ResetSearchDictionaries();
 
             foreach (Song s in songs)
-                UpdateSongForFilterPlaylists(s);
+                UpdateSong(s);
 
             RefreshSongGridView();
             if (showingPlaylist.GetType() == typeof(FilterPlaylist))
@@ -970,13 +970,13 @@ namespace KoPlayer.Forms
         {
             s.Rating = rating;
             library.UpdateSongInfo(currentlyPlaying);
-            UpdateSongForFilterPlaylists(s);
+            UpdateSong(s);
             RefreshSongGridView();
             if (showingPlaylist.GetType() == typeof(FilterPlaylist))
                 UpdateShowingPlaylist();
         }
 
-        private void UpdateSongForFilterPlaylists(Song song)
+        private void UpdateSong(Song song)
         {
             foreach (PlaylistBase pl in playlists)
                 pl.UpdateSongInfo(song);
@@ -1920,7 +1920,7 @@ namespace KoPlayer.Forms
 
         private void songPropertiesWindow_SongChanged(object sender, SongChangedEventArgs e)
         {
-            UpdateSongForFilterPlaylists(e.ChangedSong);
+            UpdateSong(e.ChangedSong);
             UpdateShowingPlaylist();
         }
 

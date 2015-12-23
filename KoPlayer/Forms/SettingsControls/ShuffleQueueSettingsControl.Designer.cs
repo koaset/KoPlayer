@@ -35,6 +35,7 @@
             this.recent_box = new System.Windows.Forms.NumericUpDown();
             this.source_label = new System.Windows.Forms.Label();
             this.playlist_box = new System.Windows.Forms.ComboBox();
+            this.weighRating_checkBox = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.upcoming_box)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.recent_box)).BeginInit();
             this.SuspendLayout();
@@ -51,7 +52,7 @@
             // nextsongs_label
             // 
             this.nextsongs_label.AutoSize = true;
-            this.nextsongs_label.Location = new System.Drawing.Point(13, 127);
+            this.nextsongs_label.Location = new System.Drawing.Point(13, 139);
             this.nextsongs_label.Name = "nextsongs_label";
             this.nextsongs_label.Size = new System.Drawing.Size(119, 13);
             this.nextsongs_label.TabIndex = 12;
@@ -59,7 +60,7 @@
             // 
             // upcoming_box
             // 
-            this.upcoming_box.Location = new System.Drawing.Point(16, 143);
+            this.upcoming_box.Location = new System.Drawing.Point(16, 155);
             this.upcoming_box.Maximum = new decimal(new int[] {
             25,
             0,
@@ -83,7 +84,7 @@
             // prevsongs_label
             // 
             this.prevsongs_label.AutoSize = true;
-            this.prevsongs_label.Location = new System.Drawing.Point(13, 83);
+            this.prevsongs_label.Location = new System.Drawing.Point(13, 95);
             this.prevsongs_label.Name = "prevsongs_label";
             this.prevsongs_label.Size = new System.Drawing.Size(106, 13);
             this.prevsongs_label.TabIndex = 10;
@@ -91,7 +92,7 @@
             // 
             // recent_box
             // 
-            this.recent_box.Location = new System.Drawing.Point(16, 99);
+            this.recent_box.Location = new System.Drawing.Point(16, 111);
             this.recent_box.Maximum = new decimal(new int[] {
             10,
             0,
@@ -105,7 +106,7 @@
             // source_label
             // 
             this.source_label.AutoSize = true;
-            this.source_label.Location = new System.Drawing.Point(13, 38);
+            this.source_label.Location = new System.Drawing.Point(13, 21);
             this.source_label.Name = "source_label";
             this.source_label.Size = new System.Drawing.Size(76, 13);
             this.source_label.TabIndex = 15;
@@ -115,16 +116,28 @@
             // 
             this.playlist_box.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.playlist_box.FormattingEnabled = true;
-            this.playlist_box.Location = new System.Drawing.Point(16, 55);
+            this.playlist_box.Location = new System.Drawing.Point(16, 38);
             this.playlist_box.Name = "playlist_box";
             this.playlist_box.Size = new System.Drawing.Size(121, 21);
             this.playlist_box.TabIndex = 16;
             this.playlist_box.SelectedIndexChanged += new System.EventHandler(this.playlist_box_SelectedIndexChanged);
             // 
+            // weighRating_checkBox
+            // 
+            this.weighRating_checkBox.AutoSize = true;
+            this.weighRating_checkBox.Location = new System.Drawing.Point(16, 70);
+            this.weighRating_checkBox.Name = "weighRating_checkBox";
+            this.weighRating_checkBox.Size = new System.Drawing.Size(189, 17);
+            this.weighRating_checkBox.TabIndex = 18;
+            this.weighRating_checkBox.Text = "Play higher rated songs more often";
+            this.weighRating_checkBox.UseVisualStyleBackColor = true;
+            this.weighRating_checkBox.CheckedChanged += new System.EventHandler(this.weighRating_checkBox_CheckedChanged);
+            // 
             // ShuffleQueueSettingsControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.weighRating_checkBox);
             this.Controls.Add(this.playlist_box);
             this.Controls.Add(this.source_label);
             this.Controls.Add(this.title_label);
@@ -150,6 +163,7 @@
         private System.Windows.Forms.NumericUpDown recent_box;
         private System.Windows.Forms.Label source_label;
         private System.Windows.Forms.ComboBox playlist_box;
+        private System.Windows.Forms.CheckBox weighRating_checkBox;
 
     }
 }

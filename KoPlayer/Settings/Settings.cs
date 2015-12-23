@@ -58,6 +58,7 @@ namespace KoPlayer
         public string Shufflequeue_SourcePlaylistName = "Library";
         public int Shufflequeue_NumPrevious = 5;
         public int Shufflequeue_NumNext = 15;
+        public bool Shufflequeue_WeighRating = false;
 
         public Keys[] RatingHotkeys = { (Keys)220, Keys.D1, Keys.D2, Keys.D3, Keys.D4, Keys.D5 };
 
@@ -76,21 +77,7 @@ namespace KoPlayer
         public bool PopupOnSongChange = false;
 
         public bool ScrobblingEnabled = false;
-
-        public Settings()
-        {
-
-        }
-
-        /// <summary>
-        /// Loads from file
-        /// </summary>
-        /// <param name="path"></param>
-        public Settings(string path)
-        {
-            Settings loadedSettings = Load(path);
-        }
-
+        
         /// <summary>
         /// Saves the current settings
         /// </summary>

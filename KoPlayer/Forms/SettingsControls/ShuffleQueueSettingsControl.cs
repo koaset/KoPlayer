@@ -19,34 +19,40 @@ namespace KoPlayer.Forms.SettingsControls
         public ShuffleQueueSettingsControl(Settings settings, List<PlaylistBase> playlists)
         {
             this.settings = settings;
-            this.playlistNames = new List<string>();
-            foreach (PlaylistBase pl in playlists)
+            playlistNames = new List<string>();
+            foreach (var pl in playlists)
                 if (pl.Name != "Shuffle Queue")
-                    this.playlistNames.Add(pl.Name);
+                    playlistNames.Add(pl.Name);
 
             InitializeComponent();
 
-            this.recent_box.Value = settings.Shufflequeue_NumPrevious;
-            this.upcoming_box.Value = settings.Shufflequeue_NumNext;
+            recent_box.Value = settings.Shufflequeue_NumPrevious;
+            upcoming_box.Value = settings.Shufflequeue_NumNext;
+            weighRating_checkBox.Checked = settings.Shufflequeue_WeighRating;
 
-            foreach (string name in this.playlistNames)
-                this.playlist_box.Items.Add(name);
-            this.playlist_box.SelectedIndex = this.playlistNames.IndexOf(settings.Shufflequeue_SourcePlaylistName);
+            foreach (string name in playlistNames)
+                playlist_box.Items.Add(name);
+            playlist_box.SelectedIndex = playlistNames.IndexOf(settings.Shufflequeue_SourcePlaylistName);
         }
 
         private void playlist_box_SelectedIndexChanged(object sender, EventArgs e)
         {
-            this.settings.Shufflequeue_SourcePlaylistName = this.playlist_box.Text;
+            settings.Shufflequeue_SourcePlaylistName = playlist_box.Text;
         }
 
         private void recent_box_ValueChanged(object sender, EventArgs e)
         {
-            this.settings.Shufflequeue_NumPrevious = (int)this.recent_box.Value;
+            settings.Shufflequeue_NumPrevious = (int)recent_box.Value;
         }
 
         private void upcoming_box_ValueChanged(object sender, EventArgs e)
         {
-            this.settings.Shufflequeue_NumNext = (int)this.upcoming_box.Value;
+            settings.Shufflequeue_NumNext = (int)upcoming_box.Value;
+        }
+
+        private void weighRating_checkBox_CheckedChanged(object sender, EventArgs e)
+        {
+            settings.Shufflequeue_WeighRating = weighRating_checkBox.Checked;
         }
     }
 }
