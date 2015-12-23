@@ -40,7 +40,7 @@ namespace KoPlayer.Lib
 
         public virtual List<Song> GetSongs()
         {
-            return new List<Song>(songs);
+            return songs;
         }
 
         public virtual Song GetNext()

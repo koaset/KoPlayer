@@ -216,7 +216,7 @@ namespace LibTests
             Assert.AreEqual(2, fpl.NumSongs);
         }
 
-        private Library CreateLibrary()
+        public static Library CreateLibrary()
         {
             Library lib = new Library();
 
@@ -225,7 +225,7 @@ namespace LibTests
             return lib;
         }
 
-        private void AddSongsToLibrary(Library lib)
+        private static void AddSongsToLibrary(Library lib)
         {
             var song = new Song(@"Songs\empty10sec.mp3");
             song.Rating = 3;

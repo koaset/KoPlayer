@@ -204,7 +204,7 @@ namespace KoPlayer.Forms
             else
             {
                 songGridView.DataSource = null;
-                songGridView.DataSource = showingPlaylist.GetSongs();
+                songGridView.DataSource = new List<Song>(showingPlaylist.GetSongs());
 
                 if (showingPlaylist == shuffleQueue)
                     SetShuffleQueueColors();
