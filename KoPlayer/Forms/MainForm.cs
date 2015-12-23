@@ -152,6 +152,14 @@ namespace KoPlayer.Forms
             }
 
             SetPlaylistGridView();
+
+            
+            playlistGridView.ClearSelection();
+            // Select proper playlist in gridview
+            foreach (DataGridViewRow row in playlistGridView.Rows)
+                if ((row.DataBoundItem as PlaylistBase).Name == settings.StartupPlaylist)
+                    row.Cells[0].Selected = true;
+
             shuffleQueue.Source = GetPlaylist(settings.Shufflequeue_SourcePlaylistName);
             shuffleQueue.Populate();
             UpdateTrayIconText();

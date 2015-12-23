@@ -17,8 +17,6 @@ namespace KoPlayer.Lib
 
         protected Dictionary<string, Song> libraryDictionary;
 
-        protected List<Dictionary<string, List<Song>>> sortDictionaries;
-
         protected Playlist() { }
 
         public Playlist(Library library)

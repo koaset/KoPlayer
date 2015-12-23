@@ -18,13 +18,12 @@ namespace KoPlayer.Lib
         public override string Name { get { return "Library"; } }
         public override string Path { get { return PATH; } }
         public Dictionary<string, Song> PathDictionary { get { return pathDictionary; } }
-        public List<Dictionary<string, List<Song>>> SortDictionaries { get { return this.sortDictionaries; } }
-
+        public List<Dictionary<string, List<Song>>> SortDictionaries { get { return base.sortDictionaries; } }
+        
         public static string PATH = KoPlayer.Forms.MainForm.ApplicationPath + "\\Library.xml";
         public static string[] EXTENSIONS = {".mp3", ".m4a", ".wma", ".aac", ".flac"};
 
         private Dictionary<string, Song> pathDictionary;
-        private List<Dictionary<string, List<Song>>> sortDictionaries;
         private List<Song> newSongs;
         private List<string> invalidSongPaths;
 

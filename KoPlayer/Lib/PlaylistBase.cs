@@ -28,6 +28,7 @@ namespace KoPlayer.Lib
 
         protected SortOrder sortOrder = SortOrder.None;
         protected string sortField = "";
+        protected List<Dictionary<string, List<Song>>> sortDictionaries;
 
         protected void ResetSortVariables()
         {
