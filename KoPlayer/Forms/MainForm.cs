@@ -644,7 +644,19 @@ namespace KoPlayer.Forms
             {
                 string itemText = "Play";
                 if (musicPlayer.PlaybackState == PlaybackState.Playing)
+                {
                     itemText = "Pause";
+
+                    var ratingMenu = new MenuItem("Rate current song");
+                    for (int i = 0; i <= 5; i++)
+                    {
+                        int rating = i;
+                        ratingMenu.MenuItems.Add("Rate " + rating);
+                        ratingMenu.MenuItems[i].Click += (o, e) => { RateSong(currentlyPlaying, rating); };
+                    }
+                    cm.MenuItems.Add(ratingMenu);
+                }
+
                 cm.MenuItems.Add(CreateMenuItem(itemText, playpauseButton_Click));
 
                 cm.MenuItems.Add(CreateMenuItem("Play next", nextButton_Click));
