@@ -97,13 +97,13 @@ namespace KoPlayer.Lib
 
                 switch (filterType)
                 {
-                    case "KoPlayer.Lib.Filters.StringFilter":
+                    case "StringFilter":
                         filter = new StringFilter(sr);
                         break;
-                    case "KoPlayer.Lib.Filters.RatingFilter":
+                    case "RatingFilter":
                         filter = new RatingFilter(sr);
                         break;
-                    case "KoPlayer.Lib.Filters.DateFilter":
+                    case "DateFilter":
                         filter = new DateFilter(sr);
                         break;
                     default:

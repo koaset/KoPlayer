@@ -16,7 +16,7 @@ namespace KoPlayer.Lib.Filters
 
         public void Save(StreamWriter sw)
         {
-            sw.WriteLine(GetType());
+            sw.WriteLine(GetType().Name);
             SaveData(sw);
         }
 

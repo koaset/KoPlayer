@@ -193,7 +193,7 @@ namespace KoPlayer.Lib
             {
                 using (var sw = new StreamWriter(Path))
                 {
-                    sw.WriteLine(GetType());
+                    sw.WriteLine(GetType().Name);
                     SaveHeader(sw);
                     SaveSongs(sw);
                 }

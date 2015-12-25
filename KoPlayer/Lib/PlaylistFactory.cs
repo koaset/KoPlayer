@@ -19,11 +19,11 @@ namespace KoPlayer.Lib
 
                     switch (type)
                     {
-                        case "KoPlayer.Lib.Playlist":
+                        case "Playlist":
                             return new Playlist(sr, library);
-                        case "KoPlayer.Lib.ShuffleQueue":
+                        case "ShuffleQueue":
                             return new ShuffleQueue(sr, library, settings);
-                        case "KoPlayer.Lib.FilterPlaylist":
+                        case "FilterPlaylist":
                             return new FilterPlaylist(sr, library);
                         default:
                             return null;

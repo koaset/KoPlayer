@@ -1,3 +1,3 @@
-KoPlayer.Lib.ShuffleQueue
+ShuffleQueue
 Shuffle Queue
 0
