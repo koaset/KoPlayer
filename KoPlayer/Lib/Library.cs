@@ -302,7 +302,10 @@ namespace KoPlayer.Lib
 
         public SearchResult Search(string searchString)
         {
-            searchString = searchString.ToLower().Trim();
+            var words = searchString.ToLower().Split(' ').ToList();
+
+            foreach (string s in words)
+                s.Trim();
 
             var result = new SearchResult(this);
             var resultSongs = result.GetSongs();
@@ -312,8 +315,7 @@ namespace KoPlayer.Lib
             {
                 var dictionary = sortDictionaries[i];
 
-                var keysToAdd = dictionary.Where(x => x.Key.ToLower()
-                    .Contains(searchString)).Select(x => x.Key).ToList();
+                var keysToAdd = AndSearch(dictionary, words);
 
                 foreach (string keyToAdd in keysToAdd)
                 {
@@ -325,6 +327,21 @@ namespace KoPlayer.Lib
             }
 
             return result;
+        }
+
+        private List<string> AndSearch(Dictionary<string, List<Song>> dictionary, List<string> words)
+        {
+            var keysToAdd = dictionary.Keys.ToList();
+
+            foreach (string word in words)
+            {
+                if (string.IsNullOrEmpty(word))
+                    continue;
+
+                keysToAdd.RemoveAll(k => !k.ToLower().Contains(word));
+            }
+
+            return keysToAdd;
         }
 
         private Dictionary<string, Song> SongListToPathDictionary()
