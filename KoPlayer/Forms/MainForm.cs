@@ -274,6 +274,10 @@ namespace KoPlayer.Forms
             playlistGridView.DataSource = null;
             playlistGridView.Columns.Clear();
             playlistGridView.DataSource = playlists;
+            playlistGridView.ClearSelection();
+
+            int selectedIndex = playlists.IndexOf(showingPlaylist);
+            playlistGridView.Rows[selectedIndex].Cells[0].Selected = true;
         }
 
         private void SortPlaylists()
