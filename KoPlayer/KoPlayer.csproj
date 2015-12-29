@@ -148,7 +148,6 @@
     <Compile Include="Forms\Controls\DataGridViewPlus.Designer.cs">
       <DependentUpon>DataGridViewPlus.cs</DependentUpon>
     </Compile>
-    <Compile Include="Fixes.cs" />
     <Compile Include="KeyboardHook.cs" />
     <Compile Include="Forms\Controls\RatingBox.cs">
       <SubType>Component</SubType>
