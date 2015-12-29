@@ -334,12 +334,8 @@ namespace KoPlayer.Lib
             var keysToAdd = dictionary.Keys.ToList();
 
             foreach (string word in words)
-            {
-                if (string.IsNullOrEmpty(word))
-                    continue;
-
-                keysToAdd.RemoveAll(k => !k.ToLower().Contains(word));
-            }
+                if (!string.IsNullOrEmpty(word))
+                    keysToAdd.RemoveAll(k => !k.ToLower().Contains(word));
 
             return keysToAdd;
         }
