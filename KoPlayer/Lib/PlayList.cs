@@ -206,7 +206,7 @@ namespace KoPlayer.Lib
 
         protected virtual void SaveSongs(StreamWriter sw)
         {
-            foreach (string path in songs.Select(s => s.Path).ToList())
+            foreach (string path in songs.Select(s => s.Path))
                 sw.WriteLine(path);
         }
 
