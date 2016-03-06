@@ -83,17 +83,27 @@ namespace KoPlayer
         public async void TryLoginAsync(string userName, string password)
         {
             ChangeStatus("Connecting");
-            var response = await client.Auth.GetSessionTokenAsync(userName, password);
-            scrobbler = new Scrobbler(client.Auth, client.HttpClient);
 
-            if (response.Success)
+            try
             {
-                ChangeStatus("Connected");
-                currentSession = client.Auth.UserSession;
-                SaveSession(currentSession);
+                var response = await client.Auth.GetSessionTokenAsync(userName, password);
+                scrobbler = new Scrobbler(client.Auth, client.HttpClient);
+
+                if (response.Success)
+                {
+                    ChangeStatus("Connected");
+                    currentSession = client.Auth.UserSession;
+                    SaveSession(currentSession);
+
+                }
+                else
+                    ChangeStatus("Not connected");
             }
-            else
-                ChangeStatus("Not connected");
+            catch (Exception ex)
+            {
+                System.Windows.Forms.MessageBox.Show("An error occured: " + ex.ToString());
+                ChangeStatus("Connection problem");
+            }
         }
 
         public void ScrobbleSong(Song song)
@@ -126,10 +136,17 @@ namespace KoPlayer
             else
                 toScrobble.AddRange(scrobbleQueue);
 
-            var response = await scrobbler.ScrobbleAsync(toScrobble);
-            
-            if (response.Success)
-                scrobbleQueue.RemoveRange(0, toScrobble.Count);
+            try
+            {
+                var response = await scrobbler.ScrobbleAsync(toScrobble);
+
+                if (response.Success)
+                    scrobbleQueue.RemoveRange(0, toScrobble.Count);
+            }
+            catch (Exception ex)
+            {
+                ErrorLogger.Log(ex);
+            }
         }
 
         private void ChangeStatus(string newStatus)

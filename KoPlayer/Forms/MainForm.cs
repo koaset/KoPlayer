@@ -770,7 +770,7 @@ namespace KoPlayer.Forms
 
             try
             {
-                this.musicPlayer.Open(song.Path);
+                 musicPlayer.Open(song.Path);
             }
             catch (Exception ex)
             {
@@ -805,6 +805,7 @@ namespace KoPlayer.Forms
             if (settings.PopupOnSongChange)
                 ShowCurrentSongPopup();
 
+            inPlaylist.Save();
         }
 
         void musicPlayer_ShouldPlay(object sender, EventArgs e)
@@ -1695,6 +1696,7 @@ namespace KoPlayer.Forms
             this.songInfoLabel.Update();
             this.playlistGridView.Update();
             this.TopMost = false;
+            this.songGridView.Focus();
         }
 
         private void HideKoPlayer()
