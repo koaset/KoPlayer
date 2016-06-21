@@ -28,9 +28,9 @@ namespace KoPlayer.Forms.SettingsControls
 
             enable_checkbox.Checked = settings.ScrobblingEnabled;
 
-            if (enable_checkbox.Checked)
+            /*if (enable_checkbox.Checked)
                 lfmHandler.TryResumeSession();
-            else
+            else*/
                 lfmHandler.Initialize();
 
             status_label.Text = lfmHandler.Status;
@@ -53,9 +53,9 @@ namespace KoPlayer.Forms.SettingsControls
             var checkbox = sender as CheckBox;
             settings.ScrobblingEnabled = checkbox.Checked;
 
-            if (checkbox.Checked)
+            /*if (checkbox.Checked)
                 lfmHandler.TryResumeSession();
-            else
+            else*/
                 lfmHandler.Initialize();
         }
 

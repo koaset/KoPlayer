@@ -58,12 +58,12 @@
       <HintPath>..\packages\CSCore.1.0.0.0\lib\net35-client\CSCore.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="IF.Lastfm.Core, Version=0.2.2.252, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Inflatable.Lastfm.0.2.2.252\lib\portable-win8+net45+wp8+wpa81\IF.Lastfm.Core.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="KoScrobbler, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\KoScrobbler.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.6.0.5\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.8.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="policy.2.0.taglib-sharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=db62eba44689b5b0, processorArchitecture=MSIL">
@@ -328,6 +328,7 @@ xcopy "$(TargetDir)IF.Lastfm.Core.dll" "$(SolutionDir)bin\" /Y /I
 xcopy "$(TargetDir)Library.xml" "$(SolutionDir)bin\" /Y /I
 xcopy "$(TargetDir)Newtonsoft.Json.dll" "$(SolutionDir)bin\" /Y /I
 xcopy "$(TargetDir)taglib-sharp.dll" "$(SolutionDir)bin\" /Y /I
+xcopy "$(TargetDir)KoScrobbler.dll" "$(SolutionDir)bin\" /Y /I
 )</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
