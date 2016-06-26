@@ -1,13 +1,12 @@
-﻿using KoScrobbler;
-using KoPlayer.Lib;
+﻿using KoPlayer.Lib;
 using Microsoft.Win32;
 using System;
-using System.IO;
 using System.Collections.Generic;
-using System.Timers;
 using System.ComponentModel;
 using KoScrobbler.Entities;
 using KoScrobbler.Interfaces;
+using KoScrobbler;
+using System.Linq;
 
 namespace KoPlayer
 {
@@ -21,18 +20,7 @@ namespace KoPlayer
 
         public string Status { get; set; }
 
-        /*public string SessionUserName
-        {
-            get
-            {
-                if (currentSession != null)
-                    return currentSession.Username;
-                else
-                    return "";
-            }
-        }*/
-
-        public string SessionUserName { get; set; }
+        public string UserName { get; private set; }
 
         private BackgroundWorker scrobbleWorker;
         private List<Scrobble> scrobbleQueue;
@@ -40,8 +28,9 @@ namespace KoPlayer
 
         public LastfmHandler()
         {
-            scrobbler = new KoScrobbler.KoScrobbler(apiKey, apiSecret);
-            scrobbler.SessionKey = LoadSession();
+            scrobbler = new Scrobbler(apiKey, apiSecret);
+
+            LoadSession();
 
             Initialize();
         }
@@ -57,40 +46,45 @@ namespace KoPlayer
 
             scrobbleQueue = new List<Scrobble>();
         }
-        /*
+
         public void TryResumeSession()
         {
-            if (string.IsNullOrEmpty(sessionKey))
+            if (string.IsNullOrEmpty(scrobbler.SessionKey) ||
+                string.IsNullOrEmpty(UserName))
                 return;
 
             ChangeStatus("Resuming");
 
-            client.Auth.LoadSession(currentSession);
+            try
+            {
+                var response = scrobbler.ValidateSession(UserName, scrobbler.SessionKey);
 
-            ChangeStatus("Not Connected");
-
-            if (client.Auth.UserSession == null)
-                return;
-
-            scrobbler = new Scrobbler(client.Auth, client.HttpClient);
-
-            if (client.Auth.Authenticated)
-                ChangeStatus("Connected");
-        }*/
+                if (response.Success)
+                    ChangeStatus("Connected");
+                else
+                    ChangeStatus("Not Connected");
+            }
+            catch
+            {
+                ChangeStatus("Not Connected");
+            }
+        }
 
         public void TryLoginAsync(string userName, string password)
         {
             ChangeStatus("Connecting");
 
+            UserName = userName;
+
             try
             {
-                var response = scrobbler.GetMobileSession(userName, password);
-                
+                var response = scrobbler.CreateSession(userName, password);
+
                 if (response.Success)
                 {
                     ChangeStatus("Connected");
                     scrobbler.SessionKey = response.SessionKey;
-                    SaveSession(response.SessionKey);
+                    SaveSession();
                 }
                 else
                     ChangeStatus("Not connected");
@@ -104,7 +98,7 @@ namespace KoPlayer
 
         public void ScrobbleSong(Song song)
         {
-            scrobbleQueue.Add(new Scrobble(song.Artist, song.Album, song.Title, DateTime.UtcNow));
+            scrobbleQueue.Add(new Scrobble(song.Artist, song.Album, song.Title, song.LastPlayed));
             StartWorker();
         }
 
@@ -124,18 +118,13 @@ namespace KoPlayer
             if (scrobbleQueue.Count == 0)
                 return;
 
-            var toScrobble = new List<Scrobble>();
-
             // Only allowed 50 songs in each scrobble
-            if (scrobbleQueue.Count > 50)
-                toScrobble.AddRange(scrobbleQueue.GetRange(0, 50));
-            else
-                toScrobble.AddRange(scrobbleQueue);
+            var toScrobble = scrobbleQueue.Take(50).ToList();
 
             try
             {
                 var response = scrobbler.TryScrobble(toScrobble);
-
+                
                 if (response.Success)
                     scrobbleQueue.RemoveRange(0, toScrobble.Count);
             }
@@ -152,49 +141,36 @@ namespace KoPlayer
             if (Status == "Connected" && scrobbleQueue.Count > 0)
                 StartWorker();
 
-            if (StatusChanged != null)
-                StatusChanged(this, new EventArgs());
+            StatusChanged?.Invoke(this, new EventArgs());
         }
 
-        private void SaveSession(string sessionKey)
+        private void SaveSession()
         {
-            var key = Registry.CurrentUser.OpenSubKey(sessionRegistryPath, true);
-            if (key == null)
-                key = Registry.CurrentUser.CreateSubKey(sessionRegistryPath);
+            var key = Registry.CurrentUser.OpenSubKey(sessionRegistryPath, true) ?? Registry.CurrentUser.CreateSubKey(sessionRegistryPath);
             key.Close();
 
-            /*var usernameKey = Registry.CurrentUser.OpenSubKey(sessionRegistryPath, true);
-            usernameKey.SetValue("username", session.Username);
-            usernameKey.Close();*/
-
-            var tokenKey = Registry.CurrentUser.OpenSubKey(sessionRegistryPath, true);
-            tokenKey.SetValue("token", sessionKey);
-            tokenKey.Close();
-        }
-
-        private string LoadSession()
-        {
-            var ret = string.Empty;
-
-            /*var usernameKey = Registry.CurrentUser.OpenSubKey(sessionRegistryPath);
-            if (usernameKey == null)
-                return null;
-            else
+            using (var usernameKey = Registry.CurrentUser.OpenSubKey(sessionRegistryPath, true))
             {
-                ret.Username = usernameKey.GetValue("username").ToString();
-                usernameKey.Close();
-            }*/
-
-            var tokenKey = Registry.CurrentUser.OpenSubKey(sessionRegistryPath);
-            if (tokenKey == null)
-                return null;
-            else
-            {
-                ret = tokenKey.GetValue("token").ToString();
-                tokenKey.Close();
+                usernameKey.SetValue("username", UserName);
             }
 
-            return ret;
+            using (var sessionKey = Registry.CurrentUser.OpenSubKey(sessionRegistryPath, true))
+            {
+                sessionKey.SetValue("sessionKey", scrobbler.SessionKey);
+            }
+        }
+
+        private void LoadSession()
+        {
+            using (var usernameKey = Registry.CurrentUser.OpenSubKey(sessionRegistryPath))
+            {
+                UserName = usernameKey?.GetValue("username")?.ToString();
+            }
+            
+            using (var sessionKey = Registry.CurrentUser.OpenSubKey(sessionRegistryPath))
+            {
+                scrobbler.SessionKey = sessionKey?.GetValue("sessionKey")?.ToString();
+            }
         }
     }
 }

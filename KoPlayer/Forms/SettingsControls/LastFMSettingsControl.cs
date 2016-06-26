@@ -1,11 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.Data;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace KoPlayer.Forms.SettingsControls
@@ -19,20 +13,14 @@ namespace KoPlayer.Forms.SettingsControls
         {
             this.settings = settings;
             this.lfmHandler = lfmHandler;
-            
-            lfmHandler.StatusChanged += lfmHandler_StatusChanged;
 
             InitializeComponent();
 
-            username_box.Text = lfmHandler.SessionUserName;
+            username_box.Text = lfmHandler.UserName;
 
             enable_checkbox.Checked = settings.ScrobblingEnabled;
 
-            /*if (enable_checkbox.Checked)
-                lfmHandler.TryResumeSession();
-            else*/
-                lfmHandler.Initialize();
-
+            lfmHandler.StatusChanged += lfmHandler_StatusChanged;
             status_label.Text = lfmHandler.Status;
         }
 
@@ -53,9 +41,9 @@ namespace KoPlayer.Forms.SettingsControls
             var checkbox = sender as CheckBox;
             settings.ScrobblingEnabled = checkbox.Checked;
 
-            /*if (checkbox.Checked)
+            if (checkbox.Checked)
                 lfmHandler.TryResumeSession();
-            else*/
+            else
                 lfmHandler.Initialize();
         }
 

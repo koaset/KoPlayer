@@ -109,8 +109,8 @@ namespace KoPlayer.Forms
             SetUpGlobalHotkeys();
 
             lfmHandler = new LastfmHandler();
-            /*if (settings.ScrobblingEnabled)
-                lfmHandler.TryResumeSession();*/
+            if (settings.ScrobblingEnabled)
+                lfmHandler.TryResumeSession();
 
             InitializeComponent();
         }
