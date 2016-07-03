@@ -101,6 +101,9 @@
     <Compile Include="Forms\Controls\KoPlayerButton.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Forms\Controls\VolumeBar.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Forms\FilterPopup.cs">
       <SubType>Form</SubType>
     </Compile>

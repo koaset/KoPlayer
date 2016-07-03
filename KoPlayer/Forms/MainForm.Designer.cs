@@ -47,7 +47,8 @@
             this.equalizerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.volumeTrackBar = new System.Windows.Forms.TrackBar();
+            this.songGridView = new KoPlayer.Forms.Controls.DataGridViewPlus();
+            this.volumeTrackBar = new KoPlayer.Forms.Controls.VolumeBar();
             this.statusStrip = new System.Windows.Forms.StatusStrip();
             this.playlistGridView = new System.Windows.Forms.DataGridView();
             this.Column1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -66,7 +67,6 @@
             this.previousButton = new KoPlayer.Forms.Controls.KoPlayerButton();
             this.albumArtBox = new System.Windows.Forms.PictureBox();
             this.songsBindingSource = new System.Windows.Forms.BindingSource(this.components);
-            this.songGridView = new KoPlayer.Forms.Controls.DataGridViewPlus();
             this.playlistBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.volumeTrackBar)).BeginInit();
@@ -211,8 +211,6 @@
             this.volumeTrackBar.TabIndex = 5;
             this.volumeTrackBar.TickStyle = System.Windows.Forms.TickStyle.None;
             this.volumeTrackBar.Value = 100;
-            this.volumeTrackBar.ValueChanged += new System.EventHandler(this.volumeTrackBar_ValueChanged);
-            this.volumeTrackBar.MouseWheel += new System.Windows.Forms.MouseEventHandler(this.volumeTrackBar_MouseWheel);
             // 
             // statusStrip
             // 
@@ -504,7 +502,7 @@
         private System.Windows.Forms.ToolStripMenuItem preferencesToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem setLibraryPathToolStripMenuItem;
         private System.Windows.Forms.PictureBox albumArtBox;
-        private System.Windows.Forms.TrackBar volumeTrackBar;
+        private KoPlayer.Forms.Controls.VolumeBar volumeTrackBar;
         private System.Windows.Forms.StatusStrip statusStrip;
         private System.Windows.Forms.DataGridView playlistGridView;
         private System.Windows.Forms.DataGridViewTextBoxColumn Column1;

@@ -107,6 +107,13 @@ namespace KoPlayer.Forms
                 lfmHandler.TryResumeSession();
 
             InitializeComponent();
+            SetControlReferences();
+        }
+
+        private void SetControlReferences()
+        {
+            volumeTrackBar.Player = musicPlayer;
+            volumeTrackBar.SongGrid = songGridView;
         }
 
         private void MainForm_Load(object sender, EventArgs e)
@@ -836,11 +843,8 @@ namespace KoPlayer.Forms
             searchBarTimer.Start();
             UpdateStatusStrip();
             UpdatePlayPauseButtonImage();
-
-            if (volumeTrackBar.InvokeRequired)
-                volumeTrackBar.Invoke(new Action(delegate { musicPlayer.Volume = volumeTrackBar.Value; }));
-            else
-                musicPlayer.Volume = volumeTrackBar.Value;
+            
+            musicPlayer.Volume = volumeTrackBar.Value;
         }
 
         private void PauseMusic()
@@ -1130,12 +1134,12 @@ namespace KoPlayer.Forms
 
         private void IncreaseVolume()
         {
-            SetVolumeBarValue(volumeTrackBar.Value + volumeTrackBar.SmallChange);
+            volumeTrackBar.SetValue(volumeTrackBar.Value + volumeTrackBar.SmallChange);
         }
 
         private void DecreaseVolume()
         {
-            SetVolumeBarValue(volumeTrackBar.Value - volumeTrackBar.SmallChange);
+            volumeTrackBar.SetValue(volumeTrackBar.Value - volumeTrackBar.SmallChange);
         }
 
         private void ShowCurrentSongPopup()
@@ -1188,21 +1192,6 @@ namespace KoPlayer.Forms
                 searchBar.Invoke(new MethodInvoker(delegate { SetSearchBarValue(value); }));
             else
                 searchBar.Value = value;
-        }
-
-        private void SetVolumeBarValue(int value)
-        {
-            if (this.volumeTrackBar.InvokeRequired)
-                volumeTrackBar.Invoke(new MethodInvoker(delegate { SetVolumeBarValue(value); }));
-            else
-            {
-                if (value > volumeTrackBar.Maximum)
-                    volumeTrackBar.Value = volumeTrackBar.Maximum;
-                else if (value < volumeTrackBar.Minimum)
-                    volumeTrackBar.Value = volumeTrackBar.Minimum;
-                else
-                    volumeTrackBar.Value = value;
-            }
         }
         #endregion
 
@@ -1401,21 +1390,7 @@ namespace KoPlayer.Forms
             }
         }
         #endregion
-
-        #region Volume trackbar
-        private void volumeTrackBar_ValueChanged(object sender, EventArgs e)
-        {
-            musicPlayer.Volume = volumeTrackBar.Value;
-        }
-
-        private void volumeTrackBar_MouseWheel(object sender, EventArgs e)
-        {
-            songGridView.Focus();
-            HandledMouseEventArgs ee = (HandledMouseEventArgs)e;
-            ee.Handled = true;
-        }
-        #endregion
-
+        
         #region New playlist
         private void newPlaylistToolStripMenuItem_Click(object sender, EventArgs e)
         {
