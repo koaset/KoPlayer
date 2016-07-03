@@ -33,7 +33,7 @@
             this.filterType_combobox = new System.Windows.Forms.ComboBox();
             this.searchString_textbox = new System.Windows.Forms.TextBox();
             this.filterParams_combobox = new System.Windows.Forms.ComboBox();
-            this.ratingBox1 = new KoPlayer.Forms.RatingBox();
+            this.ratingBox1 = new KoPlayer.Forms.Controls.RatingBox();
             this.date_box = new System.Windows.Forms.NumericUpDown();
             ((System.ComponentModel.ISupportInitialize)(this.ratingBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.date_box)).BeginInit();
@@ -143,7 +143,7 @@
         private System.Windows.Forms.ComboBox filterType_combobox;
         private System.Windows.Forms.TextBox searchString_textbox;
         private System.Windows.Forms.ComboBox filterParams_combobox;
-        private RatingBox ratingBox1;
+        private KoPlayer.Forms.Controls.RatingBox ratingBox1;
         private System.Windows.Forms.NumericUpDown date_box;
     }
 }

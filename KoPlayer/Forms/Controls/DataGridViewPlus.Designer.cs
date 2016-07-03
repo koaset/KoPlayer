@@ -1,4 +1,4 @@
-﻿namespace KoPlayer.Forms
+﻿namespace KoPlayer.Forms.Controls
 {
     partial class DataGridViewPlus
     {

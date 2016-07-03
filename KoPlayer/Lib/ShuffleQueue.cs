@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using System.Xml.Serialization;
 using System.IO;
-using System.Windows.Forms;
 
 namespace KoPlayer.Lib
 {
@@ -45,11 +40,11 @@ namespace KoPlayer.Lib
             while (CurrentIndex > Settings.Shufflequeue_NumPrevious)
                 Remove(0);
 
-            if (Source.NumSongs > 0)
-                while (NumSongs - CurrentIndex < Settings.Shufflequeue_NumNext + 1)
-                    Add(Source.GetRandom(Settings.Shufflequeue_WeighRating));
+            if (Source.NumSongs <= 0)
+                return;
 
-            Save();
+            while (NumSongs - CurrentIndex < Settings.Shufflequeue_NumNext + 1)
+                Add(Source.GetRandom(Settings.Shufflequeue_WeighRating));
         }
 
         public override void Insert(int index, List<Song> songs)

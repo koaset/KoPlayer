@@ -66,7 +66,7 @@
             this.previousButton = new KoPlayer.Forms.Controls.KoPlayerButton();
             this.albumArtBox = new System.Windows.Forms.PictureBox();
             this.songsBindingSource = new System.Windows.Forms.BindingSource(this.components);
-            this.songGridView = new KoPlayer.Forms.DataGridViewPlus();
+            this.songGridView = new KoPlayer.Forms.Controls.DataGridViewPlus();
             this.playlistBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.volumeTrackBar)).BeginInit();
@@ -513,7 +513,7 @@
         private System.Windows.Forms.TrackBar searchBar;
         private System.Windows.Forms.Label songInfoLabel;
         private System.Windows.Forms.ToolStripMenuItem newPlaylistToolStripMenuItem;
-        private Forms.DataGridViewPlus songGridView;
+        private KoPlayer.Forms.Controls.DataGridViewPlus songGridView;
         private System.Windows.Forms.Label currentTime_Label;
         private System.Windows.Forms.Label songLength_Label;
         private System.Windows.Forms.NotifyIcon trayIcon;

@@ -55,7 +55,7 @@
             this.cancel_button = new System.Windows.Forms.Button();
             this.save_ComboBox = new System.Windows.Forms.ComboBox();
             this.save_CheckBox = new System.Windows.Forms.CheckBox();
-            this.rating_numupdownstring = new KoPlayer.Forms.RatingBox();
+            this.rating_numupdownstring = new KoPlayer.Forms.Controls.RatingBox();
             ((System.ComponentModel.ISupportInitialize)(this.rating_numupdownstring)).BeginInit();
             this.SuspendLayout();
             // 
@@ -427,7 +427,7 @@
         private System.Windows.Forms.TextBox lastplayed_box;
         private System.Windows.Forms.Button ok_button;
         private System.Windows.Forms.Button cancel_button;
-        private RatingBox rating_numupdownstring;
+        private KoPlayer.Forms.Controls.RatingBox rating_numupdownstring;
         private System.Windows.Forms.ComboBox save_ComboBox;
         private System.Windows.Forms.CheckBox save_CheckBox;
     }

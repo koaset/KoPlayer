@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace KoPlayer.Forms
+namespace KoPlayer.Forms.Controls
 {
 
     public partial class DataGridViewPlus : DataGridView

@@ -1,9 +1,5 @@
-﻿using CSCore.CoreAudioAPI;
-using CSCore.SoundOut;
-using CSCore.Streams;
+﻿using CSCore.SoundOut;
 using KoPlayer.Lib;
-using KoPlayer.Lib.Filters;
-using KoPlayer.Forms;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
@@ -30,7 +26,7 @@ namespace KoPlayer.Forms
 
         #region Properties
         public Settings Settings { get { return settings; } set { settings = value; } }
-        public Song CurrentlyPlaying { get { return this.currentlyPlaying; } }
+        public Song CurrentlyPlaying { get { return currentlyPlaying; } }
         public LastfmHandler LastFMHandler { get { return lfmHandler; } }
         public List<PlaylistBase> Playlists { get { return playlists; } }
         #endregion
@@ -90,9 +86,7 @@ namespace KoPlayer.Forms
             }
             library.Changed += library_LibraryChanged;
 
-            settings = Settings.Load(SettingsPath);
-            if (settings == null)
-                settings = new Settings();
+            settings = Settings.Load(SettingsPath) ?? new Settings();
 
             musicPlayer.OpenCompleted += equalizerSettings_ShouldSet;
             musicPlayer.OpenCompleted += musicPlayer_ShouldPlay;
@@ -117,16 +111,14 @@ namespace KoPlayer.Forms
 
         private void MainForm_Load(object sender, EventArgs e)
         {
-            this.trayIcon.Icon = ((System.Drawing.Icon)(this.Icon));
-            this.Width = settings.FormWidth;
-            this.Height = settings.FormHeight;
+            trayIcon.Icon = Icon;
+            Width = settings.FormWidth;
+            Height = settings.FormHeight;
 
             ResetSearchBarTimer();
             LoadPlaylists();
 
-            showingPlaylist = GetPlaylist(settings.StartupPlaylist);
-            if (showingPlaylist == null)
-                showingPlaylist = library;
+            showingPlaylist = GetPlaylist(settings.StartupPlaylist) ?? library;
             playingPlaylist = showingPlaylist;
 
             SetSongGridViewStyle();
@@ -135,11 +127,8 @@ namespace KoPlayer.Forms
             songGridView.AutoGenerateColumns = false;
             songGridView.Columns["Length"].DefaultCellStyle.Format = Song.LengthFormat;
 
-            columnSettings = ColumnSettings.Load(ColumnSettingsPath);
-            if (columnSettings == null)
-                columnSettings = ColumnSettings.Load(DefaultColumnSettingsPath);
-            if (columnSettings == null)
-                columnSettings = new ColumnSettings(songGridView.Columns);
+            columnSettings = ColumnSettings.Load(ColumnSettingsPath) 
+                ?? ColumnSettings.Load(DefaultColumnSettingsPath) ?? new ColumnSettings(songGridView.Columns);
 
             //Sets the columns
             foreach (ColumnSetting cs in columnSettings.SettingList)
@@ -224,11 +213,11 @@ namespace KoPlayer.Forms
             foreach (DataGridViewRow row in songGridView.Rows)
             {
                 if (row.Index == shuffleQueue.CurrentIndex)
-                    row.DefaultCellStyle.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
+                    row.DefaultCellStyle.BackColor = SystemColors.GradientInactiveCaption;
                 else if (row.Index % 2 == 0)
                     row.DefaultCellStyle.BackColor = Color.White;
                 else
-                    row.DefaultCellStyle.BackColor = System.Drawing.SystemColors.Control;
+                    row.DefaultCellStyle.BackColor = SystemColors.Control;
             }
         }
 
@@ -260,12 +249,14 @@ namespace KoPlayer.Forms
             // Load other playlists
             string[] playlistFiles = Directory.GetFiles(PlaylistDirectoryPath, "*.pl", SearchOption.AllDirectories);
             foreach (string playlistPath in playlistFiles)
-                if (playlistPath != ShuffleQueuePath)
-                {
-                    var pl = PlaylistFactory.MakePlaylist(playlistPath, library, settings);
-                    if (pl != null)
-                        playlists.Add(pl);
-                }
+            {
+                if (playlistPath == ShuffleQueuePath)
+                    continue;
+
+                var pl = PlaylistFactory.MakePlaylist(playlistPath, library, settings);
+                if (pl != null)
+                    playlists.Add(pl);
+            }
         }
 
         private void SetPlaylistGridView()
@@ -433,7 +424,7 @@ namespace KoPlayer.Forms
             settingsWindow.StartPosition = FormStartPosition.CenterParent;
             settings.Save(SettingsPath);
             
-            if (settingsWindow.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            if (settingsWindow.ShowDialog() == DialogResult.OK)
                 SetSettings();
             else
                 settings = Settings.Load(SettingsPath);
@@ -480,11 +471,9 @@ namespace KoPlayer.Forms
             // Stop playback & timers
             searchBarTimer.Stop();
             searchBarTimer.Dispose();
-            if (searchLibraryTimer != null)
-            {
-                searchLibraryTimer.Stop();
-                searchLibraryTimer.Dispose();
-            }
+            searchLibraryTimer?.Stop();
+            searchLibraryTimer?.Dispose();
+
             trayIcon.Dispose();
             musicPlayer.Dispose();
 
@@ -509,11 +498,11 @@ namespace KoPlayer.Forms
 
         private void SaveFormDimensions()
         {
-            this.Show();
-            this.WindowState = FormWindowState.Normal;
+            Show();
+            WindowState = FormWindowState.Normal;
             settings.FormWidth = this.Width;
             settings.FormHeight = this.Height;
-            this.Hide();
+            Hide();
         }
 
         #endregion
@@ -794,12 +783,12 @@ namespace KoPlayer.Forms
             }
 
             // Saves changed from tag editing when song is not playing any more
-            if (songToSave != null)
-                if (songToSave.Path != currentlyPlaying.Path)
-                {
-                    songToSave.Save();
-                    songToSave = null;
-                }
+            if (songToSave != null &&
+                songToSave.Path != currentlyPlaying.Path)
+            {
+                songToSave.Save();
+                songToSave = null;
+            }
 
             // Show song popup according to settings
             if (settings.PopupOnSongChange)
@@ -1292,7 +1281,7 @@ namespace KoPlayer.Forms
         #region Sorting
         private void songGridView_ColumnHeaderMouseClick(object sender, DataGridViewCellMouseEventArgs e)
         {
-            if (e.Button == System.Windows.Forms.MouseButtons.Left)
+            if (e.Button == MouseButtons.Left)
             {
                 if (showingPlaylist != shuffleQueue)
                 {
@@ -1300,12 +1289,12 @@ namespace KoPlayer.Forms
                     UpdateShowingPlaylist();
                 }
             }
-            else if (e.Button == System.Windows.Forms.MouseButtons.Right)
+            else if (e.Button == MouseButtons.Right)
             {
                 ContextMenu cm = new ContextMenu();
                 foreach (DataGridViewColumn column in songGridView.Columns)
                 {
-                    MenuItem item = new MenuItem(column.HeaderText);
+                    var item = new MenuItem(column.HeaderText);
                     item.Name = column.Name;
                     item.Checked = column.Visible;
                     item.Click += columnHeaderContextMenu_Click;
@@ -1643,10 +1632,10 @@ namespace KoPlayer.Forms
         {
             if (e.Data.GetType() == typeof(DragDropSongs))
             {
-                DragDropSongs data = (DragDropSongs)e.Data;
+                var data = (DragDropSongs)e.Data;
                 data.ReturnPaths = false;
 
-                Point p = playlistGridView.PointToClient(new Point(e.X, e.Y));
+                var p = playlistGridView.PointToClient(new Point(e.X, e.Y));
                 var info = playlistGridView.HitTest(p.X, p.Y);
 
                 if (info.RowIndex >= 0)
@@ -1656,9 +1645,9 @@ namespace KoPlayer.Forms
                     //Rows recieved are reverse order from what we want here
                     rows.Reverse();
 
-                    List<Song> songs = new List<Song>();
-                        foreach (DataGridViewRow row in rows)
-                             songs.Add((Song)row.DataBoundItem);
+                    var songs = new List<Song>();
+                    foreach (DataGridViewRow row in rows)
+                        songs.Add((Song)row.DataBoundItem);
 
                     var pl = GetPlaylist(playlistGridView.Rows[info.RowIndex].Cells[0].Value.ToString());
                     if (pl.GetType() == typeof(Playlist) ||

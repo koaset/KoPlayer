@@ -55,7 +55,7 @@
             this.cancel_button = new System.Windows.Forms.Button();
             this.previous_button = new System.Windows.Forms.Button();
             this.next_button = new System.Windows.Forms.Button();
-            this.rating_numupdownstring = new KoPlayer.Forms.RatingBox();
+            this.rating_numupdownstring = new KoPlayer.Forms.Controls.RatingBox();
             ((System.ComponentModel.ISupportInitialize)(this.rating_numupdownstring)).BeginInit();
             this.SuspendLayout();
             // 
@@ -398,6 +398,6 @@
         private System.Windows.Forms.Button cancel_button;
         private System.Windows.Forms.Button previous_button;
         private System.Windows.Forms.Button next_button;
-        private RatingBox rating_numupdownstring;
+        private KoPlayer.Forms.Controls.RatingBox rating_numupdownstring;
     }
 }
