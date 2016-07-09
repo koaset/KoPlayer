@@ -4,3 +4,4 @@ LibTests/bin/
 LibTests/obj/
 packages/
 .vs
+*.suo
