@@ -42,7 +42,7 @@ namespace KoPlayer.Forms.SettingsControls
             settings.ScrobblingEnabled = checkbox.Checked;
 
             if (checkbox.Checked)
-                lfmHandler.TryResumeSession();
+                lfmHandler.ResumeSessionAsync();
             else
                 lfmHandler.Initialize();
         }
@@ -50,7 +50,7 @@ namespace KoPlayer.Forms.SettingsControls
         private void connect_button_Click(object sender, EventArgs e)
         {
             enable_checkbox.Checked = true;
-            lfmHandler.TryLoginAsync(username_box.Text, password_box.Text);
+            lfmHandler.LoginAsync(username_box.Text, password_box.Text);
         }
     }
 }

@@ -104,7 +104,7 @@ namespace KoPlayer.Forms
 
             lfmHandler = new LastfmHandler();
             if (settings.ScrobblingEnabled)
-                lfmHandler.TryResumeSession();
+                lfmHandler.ResumeSessionAsync();
 
             InitializeComponent();
             SetControlReferences();

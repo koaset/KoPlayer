@@ -47,7 +47,7 @@ namespace KoPlayer
             scrobbleQueue = new List<Scrobble>();
         }
 
-        public void TryResumeSession()
+        public async void ResumeSessionAsync()
         {
             if (string.IsNullOrEmpty(scrobbler.SessionKey) ||
                 string.IsNullOrEmpty(UserName))
@@ -57,7 +57,7 @@ namespace KoPlayer
 
             try
             {
-                var response = scrobbler.ValidateSession(UserName, scrobbler.SessionKey);
+                var response = await scrobbler.ValidateSessionAsync(UserName, scrobbler.SessionKey);
 
                 if (response.Success)
                     ChangeStatus("Connected");
@@ -70,7 +70,7 @@ namespace KoPlayer
             }
         }
 
-        public void TryLoginAsync(string userName, string password)
+        public async void LoginAsync(string userName, string password)
         {
             ChangeStatus("Connecting");
 
@@ -78,7 +78,7 @@ namespace KoPlayer
 
             try
             {
-                var response = scrobbler.CreateSession(userName, password);
+                var response = await scrobbler.CreateSessionAsync(userName, password);
 
                 if (response.Success)
                 {
@@ -110,10 +110,10 @@ namespace KoPlayer
 
         private void scrobbleWorker_DoWork(object sender, DoWorkEventArgs e)
         {
-            TryScrobble();
+            ScrobbleAsync();
         }
 
-        public void TryScrobble()
+        public async void ScrobbleAsync()
         {
             if (scrobbleQueue.Count == 0)
                 return;
@@ -123,7 +123,7 @@ namespace KoPlayer
 
             try
             {
-                var response = scrobbler.TryScrobble(toScrobble);
+                var response = await scrobbler.ScrobbleAsync(toScrobble);
                 
                 if (response.Success)
                     scrobbleQueue.RemoveRange(0, toScrobble.Count);
