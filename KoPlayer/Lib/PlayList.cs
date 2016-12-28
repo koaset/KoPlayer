@@ -200,6 +200,7 @@ namespace KoPlayer.Lib
             }
             catch (Exception ex)
             {
+                ErrorLogger.Log(ex);
                 MessageBox.Show("Save play list exception: " + ex.ToString());
             }
         }
