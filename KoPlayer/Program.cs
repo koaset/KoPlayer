@@ -13,6 +13,8 @@ namespace KoPlayer
         [return: MarshalAs(UnmanagedType.Bool)]
         static extern bool SetForegroundWindow(IntPtr hWnd);
 
+        private static MainForm mainForm;
+
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
@@ -51,7 +53,7 @@ namespace KoPlayer
                     }
                 }
             }
-        }
+        }        
 
         /// <summary>
         /// Runs the application with errorlogger
@@ -73,15 +75,32 @@ namespace KoPlayer
 
         static void Run()
         {
+            Microsoft.Win32.SystemEvents.SessionEnding += SystemEvents_SessionEnding;
+            
             // Start the main form
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            var mainForm = new MainForm();
+            mainForm = new MainForm();
             Application.Run(mainForm);
+            SavePlaylists();
+        }
 
-            // Save playlists after form exits
+        static void SavePlaylists()
+        {
             foreach (var pl in mainForm.Playlists)
-                pl.Save();
+                pl?.Save();
+        }
+
+        static void SystemEvents_SessionEnding(object sender, Microsoft.Win32.SessionEndingEventArgs e)
+        {
+            try
+            {
+                SavePlaylists();
+            }
+            catch (Exception ex)
+            {
+                ErrorLogger.Log(ex);
+            }
         }
     }
 }
