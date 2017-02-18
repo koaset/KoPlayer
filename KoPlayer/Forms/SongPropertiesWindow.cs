@@ -24,6 +24,7 @@ namespace KoPlayer.Forms
         private PlaylistBase currentPlaylist;
         private Library library;
         private MainForm mainForm;
+        private Control lastFocusedTextBox;
 
         public SongPropertiesWindow(MainForm mainForm, Song song, int clickedIndex, PlaylistBase currentPlaylist, Library library)
         {
@@ -38,7 +39,16 @@ namespace KoPlayer.Forms
 
         private void SongInfoPopup_Load(object sender, EventArgs e)
         {
+            foreach (Control control in Controls)
+                control.Enter += ControlReceivedFocus;
+
             LoadSong();
+        }
+
+        private void ControlReceivedFocus(object sender, EventArgs e)
+        {
+            if (sender.GetType() == typeof(TextBox) || sender.GetType() == typeof(Controls.RatingBox))
+                lastFocusedTextBox = sender as Control;
         }
 
         private void LoadSong()
@@ -77,6 +87,7 @@ namespace KoPlayer.Forms
             SaveCurrentSong();
             GetNextOrPrevious(true);
             LoadSong();
+            SetFocusOnSwitchSong();
         }
 
         private void previous_button_Click(object sender, EventArgs e)
@@ -84,8 +95,17 @@ namespace KoPlayer.Forms
             SaveCurrentSong();
             GetNextOrPrevious(false);
             LoadSong();
+            SetFocusOnSwitchSong();
         }
         #endregion
+
+        private void SetFocusOnSwitchSong()
+        {
+            if (lastFocusedTextBox != null)
+                lastFocusedTextBox.Focus();
+            else
+                title_box.Focus();
+        }
 
         private void SaveCurrentSong()
         {
@@ -143,6 +163,21 @@ namespace KoPlayer.Forms
         {
             if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
                 e.Handled = true;
+        }
+
+        private void SongPropertiesWindow_KeyDown(object sender, KeyEventArgs e)
+        {
+            switch (e.KeyCode)
+            {
+                case Keys.Enter:
+                    e.Handled = true;
+                    ok_button_Click(this, new EventArgs());
+                    break;
+                case Keys.Escape:
+                    e.Handled = true;
+                    cancel_button_Click(this, new EventArgs());
+                    break;
+            }
         }
     }
 

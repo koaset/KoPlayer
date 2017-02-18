@@ -325,7 +325,7 @@
             this.rating_numupdownstring.TabIndex = 31;
             this.rating_numupdownstring.TabStop = false;
             // 
-            // SongInfoPopup
+            // SongPropertiesWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -359,10 +359,12 @@
             this.Controls.Add(this.artist_box);
             this.Controls.Add(this.title_box);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
-            this.Name = "SongInfoPopup";
+            this.KeyPreview = true;
+            this.Name = "SongPropertiesWindow";
             this.ShowInTaskbar = false;
             this.Text = "Song Properties";
             this.Load += new System.EventHandler(this.SongInfoPopup_Load);
+            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.SongPropertiesWindow_KeyDown);
             ((System.ComponentModel.ISupportInitialize)(this.rating_numupdownstring)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
