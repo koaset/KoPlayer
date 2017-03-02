@@ -952,6 +952,13 @@ namespace KoPlayer.Forms
 
         private void MainForm_KeyDown(object sender, KeyEventArgs e)
         {
+            if (e.Control && e.KeyCode == Keys.F)
+            {
+                searchBox.Focus();
+                searchBox.SelectAll();
+                return;
+            }
+
             if (musicPlayer.PlaybackState != PlaybackState.Playing)
                 return;
 
