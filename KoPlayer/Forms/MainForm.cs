@@ -948,6 +948,11 @@ namespace KoPlayer.Forms
             }
             else if (e.KeyCode == Keys.Delete)
                 DeleteSongs(songGridView.SelectedRows);
+            else if (e.Control && e.KeyCode == Keys.I)
+            {
+                e.Handled = true;
+                ShowSongListProperties(new List<Song> { songGridView.SelectedRows[0].DataBoundItem as Song });
+            }
         }
 
         private void MainForm_KeyDown(object sender, KeyEventArgs e)
