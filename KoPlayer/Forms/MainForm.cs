@@ -57,6 +57,7 @@ namespace KoPlayer.Forms
         private Image currentAlbumArt;
 
         private string searchBoxDefault = "Search Library";
+        private PlaylistBase returnPlaylist;
         private System.Timers.Timer searchLibraryTimer;
         private int searchLibraryTimerInterval = 500;
         bool shouldSearch = false;
@@ -1378,6 +1379,7 @@ namespace KoPlayer.Forms
 
         private void DoSearch()
         {
+            returnPlaylist = showingPlaylist;
             ChangeToPlaylist(library);
             if (searchBox.Text.Length > 0)
             {
@@ -1397,11 +1399,26 @@ namespace KoPlayer.Forms
                 if (e.KeyCode == Keys.Escape)
                 {
                     ResetSearchBox();
+                    showingPlaylist = returnPlaylist ?? library;
+                    SelectCurrentPlaylist();
                     UpdateShowingPlaylist();
                 }
             }
         }
         #endregion
+
+        private void SelectCurrentPlaylist()
+        {
+            playlistGridView.ClearSelection();
+            foreach (DataGridViewRow row in playlistGridView.Rows)
+            {
+                if (row.DataBoundItem == showingPlaylist)
+                {
+                    playlistGridView.CurrentCell = row.Cells[0];
+                    return;
+                }
+            }
+        }
         
         #region New playlist
         private void newPlaylistToolStripMenuItem_Click(object sender, EventArgs e)
