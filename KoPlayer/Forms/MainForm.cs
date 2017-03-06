@@ -300,6 +300,27 @@ namespace KoPlayer.Forms
             return null;
         }
 
+        private void ShowSongInPlaylist(Song song, PlaylistBase playlist)
+        {
+            if (!playlist.GetSongs().Contains(song))
+                return;
+
+            if (showingPlaylist != playlist)
+                ChangeToPlaylist(playlist);
+
+            foreach (DataGridViewRow row in songGridView.Rows)
+            {
+                if (row.DataBoundItem == song)
+                {
+                    var rowIndex = row.Index;
+                    songGridView.ClearSelection();
+                    songGridView.Rows[rowIndex].Selected = true;
+                    songGridView.FirstDisplayedScrollingRowIndex = rowIndex;
+                    break;
+                }
+            }
+        }
+
         #region Playlist manipulatiom methods
         private void DeletePlaylist(DataGridViewCell cell)
         {
@@ -733,6 +754,19 @@ namespace KoPlayer.Forms
                 playpauseButton.ImageList = pauseButton_imageList;
             else
                 playpauseButton.ImageList = playButton_imageList;
+        }
+
+        private void SelectCurrentPlaylist()
+        {
+            playlistGridView.ClearSelection();
+            foreach (DataGridViewRow row in playlistGridView.Rows)
+            {
+                if (row.DataBoundItem == showingPlaylist)
+                {
+                    playlistGridView.CurrentCell = row.Cells[0];
+                    return;
+                }
+            }
         }
 
         #endregion 
@@ -1406,20 +1440,7 @@ namespace KoPlayer.Forms
             }
         }
         #endregion
-
-        private void SelectCurrentPlaylist()
-        {
-            playlistGridView.ClearSelection();
-            foreach (DataGridViewRow row in playlistGridView.Rows)
-            {
-                if (row.DataBoundItem == showingPlaylist)
-                {
-                    playlistGridView.CurrentCell = row.Cells[0];
-                    return;
-                }
-            }
-        }
-        
+                       
         #region New playlist
         private void newPlaylistToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -1924,27 +1945,35 @@ namespace KoPlayer.Forms
 
             if (!exists || songs.Count == 0)
                 return;
-
-            Form popup;
+            
             if (songs.Count > 1)
-            {
-                var multiSongWindow = new MultiSongPropertiesWindow(this, songs,
-                    this.showingPlaylist, this.library);
-                multiSongWindow.SavePlayingSong += popup_SavePlayingSong;
-                multiSongWindow.SongChanged += songPropertiesWindow_SongChanged;
-                popup = multiSongWindow;
-            }
+                OpenMultiSongPropertiesWindow(songs);
             else
-            {
-                var singleSongWindow = new SongPropertiesWindow(this, songs[0],
-                    this.clickedSongIndex, this.showingPlaylist, this.library);
-                singleSongWindow.SavePlayingSong += popup_SavePlayingSong;
-                singleSongWindow.SongChanged += songPropertiesWindow_SongChanged;
-                popup = singleSongWindow;
-            }
+                OpenSongPropertiesWindow(songs.First());
+        }
 
-            popup.StartPosition = FormStartPosition.CenterParent;
-            popup.ShowDialog();
+        private void OpenMultiSongPropertiesWindow(List<Song> songs)
+        {
+            var multiSongWindow = new MultiSongPropertiesWindow(this, songs, showingPlaylist, library);
+            multiSongWindow.SavePlayingSong += popup_SavePlayingSong;
+            multiSongWindow.SongChanged += songPropertiesWindow_SongChanged;
+            
+            multiSongWindow.StartPosition = FormStartPosition.CenterParent;
+            multiSongWindow.ShowDialog();
+
+            ShowSongInPlaylist(songs.First(), showingPlaylist);
+        }
+
+        private void OpenSongPropertiesWindow(Song song)
+        {
+            var singleSongWindow = new SongPropertiesWindow(this, song, clickedSongIndex, showingPlaylist, library);
+            singleSongWindow.SavePlayingSong += popup_SavePlayingSong;
+            singleSongWindow.SongChanged += songPropertiesWindow_SongChanged;
+
+            singleSongWindow.StartPosition = FormStartPosition.CenterParent;
+            singleSongWindow.ShowDialog();
+
+            ShowSongInPlaylist(singleSongWindow.Song, showingPlaylist);
         }
 
         private void songPropertiesWindow_SongChanged(object sender, SongChangedEventArgs e)

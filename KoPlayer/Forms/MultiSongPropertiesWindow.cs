@@ -1,11 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using KoPlayer.Lib;
 
@@ -16,7 +11,6 @@ namespace KoPlayer.Forms
         public event SavePlayingSongEventHandler SavePlayingSong;
         public event SongChangedEventHandler SongChanged;
 
-        //private Song song;
         private List<Song> songs;
         private PlaylistBase currentPlaylist;
         private Library library;
