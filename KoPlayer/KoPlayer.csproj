@@ -115,6 +115,12 @@
     <Compile Include="Forms\MultiSongPropertiesWindow.Designer.cs">
       <DependentUpon>MultiSongPropertiesWindow.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\SettingsControls\AudioSettingsControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Forms\SettingsControls\AudioSettingsControl.Designer.cs">
+      <DependentUpon>AudioSettingsControl.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\SettingsControls\GeneralSettingsControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -231,6 +237,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\SettingsControls\AudioSettingsControl.resx">
+      <DependentUpon>AudioSettingsControl.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\SettingsControls\GeneralSettingsControl.resx">
       <DependentUpon>GeneralSettingsControl.cs</DependentUpon>

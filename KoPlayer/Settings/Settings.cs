@@ -54,6 +54,7 @@ namespace KoPlayer
         public string StartupPlaylist = "Library";
         public int Volume = 100;
         public float DeviceVolume = 1.0f;
+        public string DeviceName = MusicPlayer.PlaybackDevice.FriendlyName;
 
         public string Shufflequeue_SourcePlaylistName = "Library";
         public int Shufflequeue_NumPrevious = 5;

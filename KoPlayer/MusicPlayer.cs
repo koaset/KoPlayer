@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using CSCore;
 using CSCore.Codecs;
 using CSCore.CoreAudioAPI;
@@ -11,7 +9,6 @@ namespace KoPlayer
 {
     public class MusicPlayer : IDisposable
     {
-        private MMDevice device;
         private ISoundOut soundOut;
         private IWaveSource finalSource;
         private Equalizer equalizer;
@@ -20,6 +17,9 @@ namespace KoPlayer
         private float deviceVolume = 1f;
         
         public event EventHandler OpenCompleted;
+
+        public static MMDevice PlaybackDevice { get; private set; }
+        public static MMDeviceCollection PlaybackDevices { get; private set; }
 
         public event EventHandler<PlaybackStoppedEventArgs> PlaybackStopped
         {
@@ -110,14 +110,30 @@ namespace KoPlayer
 
         public MusicPlayer()
         {
+            SetDevice();
+
+            using (var client = AudioClient.FromMMDevice(PlaybackDevice))
+            {
+                client.Initialize(AudioClientShareMode.Shared,
+                    AudioClientStreamFlags.None, 1000, 0, client.GetMixFormat(), Guid.Empty);
+                
+            }
+        }
+
+        public void SetDevice(string name = null)
+        {
             using (var enumerator = new MMDeviceEnumerator())
             {
-                device = enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia);
+                PlaybackDevices = enumerator.EnumAudioEndpoints(DataFlow.Render, DeviceState.Active);
 
-                using (var client = AudioClient.FromMMDevice(device))
+                PlaybackDevice = PlaybackDevice ?? enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia);
+                if (!string.IsNullOrEmpty(name))
                 {
-                    client.Initialize(AudioClientShareMode.Shared,
-                        AudioClientStreamFlags.None, 1000, 0, client.GetMixFormat(), Guid.Empty);
+                    foreach (var device in PlaybackDevices)
+                    {
+                        if (device.FriendlyName == name)
+                            PlaybackDevice = device;
+                    }
                 }
             }
         }
@@ -139,7 +155,7 @@ namespace KoPlayer
                     .ToWaveSource(16);
             
             if (WasapiOut.IsSupportedOnCurrentPlatform)
-                soundOut = new WasapiOut() { Latency = 100, Device = device }; 
+                soundOut = new WasapiOut() { Latency = 100, Device = PlaybackDevice }; 
             else
                 soundOut = new DirectSoundOut();
 

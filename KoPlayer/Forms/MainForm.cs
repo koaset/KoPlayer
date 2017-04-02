@@ -29,6 +29,7 @@ namespace KoPlayer.Forms
         public Song CurrentlyPlaying { get { return currentlyPlaying; } }
         public LastfmHandler LastFMHandler { get { return lfmHandler; } }
         public List<PlaylistBase> Playlists { get { return playlists; } }
+        public ShuffleQueue ShuffleQueue { get { return shuffleQueue; } }
         #endregion
 
         #region Fields
@@ -89,6 +90,7 @@ namespace KoPlayer.Forms
 
             settings = Settings.Load(SettingsPath) ?? new Settings();
 
+            musicPlayer.SetDevice(settings.DeviceName);
             musicPlayer.OpenCompleted += equalizerSettings_ShouldSet;
             musicPlayer.OpenCompleted += musicPlayer_ShouldPlay;
             musicPlayer.DeviceVolume = settings.DeviceVolume;
@@ -777,6 +779,9 @@ namespace KoPlayer.Forms
             searchBarTimer.Stop();
             musicPlayer.Stop();
             musicPlayer.Volume = 0;
+
+            if (MusicPlayer.PlaybackDevice.FriendlyName != settings.DeviceName)
+                musicPlayer.SetDevice(settings.DeviceName);
 
             // Check Last.fm scrobbling requirements
             if (currentSongTimePlayed.Ticks > 0.8 * musicPlayer.Length.Ticks ||

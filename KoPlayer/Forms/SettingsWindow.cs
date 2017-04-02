@@ -37,6 +37,7 @@ namespace KoPlayer.Forms
         {
             List<TreeNode> treeNodes = new List<TreeNode>();
             treeNodes.Add(CreateTreeNode("General"));
+            treeNodes.Add(CreateTreeNode("Audio"));
             treeNodes.Add(CreateTreeNode("Shuffle Queue"));
             treeNodes.Add(CreateTreeNode("Song List"));
             treeNodes.Add(CreateTreeNode("Hot Keys"));
@@ -77,6 +78,9 @@ namespace KoPlayer.Forms
             {
                 case "General":
                     SetAndAddControl(new GeneralSettingsControl(this.settings));
+                    break;
+                case "Audio":
+                    SetAndAddControl(new AudioSettingsControl(this.settings));
                     break;
                 case "Shuffle Queue":
                     SetAndAddControl(new ShuffleQueueSettingsControl(this.settings, this.playlists));

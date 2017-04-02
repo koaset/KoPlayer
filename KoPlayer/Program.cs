@@ -4,6 +4,7 @@ using KoPlayer.Forms;
 using System.Threading;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using KoPlayer.Lib;
 
 namespace KoPlayer
 {
@@ -80,15 +81,15 @@ namespace KoPlayer
             // Start the main form
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
+            Application.ApplicationExit += Application_ApplicationExit;
             mainForm = new MainForm();
             Application.Run(mainForm);
             SavePlaylists();
         }
 
-        static void SavePlaylists()
+        private static void Application_ApplicationExit(object sender, EventArgs e)
         {
-            foreach (var pl in mainForm.Playlists)
-                pl?.Save();
+            SavePlaylists();
         }
 
         static void SystemEvents_SessionEnding(object sender, Microsoft.Win32.SessionEndingEventArgs e)
@@ -101,6 +102,15 @@ namespace KoPlayer
             {
                 ErrorLogger.Log(ex);
             }
+        }
+
+        static void SavePlaylists()
+        {
+            mainForm.ShuffleQueue?.Save();
+
+            foreach (var pl in mainForm.Playlists)
+                if (pl != mainForm.ShuffleQueue)
+                    pl?.Save();
         }
     }
 }
