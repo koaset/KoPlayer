@@ -22,6 +22,7 @@ namespace KoPlayer.Forms
         private static string ColumnSettingsPath = Path.Combine(ApplicationPath, @"Settings\column_settings.xml");
         private static string DefaultColumnSettingsPath = Path.Combine(ApplicationPath, @"Settings\default_column_settings.xml");
         private static string EqualizerPath = Path.Combine(ApplicationPath, @"Default.eq");
+        public static string NowPlayingPath = Path.Combine(ApplicationPath, @"now_playing.txt");
         #endregion
 
         #region Properties
@@ -840,6 +841,9 @@ namespace KoPlayer.Forms
             // Show song popup according to settings
             if (settings.PopupOnSongChange)
                 ShowCurrentSongPopup();
+            
+            if (settings.SaveCurrentlyPlayingToFile)
+                SetNowPlaying(song);
 
             inPlaylist.Save();
         }
@@ -1445,7 +1449,32 @@ namespace KoPlayer.Forms
             }
         }
         #endregion
-                       
+        #region SaveNowPlayingToFile
+
+        private void SetNowPlaying(Song song)
+        {
+            try
+            {
+                var nowPlayingText = GetNowPlayingString(song);
+                File.WriteAllText(NowPlayingPath, nowPlayingText, System.Text.Encoding.UTF8);
+            }
+            catch (Exception ex)
+            {
+                ErrorLogger.Log(ex);
+            }
+            
+        }
+
+        private string GetNowPlayingString(Song song)
+        {
+            return settings.CurrentlyPlayingBaseString
+                .Replace("%title%", song.Title)
+                .Replace("%artist%", song.Artist)
+                .Replace("%album%", song.Album) + "\n";
+        }
+
+        #endregion
+
         #region New playlist
         private void newPlaylistToolStripMenuItem_Click(object sender, EventArgs e)
         {

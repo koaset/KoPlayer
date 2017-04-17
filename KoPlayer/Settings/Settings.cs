@@ -77,6 +77,9 @@ namespace KoPlayer
         public bool MinimizeToTray = true;
         public bool PopupOnSongChange = false;
 
+        public bool SaveCurrentlyPlayingToFile = false;
+        public string CurrentlyPlayingBaseString = "%title% - %artist%";
+
         public bool ScrobblingEnabled = false;
         
         /// <summary>

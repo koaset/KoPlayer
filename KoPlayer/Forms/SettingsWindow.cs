@@ -43,8 +43,9 @@ namespace KoPlayer.Forms
             treeNodes.Add(CreateTreeNode("Hot Keys"));
             treeNodes[treeNodes.Count - 1].Nodes.Add(CreateTreeNode("Global"));
             treeNodes.Add(CreateTreeNode("last.fm Scrobbler"));
+            treeNodes.Add(CreateTreeNode("Other"));
             settingsCategoryView.Nodes.AddRange(treeNodes.ToArray());
-            settingsCategoryView.Select();
+                        settingsCategoryView.Select();
         }
 
         private TreeNode CreateTreeNode(string name)
@@ -96,6 +97,9 @@ namespace KoPlayer.Forms
                     break;
                 case "last.fm Scrobbler":
                     SetAndAddControl(new LastFMSettingsControl(this.settings, callingForm.LastFMHandler));
+                    break;
+                case "Other":
+                    SetAndAddControl(new OtherSettingsControl(this.settings));
                     break;
             }
             
