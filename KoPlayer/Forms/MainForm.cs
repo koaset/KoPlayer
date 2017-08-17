@@ -759,6 +759,16 @@ namespace KoPlayer.Forms
                 playpauseButton.ImageList = playButton_imageList;
         }
 
+        private void UpdateVolume()
+        {
+            if (volumeTrackBar.InvokeRequired)
+            {
+                volumeTrackBar.Invoke(new MethodInvoker(UpdateVolume));
+                return;
+            }
+            musicPlayer.Volume = volumeTrackBar.Value;
+        }
+
         private void SelectCurrentPlaylist()
         {
             playlistGridView.ClearSelection();
@@ -887,8 +897,8 @@ namespace KoPlayer.Forms
             searchBarTimer.Start();
             UpdateStatusStrip();
             UpdatePlayPauseButtonImage();
-            
-            musicPlayer.Volume = volumeTrackBar.Value;
+
+            UpdateVolume();
         }
 
         private void PauseMusic()
