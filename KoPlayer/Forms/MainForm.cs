@@ -36,6 +36,7 @@ namespace KoPlayer.Forms
         #region Fields
         private Library library;
         private ShuffleQueue shuffleQueue;
+        private Timer saveTimer;
         
         private PlaylistBase showingPlaylist;
         private PlaylistBase playingPlaylist;
@@ -112,12 +113,27 @@ namespace KoPlayer.Forms
 
             InitializeComponent();
             SetControlReferences();
+            SetupSaveTimer();
         }
 
         private void SetControlReferences()
         {
             volumeTrackBar.Player = musicPlayer;
             volumeTrackBar.SongGrid = songGridView;
+        }
+
+        private void SetupSaveTimer()
+        {
+            saveTimer = new Timer();
+            saveTimer.Interval = (int)TimeSpan.FromMinutes(1).TotalMilliseconds;
+            saveTimer.Tick += saveTimer_Elapsed;
+            saveTimer.Start();
+        }
+
+        private void saveTimer_Elapsed(object sender, EventArgs e)
+        {
+            library?.Save();
+            ShuffleQueue?.Save();
         }
 
         private void MainForm_Load(object sender, EventArgs e)
@@ -505,6 +521,8 @@ namespace KoPlayer.Forms
             searchBarTimer.Dispose();
             searchLibraryTimer?.Stop();
             searchLibraryTimer?.Dispose();
+            saveTimer.Stop();
+            saveTimer.Dispose();
 
             trayIcon.Dispose();
             musicPlayer.Dispose();
