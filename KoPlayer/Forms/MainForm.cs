@@ -2058,5 +2058,48 @@ namespace KoPlayer.Forms
         }
 
         #endregion
+
+        private void exportPlaylistToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            
+            var dialog = new FolderBrowserDialog();
+
+            if (dialog.ShowDialog() == DialogResult.OK)
+            {
+                var exportDirectory = dialog.SelectedPath;
+                var info = new DirectoryInfo(exportDirectory);
+
+                foreach (var song in showingPlaylist.GetSongs())
+                {
+                    var fileName = song.Path.Split(new[] { Path.DirectorySeparatorChar }, StringSplitOptions.RemoveEmptyEntries).Last();
+
+                    var counter = 0;
+
+                    string GetFilePath(string newDir, string file, int i)
+                    {
+                        if (i == 0)
+                        {
+                            return $"{newDir}{Path.DirectorySeparatorChar}{file}";
+                        }
+
+                        var splitFile = file.Split(new[] { '.' }, StringSplitOptions.RemoveEmptyEntries);
+                        var extension = splitFile.Last();
+
+                        var newFileName = splitFile.Take(splitFile.Length - 1).Aggregate((p1, p2) => $"{p1}.{p2}") + $" ({i})." + extension;
+
+                        return $"{newDir}{Path.DirectorySeparatorChar}{newFileName}";
+                    }
+
+                    var newPath = GetFilePath(exportDirectory, fileName, counter);
+
+                    while (File.Exists(newPath))
+                    {
+                        newPath = GetFilePath(exportDirectory, fileName, ++counter);
+                    }
+                    
+                    File.Copy(song.Path, newPath);
+                }
+            }
+        }
     }
 }

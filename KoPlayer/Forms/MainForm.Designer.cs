@@ -30,8 +30,8 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -68,13 +68,14 @@
             this.albumArtBox = new System.Windows.Forms.PictureBox();
             this.songsBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.playlistBindingSource = new System.Windows.Forms.BindingSource(this.components);
+            this.exportPlaylistToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.songGridView)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.volumeTrackBar)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.playlistGridView)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.searchBar)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.albumArtBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.songsBindingSource)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.songGridView)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.playlistBindingSource)).BeginInit();
             this.SuspendLayout();
             // 
@@ -97,6 +98,7 @@
             this.setLibraryPathToolStripMenuItem,
             this.newPlaylistToolStripMenuItem,
             this.newRatingFilterPlaylistToolStripMenuItem,
+            this.exportPlaylistToolStripMenuItem,
             this.preferencesToolStripMenuItem,
             this.exitToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
@@ -199,6 +201,38 @@
             this.aboutToolStripMenuItem.Text = "About";
             this.aboutToolStripMenuItem.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
             // 
+            // songGridView
+            // 
+            this.songGridView.AllowDrop = true;
+            this.songGridView.AllowUserToAddRows = false;
+            this.songGridView.AllowUserToDeleteRows = false;
+            this.songGridView.AllowUserToOrderColumns = true;
+            this.songGridView.AllowUserToResizeRows = false;
+            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.ButtonFace;
+            this.songGridView.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle1;
+            this.songGridView.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.songGridView.BackgroundColor = System.Drawing.SystemColors.ButtonHighlight;
+            this.songGridView.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.None;
+            this.songGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
+            this.songGridView.EditMode = System.Windows.Forms.DataGridViewEditMode.EditProgrammatically;
+            this.songGridView.EnableDragDrop = true;
+            this.songGridView.Location = new System.Drawing.Point(193, 95);
+            this.songGridView.Name = "songGridView";
+            this.songGridView.ReadOnly = true;
+            this.songGridView.RowHeadersVisible = false;
+            this.songGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
+            this.songGridView.Size = new System.Drawing.Size(943, 526);
+            this.songGridView.TabIndex = 14;
+            this.songGridView.RowDrag += new System.Windows.Forms.ItemDragEventHandler(this.songGridView_RowDrag);
+            this.songGridView.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.songGridView_CellDoubleClick);
+            this.songGridView.ColumnHeaderMouseClick += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.songGridView_ColumnHeaderMouseClick);
+            this.songGridView.DragDrop += new System.Windows.Forms.DragEventHandler(this.songGridView_DragDrop);
+            this.songGridView.DragEnter += new System.Windows.Forms.DragEventHandler(this.songGridView_DragEnter);
+            this.songGridView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.songGridView_KeyDown);
+            this.songGridView.MouseDown += new System.Windows.Forms.MouseEventHandler(this.songGridView_MouseDown);
+            // 
             // volumeTrackBar
             // 
             this.volumeTrackBar.AutoSize = false;
@@ -206,8 +240,10 @@
             this.volumeTrackBar.Location = new System.Drawing.Point(193, 62);
             this.volumeTrackBar.Maximum = 1000;
             this.volumeTrackBar.Name = "volumeTrackBar";
+            this.volumeTrackBar.Player = null;
             this.volumeTrackBar.Size = new System.Drawing.Size(118, 27);
             this.volumeTrackBar.SmallChange = 25;
+            this.volumeTrackBar.SongGrid = null;
             this.volumeTrackBar.TabIndex = 5;
             this.volumeTrackBar.TickStyle = System.Windows.Forms.TickStyle.None;
             this.volumeTrackBar.Value = 100;
@@ -411,41 +447,17 @@
             this.albumArtBox.TabIndex = 3;
             this.albumArtBox.TabStop = false;
             // 
-            // songGridView
-            // 
-            this.songGridView.AllowDrop = true;
-            this.songGridView.AllowUserToAddRows = false;
-            this.songGridView.AllowUserToDeleteRows = false;
-            this.songGridView.AllowUserToOrderColumns = true;
-            this.songGridView.AllowUserToResizeRows = false;
-            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.ButtonFace;
-            this.songGridView.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle1;
-            this.songGridView.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.songGridView.BackgroundColor = System.Drawing.SystemColors.ButtonHighlight;
-            this.songGridView.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.None;
-            this.songGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
-            this.songGridView.EditMode = System.Windows.Forms.DataGridViewEditMode.EditProgrammatically;
-            this.songGridView.EnableDragDrop = true;
-            this.songGridView.Location = new System.Drawing.Point(193, 95);
-            this.songGridView.Name = "songGridView";
-            this.songGridView.ReadOnly = true;
-            this.songGridView.RowHeadersVisible = false;
-            this.songGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.songGridView.Size = new System.Drawing.Size(943, 526);
-            this.songGridView.TabIndex = 14;
-            this.songGridView.RowDrag += new System.Windows.Forms.ItemDragEventHandler(this.songGridView_RowDrag);
-            this.songGridView.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.songGridView_CellDoubleClick);
-            this.songGridView.ColumnHeaderMouseClick += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.songGridView_ColumnHeaderMouseClick);
-            this.songGridView.DragDrop += new System.Windows.Forms.DragEventHandler(this.songGridView_DragDrop);
-            this.songGridView.DragEnter += new System.Windows.Forms.DragEventHandler(this.songGridView_DragEnter);
-            this.songGridView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.songGridView_KeyDown);
-            this.songGridView.MouseDown += new System.Windows.Forms.MouseEventHandler(this.songGridView_MouseDown);
-            // 
             // playlistBindingSource
             // 
             this.playlistBindingSource.DataSource = typeof(KoPlayer.Lib.Playlist);
+            // 
+            // exportPlaylistToolStripMenuItem
+            // 
+            this.exportPlaylistToolStripMenuItem.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.exportPlaylistToolStripMenuItem.Name = "exportPlaylistToolStripMenuItem";
+            this.exportPlaylistToolStripMenuItem.Size = new System.Drawing.Size(204, 22);
+            this.exportPlaylistToolStripMenuItem.Text = "Export playlist to folder";
+            this.exportPlaylistToolStripMenuItem.Click += new System.EventHandler(this.exportPlaylistToolStripMenuItem_Click);
             // 
             // MainForm
             // 
@@ -479,12 +491,12 @@
             this.Resize += new System.EventHandler(this.MainForm_Resize);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.songGridView)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.volumeTrackBar)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.playlistGridView)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.searchBar)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.albumArtBox)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.songsBindingSource)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.songGridView)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.playlistBindingSource)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -529,5 +541,6 @@
         private Controls.KoPlayerButton previousButton;
         private Controls.KoPlayerButton playpauseButton;
         private Controls.KoPlayerButton nextButton;
+        private System.Windows.Forms.ToolStripMenuItem exportPlaylistToolStripMenuItem;
     }
 }
